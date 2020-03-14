@@ -8,6 +8,8 @@ class LessonDB {
   double mainVideoStartTime;
   double mainVideoEndTime;
 
+  var db_reference;
+
   List<String> labelsList;
   List<QuestionDB> questionsList;
 
@@ -22,6 +24,11 @@ class LessonDB {
 
     this.questionsList =  new List();
     this.labelsList = _labelsList;
+    this.db_reference = null;
+  }
+
+  String getDBReference() {
+    return this.db_reference;
   }
 
   String getMainVideoURL() {
@@ -49,6 +56,10 @@ class LessonDB {
 
   List<QuestionDB> getQuestionsList() {
     return this.questionsList;
+  }
+
+  void setDBReference(var arg) {
+    this.db_reference = arg;
   }
 
   void setMainVideoURL(String arg) {
