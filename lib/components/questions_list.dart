@@ -33,54 +33,52 @@ class _QuestionsListState extends State<QuestionsList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 10.0,
-          ),
-          Center(
-            child: Text(
-              'Questions',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
+    return Column(
+      children: <Widget>[
+        SizedBox(
+          height: 10.0,
+        ),
+        Center(
+          child: Text(
+            'Questions',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(
-            height: 15.0,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.0),
-            child: Column(
-              children: List.generate(
-                questionsTemp.length,
-                (index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.lightBlue,
-                        width: 1.0,
-                      ),
+        ),
+        SizedBox(
+          height: 15.0,
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.0),
+          child: Column(
+            children: List.generate(
+              questionsTemp.length,
+              (index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.lightBlue,
+                      width: 1.0,
                     ),
-                    key: ValueKey('value${questionsTemp[index]}'),
-                    child: ListTile(
-                      title: Text('Question number - ${questionsTemp[index]}'),
-                      trailing: Icon(Icons.keyboard_arrow_right),
-                    ),
-                  );
-                },
-              ),
+                  ),
+//                  key: ValueKey('value${questionsTemp[index]}'),
+                  child: ListTile(
+                    title: Text('Question number - ${questionsTemp[index]}'),
+                    trailing: Icon(Icons.keyboard_arrow_right),
+                  ),
+                );
+              },
             ),
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: addNewQuestion,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
+        ),
+        FloatingActionButton(
+          onPressed: addNewQuestion,
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        ),
+      ],
     );
   }
 }

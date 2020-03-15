@@ -3,12 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:temp_project/components/questions_list.dart';
 import 'package:temp_project/utilites/lesson_objects.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:temp_project/components/video_creator_details.dart';
 import 'package:temp_project/utilites/constants.dart';
 import 'package:temp_project/components/expanded_chekbox_list.dart';
-import 'package:temp_project/components/questions_list.dart';
-import 'dart:convert' as convert;
-import 'package:http/http.dart' as http;
 import 'package:temp_project/services/youtube_helper.dart';
 
 class VideoCreatorScreen extends StatefulWidget {
