@@ -4,6 +4,7 @@ import 'package:temp_project/utilites/lesson_objects.dart';
 import 'package:temp_project/components/lesson_card.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
+import 'package:temp_project/database/question_db.dart';
 
 import 'package:temp_project/screens/video_creator_screen.dart';
 
@@ -16,16 +17,24 @@ class LessonsListScreen  extends StatefulWidget{
 }
 class _LessonsListScreenState  extends State<LessonsListScreen>{
   //the search of a word
-  DatabaseUtilities db;
+  DatabaseUtilities db = new DatabaseUtilities();
   var _searceView=new TextEditingController();
-  List<LessonDB> all_lesson;
+  List<LessonDB> all_lesson = List<LessonDB>();
 
 
 
   @override
   void initState(){
+    _getThingsOnStartup().then((value){
+    });
     super.initState();
-    all_lesson.addAll(db.getLessonsFromDB());
+
+  }
+
+  Future _getThingsOnStartup() async {
+    List<LessonDB> list = await db.getLessonsFromDB();
+    all_lesson.addAll(list);
+
   }
 
   void filterSearchResults(String query) {
@@ -42,9 +51,9 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
       });
       return;
     } else {
-      setState(() {
+      setState(() async{
         all_lesson.clear();
-        all_lesson.addAll(db.getLessonsFromDB());
+        all_lesson.addAll(await db.getLessonsFromDB());
       });
     }
   }
