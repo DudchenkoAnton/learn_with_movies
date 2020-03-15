@@ -21,8 +21,6 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
   var _searceView=new TextEditingController();
   List<LessonDB> all_lesson = List<LessonDB>();
 
-
-
   @override
   void initState(){
     _getThingsOnStartup().then((value){
@@ -33,8 +31,11 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
 
   Future _getThingsOnStartup() async {
     List<LessonDB> list = await db.getLessonsFromDB();
+    all_lesson.clear();
     all_lesson.addAll(list);
-
+    setState(() {
+      build(context);
+    });
   }
 
   void filterSearchResults(String query) {
