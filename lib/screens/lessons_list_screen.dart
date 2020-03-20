@@ -4,7 +4,8 @@ import 'package:temp_project/utilites/lesson_objects.dart';
 import 'package:temp_project/components/lesson_card.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
-
+import 'package:progress_dialog/progress_dialog.dart';
+import 'package:temp_project/database/question_db.dart';
 import 'package:temp_project/screens/video_creator_screen.dart';
 
 class LessonsListScreen  extends StatefulWidget{
@@ -19,13 +20,43 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
   DatabaseUtilities db;
   var _searceView=new TextEditingController();
   List<LessonDB> all_lesson;
-
+  ProgressDialog pr;
 
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    all_lesson.addAll(db.getLessonsFromDB());
+    db = new DatabaseUtilities();
+
+    LessonDB l1 = new LessonDB("rrr", "ttt", "fff bbb",
+        2.34, 5.32, ["uouou", "oioio", "opopo"]);
+    l1.addQuestion(
+        new QuestionDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
+            "Some question ?",
+            "Some answer",
+            6.19,
+            7.20)
+    );
+
+    l1.addQuestion(
+        new QuestionDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
+            "Some question 2 ?",
+            "Some answer 2",
+            9.33,
+            11.56)
+    );
+
+    db.addLessonToDB(l1);
+    _lessonGetDB();
+  }
+  Future _lessonGetDB() async{
+    List<LessonDB> lessonTemp=new List();
+    lessonTemp= await db.getLessonsFromDB();
+
+    setState(() {
+      all_lesson=lessonTemp;
+    });
+
   }
 
   void filterSearchResults(String query) {
@@ -44,7 +75,7 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
     } else {
       setState(() {
         all_lesson.clear();
-        all_lesson.addAll(db.getLessonsFromDB());
+       // all_lesson.addAll(db.getLessonsFromDB());
       });
     }
   }
@@ -52,15 +83,32 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
 
   @override
   Widget build(BuildContext context){
+    pr = new ProgressDialog(context);
+    pr.style(
+        message: 'Please Waiting...',
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: CircularProgressIndicator(),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        progress: 0.0,
+        maxProgress: 100.0,
+        progressTextStyle: TextStyle(
+            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
+    );
     return Scaffold(
       appBar: new AppBar(
         title: new Text("Create Lesson with movies"),
       ),
-      body: Container(
+      body:
+      Container(
          margin: EdgeInsets.only(left: 10.0,right: 10.0,top: 10.0),
          child:Column(
            children: <Widget>[
              _createSearchView(),
+             //_waiting(),
              _CardView(),
            ],
          )
@@ -76,7 +124,27 @@ class _LessonsListScreenState  extends State<LessonsListScreen>{
   }
 
 
+  Widget _waiting(){
+    return new Scaffold(
+    body: Center(child: RaisedButton(
+        child: Text('Show dialog and go to next screen',
+            style: TextStyle(color: Colors.white)),
+        color: Colors.blueAccent,
+        onPressed: () {
+  pr.show();
+  Future.delayed(Duration(seconds: 3)).then((value) {
+  pr.hide().whenComplete(() {
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (BuildContext context) => VideoCreatorScreen()));},
+  );
+  }
+  );
+  }
+  )
+  ),
+  );
 
+  }
 
 
   Widget _CardView(){

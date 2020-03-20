@@ -49,71 +49,50 @@ class _card_movieState extends State<card_movie> {
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child:
-            Row(children: <Widget>[
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
               Container(
               height: 90.0,
-              width: 100.0,
+              width: 110.0,
               decoration: BoxDecoration(
                 image: DecorationImage(
                     image:NetworkImage(url_image(widget.videoObject.getMainVideoURL())), fit: BoxFit.cover),
               ),
               ),
-              SizedBox(
-                width: 20.0,
-              ),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Column(
-                        //crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Text(
+                Flexible(child:Text(
                             widget.videoObject.getMainVideoName(),
-                            style: TextStyle(fontSize: 20.0, color: Colors.black),
-                            textAlign: TextAlign.start,
-                          ),
-                          SizedBox(
-                            height: 8.0,
-                          ),
-                          Text(
+                            style: TextStyle(fontSize: 18.0, color: Colors.black,fontWeight: FontWeight.bold)
+                          ),),
+                  SizedBox(height: 4),
+                  Text(
                             calc_time(widget.videoObject.getMainVideoStartTime(),
                                 widget.videoObject.getMainVideoEndTime())+' min',
                             style: TextStyle(fontSize: 15.0, color: Colors.black),
-                            textAlign: TextAlign.start,
-                          ),
-                ],
-              )
-            ],
-                  ),
-                  SizedBox(
-                    height: 10.0,
                   ),
                   Row(
                     children: <Widget>[
-                      SizedBox(
-                        width: 110.0,
-                      ),
                       IconButton(
                         onPressed: this.widget.edit,
                         icon: Icon(Icons.edit),
                       ),
-                      SizedBox(
-                        width: 2.0,
-                      ),
+
                       IconButton(
                         onPressed: this.widget.delete,
                         icon: Icon(Icons.delete),
                       ),
                     ],
                   )
-
-
-            ]
-              ),
-              ],
-            ),
-      ),
+                ],
+                  ),
+                  ]
+                  ),
+              )
     );
   }
 }
