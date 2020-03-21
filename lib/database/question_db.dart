@@ -54,4 +54,16 @@ class QuestionDB {
     this.videoEndTime = arg;
   }
 
+  Map<String,dynamic> toJson() {
+    //return [this.videoURL, this.question, this.answer,
+      //this.videoStartTime, this.videoEndTime];
+    Map<String,dynamic> map = new Map<String,dynamic>();
+    map["videoURL"] = this.videoURL;
+    map["question"] = this.question;
+    map["answer"] = this.answer;
+    map["videoStartTime"] = this.videoStartTime;
+    map["videoEndTime"] = this.videoEndTime;
+    return map;
+  }
+
 }

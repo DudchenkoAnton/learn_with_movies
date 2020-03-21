@@ -1,13 +1,56 @@
 import 'lesson_db.dart';
 import 'question_db.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseUtilities {
 
-  void addLessonToDB(LessonDB lesson) {
-    // implementation shall be supplied in advance.
+  final databaseReference = Firestore.instance;
+  List<LessonDB> lessonsList = new List<LessonDB>();
+
+  Future<bool> deleteLessonFromDB(LessonDB lesson) async {
+
+    var lesson_ref = lesson.getDBReference();
+
+    if (lesson_ref == null) {
+      return false;
+    }
+
+    try {
+      databaseReference
+          .collection('lessons')
+          .document(lesson_ref)
+          .delete();
+      return true;
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
-  LessonDB getLessonByID(String id) {
+  void addLessonToDB(LessonDB lesson) async {
+
+    DocumentReference ref = await databaseReference.collection("lessons")
+        .add({
+      'mainVideoURL': lesson.getMainVideoURL(),
+      'mainVideoName': lesson.getMainVideoName(),
+      'mainVideoDetails': lesson.getMainVideoDetails(),
+      'mainVideoStartTime': lesson.getMainVideoStartTime(),
+      'mainVideoEndTime': lesson.getMainVideoEndTime(),
+      'labels': lesson.getLabelsList(),
+    });
+
+    for (QuestionDB question in lesson.getQuestionsList()) {
+      databaseReference.collection('lessons').document(ref.documentID).
+      collection('questions').add({
+        'videoURL': question.getVideoURL(),
+        'question': question.getQuestion(),
+        'answer': question.getAnswer(),
+        'videoStartTime': question.getVideoStartTime(),
+        'videoEndTime': question.getVideoEndTime()
+      });
+    }
+  }
+
+  LessonDB getLessonByString(String str) {
 
     List<String> labels1 = new List();
     labels1.add("Entertainment");
@@ -44,70 +87,36 @@ class DatabaseUtilities {
     return l1;
   }
 
+  Future<List<LessonDB>>  getLessonsFromDB() async {
+    QuerySnapshot querySnapshot = await Firestore.instance.collection("lessons").getDocuments();
+    var list = querySnapshot.documents;
 
-  List<LessonDB> getLessonsFromDB() {
-    List<LessonDB> lessonsList =  new List();
+    this.lessonsList =  new List();
+    for (var cur_row in list) {
+      var data = Map<String, dynamic>.from(cur_row.data);
 
-    List<String> labels1 = new List();
-    labels1.add("Entertainment");
+      QuerySnapshot querySnapshot = await Firestore.instance.
+      collection("lessons").document(cur_row.documentID).
+      collection("questions").getDocuments();
 
-    LessonDB l1 = new LessonDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
-        "Friends: Top 20 Funniest Moments | TBS",
-        "Pull up a couch and relax at Central Perk, "
-            "where six Friends gather to talk about life "
-            "and love. Friends tells the story of siblings "
-            "Ross (David Schwimmer) and Monica (Courteney Cox) "
-            "Geller, and their friends, Chandler Bing (Matthew Perry), "
-            "Phoebe Buffay (Lisa Kudrow), Joey Tribbiani (Matt LeBlanc), "
-            "and Rachel Green (Jennifer Aniston).",
-        0,
-        30,
-        labels1);
+      var list = querySnapshot.documents;
 
-    l1.addQuestion(
-        new QuestionDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
-        "Some question ?",
-        "Some answer",
-        6.19,
-        7.20)
-    );
+      List<String> labels = (data["labels"] as List).map((s) => (s as String)).toList();
 
-    l1.addQuestion(
-        new QuestionDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
-            "Some question 2 ?",
-            "Some answer 2",
-            9.33,
-            11.56)
-    );
+      LessonDB lesson = new LessonDB(data["mainVideoURL"],
+          data["mainVideoName"], data["mainVideoDetails"],
+          data["mainVideoStartTime"], data["mainVideoEndTime"],
+          labels);
+      lesson.setDBReference(cur_row.documentID);
 
-    LessonDB l2 = new LessonDB("https://www.youtube.com/watch?v=Xvv4JB3rXsA",
-        "Best Comebacks | House M.D.",
-        "Some of the best comebacks, replies and insults dealt "
-            "by Dr. Gregory House!",
-        1,
-        5,
-        labels1);
+      for (var elm in list) {
+        var data = Map<String, dynamic>.from(elm.data);
+        lesson.addQuestion(new QuestionDB(data["videoURL"], data["question"],
+            data["answer"], data["videoStartTime"], data["videoEndTime"]));
+      }
 
-    l2.addQuestion(
-        new QuestionDB("https://www.youtube.com/watch?v=Xvv4JB3rXsA",
-            "Some question ?",
-            "Some answer",
-            1.32,
-            2.42)
-    );
-
-    l2.addQuestion(
-        new QuestionDB("https://www.youtube.com/watch?v=Xvv4JB3rXsA",
-            "Some question 2 ?",
-            "Some answer 2",
-            3.11,
-            4.47)
-    );
-
-    lessonsList.add(l1);
-    lessonsList.add(l2);
-    
-    return lessonsList;
+      this.lessonsList.add(lesson);
+    }
+    return this.lessonsList;
   }
-
 }
