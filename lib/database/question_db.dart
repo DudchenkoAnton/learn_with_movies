@@ -1,24 +1,30 @@
 class QuestionDB {
-
   String videoURL;
   String question;
   String answer;
-  double videoStartTime;
-  double videoEndTime;
+  int videoStartPoint;
+  int videoEndPoint;
 
-  QuestionDB(String _videoURL, String _question, String _answer,
-      double _videoStartTime, double _videoEndTime) {
+  QuestionDB(
+      {this.videoURL,
+      this.question,
+      this.answer,
+      this.videoEndPoint,
+      this.videoStartPoint});
 
-    this.videoURL = _videoURL;
-    this.question = _question;
-    this.answer = _answer;
-    this.videoStartTime = _videoStartTime;
-    this.videoEndTime = _videoEndTime;
-  }
+//  QuestionDB(String _videoURL, String _question, String _answer,
+//      double _videoStartTime, double _videoEndTime) {
+//    this.videoURL = _videoURL;
+//    this.question = _question;
+//    this.answer = _answer;
+//    this.videoStartTime = _videoStartTime;
+//    this.videoEndTime = _videoEndTime;
+//  }
 
   String getVideoURL() {
     return this.videoURL;
   }
+
   String getQuestion() {
     return this.question;
   }
@@ -27,17 +33,18 @@ class QuestionDB {
     return this.answer;
   }
 
-  double getVideoStartTime() {
-    return this.videoStartTime;
+  int getVideoStartTime() {
+    return this.videoStartPoint;
   }
 
-  double getVideoEndTime() {
-    return this.videoEndTime;
+  int getVideoEndTime() {
+    return this.videoEndPoint;
   }
 
   void setVideoURL(String arg) {
     this.videoURL = arg;
   }
+
   void setQuestion(String arg) {
     this.question = arg;
   }
@@ -46,24 +53,23 @@ class QuestionDB {
     this.answer = arg;
   }
 
-  void setVideoStartTime(double arg) {
-    this.videoStartTime = arg;
+  void setVideoStartTime(int arg) {
+    this.videoStartPoint = arg;
   }
 
-  void setVideoEndTime(double arg) {
-    this.videoEndTime = arg;
+  void setVideoEndTime(int arg) {
+    this.videoEndPoint = arg;
   }
 
-  Map<String,dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     //return [this.videoURL, this.question, this.answer,
-      //this.videoStartTime, this.videoEndTime];
-    Map<String,dynamic> map = new Map<String,dynamic>();
+    //this.videoStartTime, this.videoEndTime];
+    Map<String, dynamic> map = new Map<String, dynamic>();
     map["videoURL"] = this.videoURL;
     map["question"] = this.question;
     map["answer"] = this.answer;
-    map["videoStartTime"] = this.videoStartTime;
-    map["videoEndTime"] = this.videoEndTime;
+    map["videoStartTime"] = this.videoStartPoint;
+    map["videoEndTime"] = this.videoEndPoint;
     return map;
   }
-
 }

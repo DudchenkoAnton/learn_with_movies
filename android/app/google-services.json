@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "993617153811",
+    "firebase_url": "https://learnwithmovies-b9546.firebaseio.com",
+    "project_id": "learnwithmovies-b9546",
+    "storage_bucket": "learnwithmovies-b9546.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993617153811:android:accbb294da1a515c21d4e6",
+        "android_client_info": {
+          "package_name": "com.lwmuniversityproject.learnwithmovies"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993617153811-htv8lrmu2fvt2ks5ruj7ls5e9kg3h08p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGWvXxvhjPe02S7CbN2xmoB8eHu85Q0sA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993617153811-htv8lrmu2fvt2ks5ruj7ls5e9kg3h08p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

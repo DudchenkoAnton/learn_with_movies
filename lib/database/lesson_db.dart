@@ -1,53 +1,55 @@
 import 'question_db.dart';
 
 class LessonDB {
-
-  String mainVideoURL;
-  String mainVideoName;
-  String mainVideoDetails;
-  double mainVideoStartTime;
-  double mainVideoEndTime;
-
-  var db_reference;
-
+  String videoURL;
+  String lessonName;
+  String lessonDetails;
+  int videoStartPoint;
+  int videoEndPoint;
   List<String> labelsList;
-  List<QuestionDB> questionsList;
+  List<QuestionDB> questionsList = [];
+  String youtubeOriginalName;
+  String videoID;
+  String dbDocumentID;
 
-  LessonDB(String _mainVideoURL, String _mainVideoName, String _mainVideoDetails,
-      double _mainVideoStartTime, double _mainVideoEndTime, var _labelsList) {
+  LessonDB({
+    this.videoURL,
+    this.lessonName,
+    this.lessonDetails,
+    this.videoStartPoint,
+    this.videoEndPoint,
+    this.labelsList,
+    this.youtubeOriginalName,
+    this.videoID,
+    this.questionsList,
+  });
 
-    this.mainVideoURL = _mainVideoURL;
-    this.mainVideoName = _mainVideoName;
-    this.mainVideoDetails = _mainVideoDetails;
-    this.mainVideoStartTime = _mainVideoStartTime;
-    this.mainVideoEndTime = _mainVideoEndTime;
-
-    this.questionsList =  new List();
-    this.labelsList = _labelsList;
-    this.db_reference = null;
+  String getVideoID() {
+    return this.videoID;
   }
 
   String getDBReference() {
-    return this.db_reference;
+    return this.dbDocumentID;
   }
 
-  String getMainVideoURL() {
-    return this.mainVideoURL;
-  }
-  String getMainVideoName() {
-    return this.mainVideoName;
+  String getVideoURL() {
+    return this.videoURL;
   }
 
-  String getMainVideoDetails() {
-    return this.mainVideoDetails;
+  String getLessonName() {
+    return this.lessonName;
   }
 
-  double getMainVideoStartTime() {
-    return this.mainVideoStartTime;
+  String getLessonDetails() {
+    return this.lessonDetails;
   }
 
-  double getMainVideoEndTime() {
-    return this.mainVideoEndTime;
+  int getVideoStartPoint() {
+    return this.videoStartPoint;
+  }
+
+  int getVideoEndPoint() {
+    return this.videoEndPoint;
   }
 
   List<String> getLabelsList() {
@@ -59,34 +61,61 @@ class LessonDB {
   }
 
   void setDBReference(var arg) {
-    this.db_reference = arg;
+    this.dbDocumentID = arg;
   }
 
-  void setMainVideoURL(String arg) {
-    this.mainVideoURL = arg;
-  }
-  void setMainVideoName(String arg) {
-    this.mainVideoName = arg;
+  void setVideoURL(String arg) {
+    this.videoURL = arg;
   }
 
-  void seMainVideoDetails(String arg) {
-    this.mainVideoDetails = arg;
+  void setLessonName(String arg) {
+    this.lessonName = arg;
   }
 
-  void setMainVideoStartTime(double arg) {
-    this.mainVideoStartTime = arg;
+  void setLessonDetails(String arg) {
+    this.lessonDetails = arg;
   }
 
-  void setMainVideoEndTime(double arg) {
-    this.mainVideoEndTime = arg;
+  void setVideoStartPoint(int arg) {
+    this.videoStartPoint = arg;
+  }
+
+  void setVideoEndPoint(int arg) {
+    this.videoEndPoint = arg;
   }
 
   void addLabel(String _label) {
     this.labelsList.add(_label);
   }
 
+  void removeLabel(String _label) {
+    if (labelsList.indexOf(_label) != -1) {
+      labelsList.remove(_label);
+    }
+  }
+
   void addQuestion(QuestionDB _question) {
+    if (questionsList == null) {
+      questionsList = [];
+    }
     this.questionsList.add(_question);
   }
 
+  void setYoutubeOriginalName(String name) {
+    this.youtubeOriginalName = name;
+  }
+
+  void setVideoID(String _videoID) {
+    this.videoID = _videoID;
+  }
+
+  void printData() {
+    print('Start debug printing:');
+    print(lessonName);
+    print(videoURL);
+    print(videoStartPoint);
+    print(videoEndPoint);
+    print(labelsList);
+    print(youtubeOriginalName);
+  }
 }

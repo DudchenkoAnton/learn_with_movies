@@ -3,22 +3,31 @@ import 'question_db.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseUtilities {
-
   final databaseReference = Firestore.instance;
   List<LessonDB> lessonsList = new List<LessonDB>();
 
   Future<bool> deleteLessonFromDB(LessonDB lesson) async {
+    print(lesson.getDBReference());
+    var lessonReference = lesson.getDBReference();
 
-    var lesson_ref = lesson.getDBReference();
-
-    if (lesson_ref == null) {
+    if (lessonReference == null) {
       return false;
     }
 
     try {
       databaseReference
           .collection('lessons')
-          .document(lesson_ref)
+          .document(lessonReference)
+          .collection('questions')
+          .getDocuments()
+          .then((snapshot) {
+        for (DocumentSnapshot ds in snapshot.documents) {
+          ds.reference.delete();
+        }
+      });
+      databaseReference
+          .collection('lessons')
+          .document(lessonReference)
           .delete();
       return true;
     } catch (e) {
@@ -26,93 +35,105 @@ class DatabaseUtilities {
     }
   }
 
-  void addLessonToDB(LessonDB lesson) async {
-
-    DocumentReference ref = await databaseReference.collection("lessons")
-        .add({
-      'mainVideoURL': lesson.getMainVideoURL(),
-      'mainVideoName': lesson.getMainVideoName(),
-      'mainVideoDetails': lesson.getMainVideoDetails(),
-      'mainVideoStartTime': lesson.getMainVideoStartTime(),
-      'mainVideoEndTime': lesson.getMainVideoEndTime(),
+  Future<String> addLessonToDB(LessonDB lesson) async {
+    DocumentReference ref = await databaseReference.collection("lessons").add({
+      'videoURL': lesson.getVideoURL(),
+      'lessonName': lesson.getLessonName(),
+      'videoStartPoint': lesson.getVideoStartPoint(),
+      'videoEndPoint': lesson.getVideoEndPoint(),
       'labels': lesson.getLabelsList(),
     });
 
     for (QuestionDB question in lesson.getQuestionsList()) {
-      databaseReference.collection('lessons').document(ref.documentID).
-      collection('questions').add({
+      databaseReference
+          .collection('lessons')
+          .document(ref.documentID)
+          .collection('questions')
+          .add({
         'videoURL': question.getVideoURL(),
         'question': question.getQuestion(),
         'answer': question.getAnswer(),
-        'videoStartTime': question.getVideoStartTime(),
-        'videoEndTime': question.getVideoEndTime()
+        'videoStartPoint': question.getVideoStartTime(),
+        'videoEndPoint': question.getVideoEndTime()
       });
     }
+
+    return ref.documentID;
   }
 
   LessonDB getLessonByString(String str) {
-
     List<String> labels1 = new List();
     labels1.add("Entertainment");
 
-    LessonDB l1 = new LessonDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
-        "Friends: Top 20 Funniest Moments | TBS",
-        "Pull up a couch and relax at Central Perk, "
-            "where six Friends gather to talk about life "
-            "and love. Friends tells the story of siblings "
-            "Ross (David Schwimmer) and Monica (Courteney Cox) "
-            "Geller, and their friends, Chandler Bing (Matthew Perry), "
-            "Phoebe Buffay (Lisa Kudrow), Joey Tribbiani (Matt LeBlanc), "
-            "and Rachel Green (Jennifer Aniston).",
-        0,
-        30,
-        labels1);
+    LessonDB l1 = LessonDB(
+        videoURL: "https://www.youtube.com/watch?v=xHcPhdZBngw",
+        lessonName: "Friends: Top 20 Funniest Moments | TBS",
+        lessonDetails: 'Pull up a couch and relax at Central Perk,'
+            'where six Friends gather to talk about life '
+            'and love. Friends tells the story of siblings '
+            'Ross (David Schwimmer) and Monica (Courteney Cox) '
+            'Geller, and their friends, Chandler Bing (Matthew Perry), '
+            'Phoebe Buffay (Lisa Kudrow), Joey Tribbiani (Matt LeBlanc), '
+            'and Rachel Green (Jennifer Aniston).',
+        videoStartPoint: 0,
+        videoEndPoint: 30,
+        labelsList: labels1);
 
-    l1.addQuestion(
-        new QuestionDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
-            "Some question ?",
-            "Some answer",
-            6.19,
-            7.20)
-    );
+    l1.addQuestion(QuestionDB(
+        videoURL: "https://www.youtube.com/watch?v=xHcPhdZBngw",
+        question: "Some question",
+        answer: "some answer",
+        videoStartPoint: 6,
+        videoEndPoint: 15));
 
-    l1.addQuestion(
-        new QuestionDB("https://www.youtube.com/watch?v=xHcPhdZBngw",
-            "Some question 2 ?",
-            "Some answer 2",
-            9.33,
-            11.56)
-    );
+    l1.addQuestion(QuestionDB(
+        videoURL: "https://www.youtube.com/watch?v=xHcPhdZBngw",
+        question: "Some question 2",
+        answer: "Some answer 2",
+        videoStartPoint: 18,
+        videoEndPoint: 23));
 
     return l1;
   }
 
-  Future<List<LessonDB>>  getLessonsFromDB() async {
-    QuerySnapshot querySnapshot = await Firestore.instance.collection("lessons").getDocuments();
-    var list = querySnapshot.documents;
+  Future<List<LessonDB>> getLessonsFromDB() async {
+    QuerySnapshot querySnapshot =
+        await Firestore.instance.collection("lessons").getDocuments();
+    var arrivedLessonsList = querySnapshot.documents;
 
-    this.lessonsList =  new List();
-    for (var cur_row in list) {
-      var data = Map<String, dynamic>.from(cur_row.data);
+    this.lessonsList = new List();
+    for (var currentRow in arrivedLessonsList) {
+      var data = Map<String, dynamic>.from(currentRow.data);
 
-      QuerySnapshot querySnapshot = await Firestore.instance.
-      collection("lessons").document(cur_row.documentID).
-      collection("questions").getDocuments();
+      QuerySnapshot querySnapshot = await Firestore.instance
+          .collection("lessons")
+          .document(currentRow.documentID)
+          .collection("questions")
+          .getDocuments();
 
-      var list = querySnapshot.documents;
+      var arrivedQuestionsList = querySnapshot.documents;
 
-      List<String> labels = (data["labels"] as List).map((s) => (s as String)).toList();
+      List<String> labels =
+          (data["labels"] as List).map((s) => (s as String)).toList();
 
-      LessonDB lesson = new LessonDB(data["mainVideoURL"],
-          data["mainVideoName"], data["mainVideoDetails"],
-          data["mainVideoStartTime"], data["mainVideoEndTime"],
-          labels);
-      lesson.setDBReference(cur_row.documentID);
+      LessonDB lesson = LessonDB(
+        videoURL: data['videoURL'],
+        lessonName: data['lessonName'],
+        videoStartPoint: data['videoStartPoint'],
+        videoEndPoint: data['videoEndPoint'],
+        labelsList: labels,
+      );
 
-      for (var elm in list) {
+      lesson.setDBReference(currentRow.documentID);
+
+      for (var elm in arrivedQuestionsList) {
         var data = Map<String, dynamic>.from(elm.data);
-        lesson.addQuestion(new QuestionDB(data["videoURL"], data["question"],
-            data["answer"], data["videoStartTime"], data["videoEndTime"]));
+        lesson.addQuestion(QuestionDB(
+            videoURL: data['videoURL'],
+            question: data['question'],
+            answer: data['answer'],
+            videoStartPoint: data['videoStartTime'],
+            videoEndPoint: data['videoEndPoint']));
       }
 
       this.lessonsList.add(lesson);
