@@ -11,6 +11,7 @@ import 'package:temp_project/services/youtube_helper.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:temp_project/components/video_range_slider.dart';
 
 class VideoCreatorScreen extends StatefulWidget {
   static const String id = 'video_creator_screen';
@@ -30,12 +31,16 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
   bool copyNameCheckBoxValue = false;
   Widget _myAnimatedWidget = Container();
   YoutubeNetworkHelper youtubeHelper;
-  int startPointValue = 0;
-  int endPointValue = 7200;
+  List<Duration> startPointValue = [Duration(seconds: 0)];
+  List<Duration> endPointValue = [Duration(seconds: 7200)];
+  Duration videoLength = Duration(seconds: 10);
   bool showSpinner = false;
   bool canReloadVideo = false;
   List<QuestionDataContainer> _questionsList = [];
   DatabaseUtilities dbHelper = DatabaseUtilities();
+  bool editingMode = false;
+  TextEditingController _lessonNameFieldController = TextEditingController();
+  TextEditingController _videoUrlTextController = TextEditingController();
 
   List<bool> checkBoxValues = [false, false, false, false, false];
   List<String> checkBoxLabels = [
@@ -51,8 +56,8 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
   void playSelectedSegmentListener() {
-    Duration startPoint = Duration(seconds: startPointValue);
-    Duration endPoint = Duration(seconds: endPointValue);
+    Duration startPoint = startPointValue[0];
+    Duration endPoint = endPointValue[0];
 
     if (_youtubePlayerController.value.position < startPoint) {
       _youtubePlayerController.seekTo(startPoint);
@@ -68,13 +73,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     String videoID;
     showSpinner = true;
 
-    if (!initial) {
-      videoID = YoutubePlayer.convertUrlToId(url);
-      if (videoID == null) {
-        // Todo: show message to user, that url is not valid
-        loadingFailed = true;
-        canReloadVideo = true;
-      }
+    videoID = YoutubePlayer.convertUrlToId(url);
+    if (videoID == null) {
+      // Todo: show message to user, that url is not valid
+      loadingFailed = true;
+      canReloadVideo = true;
     }
 
     if (!loadingFailed && !initial) {
@@ -88,6 +91,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
       }
     }
 
+    print('Got to creating youtuvbe controller');
+    print(_youtubePlayerController);
+    print(loadingFailed);
     if (_youtubePlayerController == null && !loadingFailed) {
       try {
         _youtubePlayerController = YoutubePlayerController(
@@ -128,6 +134,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
 
   void updateVideoProvided() {
     videoProvided = true;
+    startPointValue[0] = Duration(seconds: currentLesson.getVideoStartPoint());
+    endPointValue[0] = Duration(seconds: currentLesson.getVideoEndPoint());
+    videoLength = Duration(
+        seconds: currentLesson.getVideoEndPoint() -
+            currentLesson.getVideoStartPoint());
   }
 
   void updateVideoNotProvided() {
@@ -198,26 +209,42 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     }
   }
 
-  void rangeSelectionFunction(RangeValues newRange) {
-//    if (videoProvided) {
-//      int videoLength = (widget.videoData.end - widget.videoData.start).toInt();
-//
-//      setState(() {
-//        selectedRange = newRange;
-//        startPointValue = (videoLength * newRange.start).round();
-//        endPointValue = (videoLength * newRange.end).round();
-//      });
-//    }
+  bool allDataIsEntered() {
+    print(currentLesson);
+
+    if (!videoProvided ||
+        currentLesson.lessonName == null ||
+        currentLesson.lessonName == '' ||
+        currentLesson.questionsList.length == 0 ||
+        currentLesson.labelsList.length == 0) {
+      return false;
+    }
+
+    return true;
   }
 
   void saveAndExit() async {
+    if (!allDataIsEntered()) {
+      return;
+    }
     showSpinner = true;
     if (videoProvided) {
-      String documentID = await dbHelper.addLessonToDB(currentLesson);
-      currentLesson.setDBReference(documentID);
+      if (!editingMode) {
+        String documentID = await dbHelper.addLessonToDB(currentLesson);
+        currentLesson.setDBReference(documentID);
+      } else {
+        currentLesson = await dbHelper.editLessonInDB(currentLesson);
+      }
       Navigator.pop(context, currentLesson);
     }
     showSpinner = false;
+  }
+
+  void initializeData() {
+    currentLesson = widget.videoData;
+    _videoUrlTextController.text = widget.videoData.videoURL;
+    _lessonNameFieldController.text = widget.videoData.lessonName;
+    updateQuestionListOnScreen();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,10 +260,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     if (widget.videoData == null) {
       currentLesson = LessonDB(labelsList: [], questionsList: []);
     } else {
+      editingMode = true;
+      initializeData();
       // Todo: this print will be deleted
       widget.videoData.printData();
       url = widget.videoData.getVideoURL();
-      currentLesson = widget.videoData;
       loadVideo(url, true);
     }
   }
@@ -299,9 +327,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                             children: <Widget>[
                               Expanded(
                                 child: TextField(
+                                  controller: _videoUrlTextController,
                                   onChanged: (value) {
                                     enteredURL = value;
-                                    print(enteredURL);
                                   },
                                   decoration: kTextFieldDecoration.copyWith(
                                     hintText: 'Enter video link',
@@ -312,7 +340,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                               // Todo: write callback, that removes text, entered to link
                               RoundedIconButton(
                                 icon: Icons.delete,
-                                onPressed: null,
+                                onPressed: () {
+                                  _videoUrlTextController.text = '';
+                                },
                               ),
                             ]),
                         SizedBox(height: 8.0),
@@ -353,10 +383,12 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                         ),
                         SizedBox(height: 8.0),
                         TextField(
+                          controller: _lessonNameFieldController,
+                          enabled: !copyNameCheckBoxValue && videoProvided,
                           onChanged: (value) {
-                            currentLesson.setLessonName(value);
+                            currentLesson.lessonName =
+                                _lessonNameFieldController.text;
                           },
-                          enabled: !copyNameCheckBoxValue,
                           decoration: kTextFieldDecoration.copyWith(
                             hintText: 'Enter name of lesson',
                           ),
@@ -364,7 +396,19 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                         CheckboxListTile(
                           title: Text('Set video name as lesson name'),
                           value: copyNameCheckBoxValue,
-                          onChanged: null,
+                          onChanged: true
+                              ? null
+                              : (value) {
+                                  setState(() {
+                                    if (value) {
+                                      _lessonNameFieldController.text =
+                                          currentLesson.youtubeOriginalName;
+                                      currentLesson.lessonName =
+                                          currentLesson.youtubeOriginalName;
+                                    }
+                                    copyNameCheckBoxValue = value;
+                                  });
+                                },
                         ),
                         SizedBox(height: 8.0),
                         ExpandedCheckboxList(
@@ -374,17 +418,20 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                             return CheckboxListTile(
                               title: Text(checkBoxLabels[index]),
                               value: checkBoxValues[index],
-                              onChanged: (value) {
-                                setState(() {
-                                  checkBoxValues[index] = value;
-                                });
-                                if (value) {
-                                  currentLesson.addLabel(checkBoxLabels[index]);
-                                } else {
-                                  currentLesson
-                                      .removeLabel(checkBoxLabels[index]);
-                                }
-                              },
+                              onChanged: !videoProvided
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        checkBoxValues[index] = value;
+                                      });
+                                      if (value) {
+                                        currentLesson
+                                            .addLabel(checkBoxLabels[index]);
+                                      } else {
+                                        currentLesson
+                                            .removeLabel(checkBoxLabels[index]);
+                                      }
+                                    },
                             );
                           }),
                         )
@@ -408,7 +455,12 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                           child: _myAnimatedWidget,
                         ),
                         SizedBox(height: 8.0),
-                        SizedBox(height: 8.0),
+                        VideoRangeSlider(
+                          startAt: startPointValue,
+                          endAt: endPointValue,
+                          length: videoLength,
+                          enabled: videoProvided,
+                        ),
                         SizedBox(height: 8.0),
                         RawMaterialButton(
                           elevation: 6.0,

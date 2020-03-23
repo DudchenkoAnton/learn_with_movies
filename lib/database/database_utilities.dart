@@ -35,6 +35,14 @@ class DatabaseUtilities {
     }
   }
 
+  Future<LessonDB> editLessonInDB(LessonDB lesson) async {
+    this.deleteLessonFromDB(lesson);
+    String documentID = await this.addLessonToDB(lesson);
+    lesson.setDBReference(documentID);
+
+    return lesson;
+  }
+
   Future<String> addLessonToDB(LessonDB lesson) async {
     DocumentReference ref = await databaseReference.collection("lessons").add({
       'videoURL': lesson.getVideoURL(),

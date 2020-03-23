@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_range_slider/flutter_range_slider.dart' as frs;
 
 class VideoRangeSlider extends StatefulWidget {
-  Duration startAt;
-  Duration endAt;
+  List<Duration> startAt;
+  List<Duration> endAt;
   Duration length;
+  bool enabled = true;
 
   VideoRangeSlider(
-      {@required this.startAt, @required this.endAt, @required this.length});
+      {this.enabled = true,
+      @required this.startAt,
+      @required this.endAt,
+      @required this.length});
 
   @override
   _VideoRangeSliderState createState() => _VideoRangeSliderState();
@@ -36,30 +40,32 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
 
           return cur_minutes.toString() + ":" + cur_seconds.toString();
         },
-        onChanged: (double newLowerValue, double newUpperValue) {
-          setState(() {
-            _lowerValue = newLowerValue;
-            _upperValue = newUpperValue;
+        onChanged: widget.enabled
+            ? (double newLowerValue, double newUpperValue) {
+                setState(() {
+                  _lowerValue = newLowerValue;
+                  _upperValue = newUpperValue;
 
-            int seconds = widget.length.inSeconds;
+                  int seconds = widget.length.inSeconds;
 
-            int cur_seconds = (seconds * newLowerValue / 100).toInt();
+                  int cur_seconds = (seconds * newLowerValue / 100).toInt();
 
-            widget.startAt = Duration(seconds: cur_seconds);
+                  widget.startAt[0] = Duration(seconds: cur_seconds);
 
-            int cur_minutes = (cur_seconds / 60).toInt();
-            cur_seconds -= cur_minutes * 60;
+                  int cur_minutes = (cur_seconds / 60).toInt();
+                  cur_seconds -= cur_minutes * 60;
 
-            int cur_seconds2 = (seconds * newUpperValue / 100).toInt();
+                  int cur_seconds2 = (seconds * newUpperValue / 100).toInt();
 
-            widget.endAt = Duration(seconds: cur_seconds2);
+                  widget.endAt[0] = Duration(seconds: cur_seconds2);
 
-            int cur_minutes2 = (cur_seconds2 / 60).toInt();
-            cur_seconds2 -= cur_minutes * 60;
+                  int cur_minutes2 = (cur_seconds2 / 60).toInt();
+                  cur_seconds2 -= cur_minutes * 60;
 
-            // print("Add question:" + _lowerValue.toString());
-            // print("Add answer:" + _upperValue.toString());
-          });
-        });
+                  // print("Add question:" + _lowerValue.toString());
+                  // print("Add answer:" + _upperValue.toString());
+                });
+              }
+            : null);
   }
 }

@@ -26,8 +26,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   double _lowerValue = 0.0;
   double _upperValue = 100.0;
   Duration videoLengthOriginal = Duration(minutes: 1, seconds: 20);
-  Duration startAt = Duration(seconds: 0);
-  Duration endAt = Duration(minutes: 1, seconds: 20);
+  List<Duration> startAt = [Duration(seconds: 0)];
+  List<Duration> endAt = [Duration(minutes: 1, seconds: 20)];
 
   YoutubePlayerController _controller;
 
@@ -36,8 +36,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       print("Add question:" + _questionController.text);
       print("Add answer:" + _answerController.text);
 
-      print(startAt.inSeconds.toString());
-      print(endAt.inSeconds.toString());
+      print(startAt[0].inSeconds.toString());
+      print(endAt[0].inSeconds.toString());
     });
   }
 
@@ -46,16 +46,16 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       QuestionDB temp = QuestionDB();
       temp.setQuestion(_questionController.text);
       temp.setAnswer(_answerController.text);
-      temp.setVideoStartTime(startAt.inSeconds);
-      temp.setVideoEndTime(endAt.inSeconds);
+      temp.setVideoStartTime(startAt[0].inSeconds);
+      temp.setVideoEndTime(endAt[0].inSeconds);
       temp.setVideoURL(widget.videoData.videoURL);
       Navigator.pop(context, temp);
     }
     print("Add question:" + _questionController.text);
     print("Add answer:" + _answerController.text);
 
-    print(startAt.inSeconds.toString());
-    print(endAt.inSeconds.toString());
+    print(startAt[0].inSeconds.toString());
+    print(endAt[0].inSeconds.toString());
   }
 
   @override
@@ -73,13 +73,13 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
             widget.videoData.getVideoStartPoint());
 
     if (widget.question == null) {
-      startAt = Duration(seconds: widget.videoData.getVideoStartPoint());
-      endAt = Duration(seconds: widget.videoData.getVideoEndPoint());
+      startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
+      endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
     } else {
       _answerController.text = widget.question.answer;
       _questionController.text = widget.question.question;
-      startAt = Duration(seconds: widget.question.getVideoStartTime());
-      endAt = Duration(seconds: widget.question.getVideoEndTime());
+      startAt[0] = Duration(seconds: widget.question.getVideoStartTime());
+      endAt[0] = Duration(seconds: widget.question.getVideoEndTime());
     }
 
     //TODO: update videoLengthOriginal, startAt, endAt, depending on received video data
@@ -92,11 +92,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       ),
     );
     _controller.addListener(() {
-      if (_controller.value.position < startAt) {
-        _controller.seekTo(startAt);
+      if (_controller.value.position < startAt[0]) {
+        _controller.seekTo(startAt[0]);
         _controller.pause();
-      } else if (_controller.value.position > endAt) {
-        _controller.seekTo(endAt);
+      } else if (_controller.value.position > endAt[0]) {
+        _controller.seekTo(endAt[0]);
         _controller.pause();
       }
     });
@@ -127,7 +127,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 controller: _controller,
                 showVideoProgressIndicator: true,
                 onReady: () {
-                  _controller.seekTo(startAt);
+                  _controller.seekTo(startAt[0]);
                   print('Player is ready.');
                 },
               ),
