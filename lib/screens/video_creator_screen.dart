@@ -244,6 +244,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     currentLesson = widget.videoData;
     _videoUrlTextController.text = widget.videoData.videoURL;
     _lessonNameFieldController.text = widget.videoData.lessonName;
+
     updateQuestionListOnScreen();
   }
 
