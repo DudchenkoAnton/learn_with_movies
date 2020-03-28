@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "272783530347",
+    "firebase_url": "https://learnwithmovies-f0c29.firebaseio.com",
+    "project_id": "learnwithmovies-f0c29",
+    "storage_bucket": "learnwithmovies-f0c29.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272783530347:android:8be977d0f3cba877e3942e",
+        "android_client_info": {
+          "package_name": "com.example.temp_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272783530347-lhgjp1hj8r8l7071su0kmt2vr5j49urp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.temp_project",
+            "certificate_hash": "70c047424529165b09f5c18f9fef2b183a860a44"
+          }
+        },
+        {
+          "client_id": "272783530347-5aov63hc5skurdsk493jlgdfqmbrriao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALf6MOP25-gJVE8PplRxLG0TkNZ7dkiqM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272783530347-5aov63hc5skurdsk493jlgdfqmbrriao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
