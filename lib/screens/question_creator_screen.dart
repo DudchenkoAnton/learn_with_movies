@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_range_slider/flutter_range_slider.dart' as frs;
+import 'package:temp_project/database/lesson_db.dart';
+import 'package:temp_project/database/question_db.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:temp_project/utilites/lesson_objects.dart';
+import 'package:temp_project/components/video_range_slider.dart';
 
 class QuestionCreatorScreen extends StatefulWidget {
   static const String id = 'question_creator_screen';
-  final QuestionData question;
-  final LessonData videoData;
+  final QuestionDB question;
+  final LessonDB videoData;
 
   QuestionCreatorScreen({Key key, this.question, @required this.videoData})
       : super(key: key);
@@ -25,9 +26,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   double _lowerValue = 0.0;
   double _upperValue = 100.0;
   Duration videoLengthOriginal = Duration(minutes: 1, seconds: 20);
-  Duration startAt = Duration(seconds: 0);
-  Duration endAt = Duration(minutes: 1, seconds: 20);
-  bool editingMode = false;
+  List<Duration> startAt = [Duration(seconds: 0)];
+  List<Duration> endAt = [Duration(minutes: 1, seconds: 20)];
 
   YoutubePlayerController _controller;
 
@@ -36,34 +36,26 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       print("Add question:" + _questionController.text);
       print("Add answer:" + _answerController.text);
 
-      print(startAt.inSeconds.toString());
-      print(endAt.inSeconds.toString());
+      print(startAt[0].inSeconds.toString());
+      print(endAt[0].inSeconds.toString());
     });
   }
 
   void saveQuestion() {
     if (_questionController.text != '' && _answerController.text != '') {
-      if (editingMode) {
-        widget.question.question = _questionController.text;
-        widget.question.answer = _answerController.text;
-        widget.question.start = startAt;
-        widget.question.end = endAt;
-        Navigator.pop(context);
-      } else {
-        QuestionData temp = QuestionData();
-        temp.question = _questionController.text;
-        temp.answer = _answerController.text;
-        temp.start = startAt;
-        temp.end = endAt;
-        temp.videoId = widget.videoData.videoId;
-        Navigator.pop(context, temp);
-      }
+      QuestionDB temp = QuestionDB();
+      temp.setQuestion(_questionController.text);
+      temp.setAnswer(_answerController.text);
+      temp.setVideoStartTime(startAt[0].inSeconds);
+      temp.setVideoEndTime(endAt[0].inSeconds);
+      temp.setVideoURL(widget.videoData.videoURL);
+      Navigator.pop(context, temp);
     }
     print("Add question:" + _questionController.text);
     print("Add answer:" + _answerController.text);
 
-    print(startAt.inSeconds.toString());
-    print(endAt.inSeconds.toString());
+    print(startAt[0].inSeconds.toString());
+    print(endAt[0].inSeconds.toString());
   }
 
   @override
@@ -76,18 +68,23 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
   @override
   void initState() {
+    videoLengthOriginal = Duration(
+        seconds: widget.videoData.getVideoEndPoint() -
+            widget.videoData.getVideoStartPoint());
+
     if (widget.question == null) {
+      startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
+      endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
     } else {
-      editingMode = true;
       _answerController.text = widget.question.answer;
       _questionController.text = widget.question.question;
-      startAt = widget.question.start;
-      endAt = widget.question.end;
+      startAt[0] = Duration(seconds: widget.question.getVideoStartTime());
+      endAt[0] = Duration(seconds: widget.question.getVideoEndTime());
     }
 
     //TODO: update videoLengthOriginal, startAt, endAt, depending on received video data
     _controller = YoutubePlayerController(
-      initialVideoId: widget.videoData.videoId,
+      initialVideoId: widget.videoData.getVideoID(),
       flags: YoutubePlayerFlags(
         mute: false,
         autoPlay: true,
@@ -95,11 +92,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       ),
     );
     _controller.addListener(() {
-      if (_controller.value.position < startAt) {
-        _controller.seekTo(startAt);
+      if (_controller.value.position < startAt[0]) {
+        _controller.seekTo(startAt[0]);
         _controller.pause();
-      } else if (_controller.value.position > endAt) {
-        _controller.seekTo(endAt);
+      } else if (_controller.value.position > endAt[0]) {
+        _controller.seekTo(endAt[0]);
         _controller.pause();
       }
     });
@@ -130,7 +127,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 controller: _controller,
                 showVideoProgressIndicator: true,
                 onReady: () {
-                  _controller.seekTo(startAt);
+                  _controller.seekTo(startAt[0]);
                   print('Player is ready.');
                 },
               ),
@@ -180,51 +177,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
               SizedBox(
                 height: 10.0,
               ),
-              frs.RangeSlider(
-                  min: 0.0,
-                  max: 100.0,
-                  lowerValue: _lowerValue,
-                  upperValue: _upperValue,
-                  divisions: 10000,
-                  showValueIndicator: true,
-                  valueIndicatorMaxDecimals: 1,
-                  valueIndicatorFormatter: (int index, double value) {
-                    int seconds = videoLengthOriginal.inSeconds;
-
-                    int cur_seconds = (seconds * value / 100).toInt();
-                    int cur_minutes = (cur_seconds / 60).toInt();
-                    cur_seconds -= cur_minutes * 60;
-
-                    return cur_minutes.toString() +
-                        ":" +
-                        cur_seconds.toString();
-                  },
-                  onChanged: (double newLowerValue, double newUpperValue) {
-                    setState(() {
-                      _lowerValue = newLowerValue;
-                      _upperValue = newUpperValue;
-
-                      int seconds = videoLengthOriginal.inSeconds;
-
-                      int cur_seconds = (seconds * newLowerValue / 100).toInt();
-
-                      startAt = Duration(seconds: cur_seconds);
-
-                      int cur_minutes = (cur_seconds / 60).toInt();
-                      cur_seconds -= cur_minutes * 60;
-
-                      int cur_seconds2 =
-                          (seconds * newUpperValue / 100).toInt();
-
-                      endAt = Duration(seconds: cur_seconds2);
-
-                      int cur_minutes2 = (cur_seconds2 / 60).toInt();
-                      cur_seconds2 -= cur_minutes * 60;
-
-                      // print("Add question:" + _lowerValue.toString());
-                      // print("Add answer:" + _upperValue.toString());
-                    });
-                  }),
+              VideoRangeSlider(
+                startAt: startAt,
+                endAt: endAt,
+                length: videoLengthOriginal,
+              )
             ],
           ),
         ),
