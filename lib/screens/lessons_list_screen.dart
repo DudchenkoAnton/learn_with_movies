@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:temp_project/components/lesson_card.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -29,7 +28,6 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     List<LessonDB> list = await db.getLessonsFromDB();
     allLesson.clear();
     allLesson.addAll(list);
-    print(allLesson);
     animationOn = false;
     setState(() {
       build(context);
@@ -51,8 +49,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       return;
     } else {
       setState(() async {
-        allLesson.clear();
-        allLesson.addAll(await db.getLessonsFromDB());
+        _getThingsOnStartup().then((value) {});
       });
     }
   }
@@ -67,8 +64,10 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
           margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
           child: Column(
             children: <Widget>[
+              SizedBox(height: 8.0,),
               _createSearchView(),
-              animationOn ? create_animation() : _CardView(),
+              SizedBox(height: 8.0,),
+              animationOn ? create_animation() : _LessonView(context),
             ],
           )),
       floatingActionButton: FloatingActionButton(
@@ -80,27 +79,66 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       ),
     );
   }
+  String url_image(youtubeUrl) {
+    Uri uri = Uri.parse(youtubeUrl);
+    String videoID = uri.queryParameters["v"];
+    String url = "http://img.youtube.com/vi/" + videoID + "/0.jpg";
+    return url;
+  }
 
-  Widget _CardView() {
-    print("all cards");
-    for (int i = 0; i < allLesson.length; i++) {
-      print(allLesson[i]);
-    }
 
-    return new Column(
-      //show all the card in the list of card
-      children: allLesson
-          .map((lesson_object) => new card_movie(lesson_object, () {
-                setState(() {
-                  delete_card(context, lesson_object);
-                });
-              }, () {
-                setState(() {
-                  edit_card(context, lesson_object);
-                });
-              }))
-          .toList(),
-    );
+  Widget _LessonView(context){
+    return
+      Container(
+        child:  ListView.separated(
+          shrinkWrap: true,
+        itemBuilder: (context,index){
+          return Row(
+            children: <Widget>[
+              Container(
+                  width: 140.0,
+                  height: 100.0,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(url_image(allLesson[index].videoURL))
+                          ,fit: BoxFit.cover)
+                  ),
+                ),
+              Column(
+              children: <Widget>[
+              Container(
+               width: MediaQuery.of(context).size.width-200.0,
+                height: 70.0,
+                child: ListTile(
+                  title: Text(allLesson[index].getLessonName()),
+                  subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
+                ),
+              ),
+                     Row(
+                        children: <Widget>[
+                          IconButton(
+          onPressed: ()=>setState(() {
+          edit_card(context, allLesson[index]);
+          }),
+          icon: Icon(Icons.edit),
+          ),
+          IconButton(
+          onPressed: ()=> setState(() {
+          delete_card(context, allLesson[index]);
+          }),
+          icon: Icon(Icons.delete),
+          ),
+          ],
+                     )]),
+            ],
+          );
+        },
+        separatorBuilder: (context,index)=>Divider(
+          height: 4.0,
+          color: Colors.grey,
+        ),
+        itemCount: allLesson.length),
+      );
   }
 
   void delete_card(BuildContext context, lesson_object) async {
@@ -151,7 +189,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
             hintText: "Search",
             prefixIcon: Icon(Icons.search),
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+                borderRadius: BorderRadius.all(Radius.circular(22.0)))),
       ),
     );
   }
