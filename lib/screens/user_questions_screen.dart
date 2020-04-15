@@ -88,6 +88,7 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
     lesson = widget.lessonDB;
     questions = lesson.getQuestionsList();
 
+
     QuestionDB question = questions[0];
 
     curQuestionStartPoint = question.getVideoStartTime();
