@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
+import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/screens/video_creator_screen.dart';
-
-
-
 
 class WidgetBar extends StatefulWidget {
   final String show;
@@ -13,17 +11,15 @@ class WidgetBar extends StatefulWidget {
 
   @override
   _WidgetBarState createState() => _WidgetBarState();
-
 }
-class _WidgetBarState extends State<WidgetBar>{
+
+class _WidgetBarState extends State<WidgetBar> {
   DatabaseUtilities db = new DatabaseUtilities();
   var _searchView = new TextEditingController();
   List<LessonDB> allLesson = List<LessonDB>();
   var animationOn = true;
-  Icon cusIcon=Icon(Icons.search);
-  Widget cusSearchBar=Text("Learn With Movies");
-
-
+  Icon cusIcon = Icon(Icons.search);
+  Widget cusSearchBar = Text("Learn With Movies");
 
   @override
   void initState() {
@@ -61,85 +57,96 @@ class _WidgetBarState extends State<WidgetBar>{
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar:  AppBar(
-      leading: IconButton(
-        onPressed: (){
-          setState((){
-            searchAction();
-          });},
-        icon: cusIcon,
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            setState(() {
+              searchAction();
+            });
+          },
+          icon: cusIcon,
+        ),
+        centerTitle: true,
+        title: cusSearchBar,
       ),
-      centerTitle: true,
-      title: cusSearchBar,
-    ),
-    body: animationOn ? create_animation() : _CardView(context),
-  );}
+      body: animationOn ? create_animation() : _CardView(context),
+    );
+  }
 
-
-  void searchAction(){
-    if(this.cusIcon.icon==Icons.search){
-      this.cusIcon=Icon(Icons.clear);
-      this.cusSearchBar=TextField(
+  void searchAction() {
+    if (this.cusIcon.icon == Icons.search) {
+      this.cusIcon = Icon(Icons.clear);
+      this.cusSearchBar = TextField(
         onChanged: (value) {
           filterSearchResults(value);
         },
         controller: _searchView,
-
         textInputAction: TextInputAction.go,
         decoration: InputDecoration(
-            hintText: "Search Movie",
-            hintStyle: TextStyle(
-              color: Colors.black26,
-            ),
-            border: UnderlineInputBorder(),),
+          hintText: "Search Movie",
+          hintStyle: TextStyle(
+            color: Colors.black26,
+          ),
+          border: UnderlineInputBorder(),
+        ),
         style: TextStyle(
           color: Colors.white,
           fontSize: 16.0,
         ),
       );
-    }
-    else{
-      this.cusIcon=Icon(Icons.search);
-      this.cusSearchBar=Text("Learn With Movies");
+    } else {
+      this.cusIcon = Icon(Icons.search);
+      this.cusSearchBar = Text("Learn With Movies");
     }
   }
 
-  Widget _CardView(context){
-   return ListView.separated(
-       itemBuilder: (context,index){
-         return Column(
-           children: <Widget>[
-             SizedBox(height: 4),
-         GestureDetector(
-         onTap:(){move_screen(context); },
-          child: Container(
-               width: MediaQuery.of(context).size.width-10.0,
-               height: 200.0,
-               decoration: BoxDecoration(
-                 image: DecorationImage(
-                     image: NetworkImage(url_image(allLesson[index].videoURL))
-                     ,fit: BoxFit.cover)
-               ),
-             ),),
-             ListTile(
-               title:Text(allLesson[index].lessonName),
-               subtitle: Text("${allLesson[index].getVideoLenght()} min"),
-             ),
-           ],
-         );
-       },
-       separatorBuilder: (context,index)=>Divider(
-         height: 1.0,
-         color: Colors.grey,
-       ),
-       itemCount: allLesson.length);
+  Widget _CardView(context) {
+    return ListView.separated(
+        itemBuilder: (context, index) {
+          return Column(
+            children: <Widget>[
+              SizedBox(height: 4),
+              GestureDetector(
+                onTap: () {
+                  move_screen(context, index);
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 10.0,
+                  height: 200.0,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(
+                              url_image(allLesson[index].videoURL)),
+                          fit: BoxFit.cover)),
+                ),
+              ),
+              ListTile(
+                title: Text(allLesson[index].lessonName),
+                subtitle: Text("${allLesson[index].getVideoLenght()} min"),
+              ),
+            ],
+          );
+        },
+        separatorBuilder: (context, index) => Divider(
+              height: 1.0,
+              color: Colors.grey,
+            ),
+        itemCount: allLesson.length);
   }
-  void move_screen(BuildContext context) async {
+
+  void move_screen(BuildContext context, int index) async {
     ///change the name of the screen and send the lesson!
-    await Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCreatorScreen()));
+    print('This is a video id - ${allLesson[index].videoID}');
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LessonVideoScreen(
+                  lessonData: allLesson[index],
+                )));
   }
 
   String url_image(youtubeUrl) {
@@ -166,6 +173,4 @@ class _WidgetBarState extends State<WidgetBar>{
       ),
     );
   }
-
-
 }

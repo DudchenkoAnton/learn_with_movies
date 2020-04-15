@@ -50,6 +50,7 @@ class DatabaseUtilities {
       'videoStartPoint': lesson.getVideoStartPoint(),
       'videoEndPoint': lesson.getVideoEndPoint(),
       'labels': lesson.getLabelsList(),
+      'videoID': lesson.getVideoID(),
     });
 
     for (QuestionDB question in lesson.getQuestionsList()) {
@@ -130,6 +131,7 @@ class DatabaseUtilities {
         videoStartPoint: data['videoStartPoint'],
         videoEndPoint: data['videoEndPoint'],
         labelsList: labels,
+        videoID: data['videoID'],
       );
 
       lesson.setDBReference(currentRow.documentID);

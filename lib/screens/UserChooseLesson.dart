@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:temp_project/components/WidgetBar.dart';
+
 class UserChooseLesson extends StatefulWidget {
-  static const String id = 'lessons_list_screen';
+  static const String id = 'user_choose_lesson_screen';
 
   @override
   _UserChooseLessonState createState() => _UserChooseLessonState();
@@ -10,8 +11,12 @@ class UserChooseLesson extends StatefulWidget {
 class _UserChooseLessonState extends State<UserChooseLesson> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-    WidgetBar(show: "home",),
-    WidgetBar(show: "Best Movies",),
+    WidgetBar(
+      show: "home",
+    ),
+    WidgetBar(
+      show: "Best Movies",
+    ),
     WidgetBar(show: "History"),
   ];
 
@@ -19,7 +24,6 @@ class _UserChooseLessonState extends State<UserChooseLesson> {
   void initState() {
     super.initState();
   }
-
 
   void onTabTapped(int index) {
     setState(() {
@@ -44,12 +48,9 @@ class _UserChooseLessonState extends State<UserChooseLesson> {
             title: new Text('Best Movies'),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_border),
-              title: Text('History')
-          )
+              icon: Icon(Icons.bookmark_border), title: Text('History'))
         ],
       ),
     );
   }
-
 }
