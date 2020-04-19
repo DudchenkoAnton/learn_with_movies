@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: UserChooseLesson.id,
+      initialRoute: LessonsListScreen.id,
       routes: {
         VideoCreatorScreen.id: (context) => VideoCreatorScreen(),
         UserChooseLesson.id: (context) => UserChooseLesson(),

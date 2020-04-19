@@ -88,7 +88,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       flags: YoutubePlayerFlags(
         mute: false,
         autoPlay: true,
-        forceHideAnnotation: true,
+        //forceHideAnnotation: true,
       ),
     );
     _controller.addListener(() {
@@ -123,14 +123,14 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-//              YoutubePlayer(
-//                controller: _controller,
-//                showVideoProgressIndicator: true,
-//                onReady: () {
-//                  _controller.seekTo(startAt[0]);
-//                  print('Player is ready.');
-//                },
-//              ),
+              YoutubePlayer(
+                controller: _controller,
+                showVideoProgressIndicator: true,
+                onReady: () {
+                 _controller.seekTo(startAt[0]);
+                  print('Player is ready.');
+                },
+              ),
               SizedBox(
                 height: 15.0,
               ),

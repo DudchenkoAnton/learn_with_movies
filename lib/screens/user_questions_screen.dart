@@ -84,7 +84,6 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           builder: (context) => RateScreen(),
         ),
       );
-
        */
 
       _showDialog();
@@ -136,25 +135,26 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new SmoothStarRating(
-        rating: rating,
-          size: 40,
-          filledIconData: Icons.star,
-          halfFilledIconData: Icons.star_half,
-          defaultIconData: Icons.star_border,
-          starCount: 5,
-          allowHalfRating: false,
-          spacing: 2.0,
-          onRatingChanged: (value) {
-            setState(() {
-              rating = value;
-            });
-          },
-        ),
+              rating: rating,
+              size: 40,
+              filledIconData: Icons.star,
+              halfFilledIconData: Icons.star_half,
+              defaultIconData: Icons.star_border,
+              starCount: 5,
+              allowHalfRating: false,
+              spacing: 2.0,
+              onRatingChanged: (value) {
+                setState(() {
+                  rating = value;
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                });
+              },
+            ),
 
             FlatButton(
               child: new Text("Close"),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
             ),
           ],

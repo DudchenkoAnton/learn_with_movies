@@ -51,6 +51,9 @@ class DatabaseUtilities {
       'videoEndPoint': lesson.getVideoEndPoint(),
       'labels': lesson.getLabelsList(),
       'videoID': lesson.getVideoID(),
+      'numberViews': lesson.getNumberViews(),
+      'averageRating': lesson.getAverageRating(),
+      'numberReviews': lesson.getNumberReviews(),
     });
 
     for (QuestionDB question in lesson.getQuestionsList()) {
@@ -63,7 +66,9 @@ class DatabaseUtilities {
         'question': question.getQuestion(),
         'answer': question.getAnswer(),
         'videoStartPoint': question.getVideoStartTime(),
-        'videoEndPoint': question.getVideoEndTime()
+        'videoEndPoint': question.getVideoEndTime(),
+        'answerStartPoint': question.getAnswerStartTime(),
+        'answerEndPoint': question.getAnswerEndTime()
       });
     }
 
@@ -132,6 +137,9 @@ class DatabaseUtilities {
         videoEndPoint: data['videoEndPoint'],
         labelsList: labels,
         videoID: data['videoID'],
+          numberViews: data['numberViews'],
+          averageRating: data['averageRating'],
+          numberReviews: data['numberReviews']
       );
 
       lesson.setDBReference(currentRow.documentID);
@@ -143,7 +151,9 @@ class DatabaseUtilities {
             question: data['question'],
             answer: data['answer'],
             videoStartPoint: data['videoStartPoint'],
-            videoEndPoint: data['videoEndPoint']));
+            videoEndPoint: data['videoEndPoint'],
+            answerStartPoint: data['answerStartPoint'],
+            answerEndPoint: data['answerEndPoint']));
       }
 
       this.lessonsList.add(lesson);
