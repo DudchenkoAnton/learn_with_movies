@@ -51,7 +51,21 @@ class LessonDB {
   int getVideoEndPoint() {
     return this.videoEndPoint;
   }
+  String getVideoLenght(){
 
+    var s=this.videoEndPoint-this.videoStartPoint;
+    var hrs = (s / 3600).floor();
+
+    var mins = ((s % 3600) / 60).floor();
+    var secs = (s % 60).floor();
+    var res='';
+    if (hrs > 0) {
+      res += "" + hrs.toString() + ":" + (mins < 10 ? "0" : "");
+    }
+    res += "" + mins.toString() + ":" + (secs < 10 ? "0" : secs.toString());
+    return res;
+
+  }
   List<String> getLabelsList() {
     return this.labelsList;
   }
