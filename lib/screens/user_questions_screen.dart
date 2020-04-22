@@ -3,6 +3,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
+import 'package:temp_project/database/database_utilities.dart';
 
 
 class UserQuestionsScreen extends StatefulWidget {
@@ -84,7 +85,6 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           builder: (context) => RateScreen(),
         ),
       );
-
        */
 
       _showDialog();
@@ -136,25 +136,38 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new SmoothStarRating(
-        rating: rating,
-          size: 40,
-          filledIconData: Icons.star,
-          halfFilledIconData: Icons.star_half,
-          defaultIconData: Icons.star_border,
-          starCount: 5,
-          allowHalfRating: false,
-          spacing: 2.0,
-          onRatingChanged: (value) {
-            setState(() {
-              rating = value;
-            });
-          },
-        ),
+              rating: rating,
+              size: 40,
+              filledIconData: Icons.star,
+              halfFilledIconData: Icons.star_half,
+              defaultIconData: Icons.star_border,
+              starCount: 5,
+              allowHalfRating: false,
+              spacing: 2.0,
+              onRatingChanged: (value) {
+                setState(() {
+                  rating = value;
+                  DatabaseUtilities db = new DatabaseUtilities();
+                  lesson.setNumberViews(lesson.getNumberViews() + 1);
+                  double lesson_rating = ((lesson.getNumberReviews()
+                      * lesson.getAverageRating()) + rating)
+                      / (lesson.getNumberReviews() + 1);
+                  lesson.setAverageRating(lesson_rating);
+                  lesson.setNumberReviews(lesson.getNumberReviews() + 1);
+                  db.editLessonInDB(lesson);
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+
+                });
+              },
+            ),
 
             FlatButton(
               child: new Text("Close"),
               onPressed: () {
-                Navigator.of(context).pop();
+                DatabaseUtilities db = new DatabaseUtilities();
+                lesson.setNumberViews(lesson.getNumberViews() + 1);
+                db.editLessonInDB(lesson);
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
             ),
           ],

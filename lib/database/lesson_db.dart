@@ -11,6 +11,9 @@ class LessonDB {
   String youtubeOriginalName;
   String videoID;
   String dbDocumentID;
+  int numberViews; // amount of views of lesson
+  double averageRating ;
+  int numberReviews; // amount of users that leaves a rating
 
   LessonDB({
     this.videoURL,
@@ -22,6 +25,9 @@ class LessonDB {
     this.youtubeOriginalName,
     this.videoID,
     this.questionsList,
+    this.numberViews = 0,
+    this.averageRating = 0,
+    this.numberReviews = 0
   });
 
   String getVideoID() {
@@ -51,6 +57,19 @@ class LessonDB {
   int getVideoEndPoint() {
     return this.videoEndPoint;
   }
+
+  int getNumberViews() {
+    return this.numberViews;
+  }
+
+  int getNumberReviews() {
+    return this.numberReviews;
+  }
+
+  double getAverageRating() {
+    return this.averageRating;
+  }
+
   String getVideoLenght(){
 
     var s=this.videoEndPoint-this.videoStartPoint;
@@ -121,6 +140,18 @@ class LessonDB {
 
   void setVideoID(String _videoID) {
     this.videoID = _videoID;
+  }
+
+  void setNumberViews(int arg) {
+    this.numberViews = arg;
+  }
+
+  void setNumberReviews(int arg) {
+    this.numberReviews = arg;
+  }
+
+  void setAverageRating(double arg) {
+    this.averageRating = arg;
   }
 
   void printData() {
