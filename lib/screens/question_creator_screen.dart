@@ -88,7 +88,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       flags: YoutubePlayerFlags(
         mute: false,
         autoPlay: true,
-        forceHideAnnotation: true,
+        //forceHideAnnotation: true,
       ),
     );
     _controller.addListener(() {
@@ -127,7 +127,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 controller: _controller,
                 showVideoProgressIndicator: true,
                 onReady: () {
-                  _controller.seekTo(startAt[0]);
+                 _controller.seekTo(startAt[0]);
                   print('Player is ready.');
                 },
               ),
