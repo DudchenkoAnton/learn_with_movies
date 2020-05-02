@@ -14,13 +14,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: UserChooseLesson.id,
+      initialRoute: OpenScreenLogo.id,
       routes: {
         VideoCreatorScreen.id: (context) => VideoCreatorScreen(),
-        LessonsListScreen.id: (context) => LessonsListScreen(),
-        LoginScreen.id: (context) => LoginScreen(),
-        OpenScreenLogo.id: (context) => OpenScreenLogo(),
         UserChooseLesson.id: (context) => UserChooseLesson(),
+        LessonsListScreen.id: (context) => LessonsListScreen(),
+        LoginScreen.id: (context) => LoginScreen(emailReset: "",),
+        OpenScreenLogo.id: (context) => OpenScreenLogo(),
+
 
       },
     );

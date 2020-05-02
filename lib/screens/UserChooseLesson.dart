@@ -1,40 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:temp_project/components/WidgetBar.dart';
-
 class UserChooseLesson extends StatefulWidget {
   static const String id = 'user_choose_lesson_screen';
 
   @override
   _UserChooseLessonState createState() => _UserChooseLessonState();
 }
-
 class _UserChooseLessonState extends State<UserChooseLesson> {
   int _currentIndex = 0;
+
+
   final List<Widget> _children = [
-    WidgetBar(
-      show: "home",
-    ),
-    WidgetBar(
-      show: "Best Movies",
-    ),
-    WidgetBar(show: "History"),
+   new WidgetBar(show: "Home",),
+   new WidgetBar(show: "Best Movies",),
+    new WidgetBar(show: "History",),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-  }
+
+
+  PageController pageController = PageController();
 
   void onTabTapped(int index) {
+    pageController.jumpToPage(index);
+  }
+
+  void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
 
+/*
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+      print(_currentIndex);
+    });
+  }
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _children[_currentIndex], // new
+     // body: _children.elementAt(_currentIndex), // new
+
+     body: PageView(
+         controller: pageController,
+         onPageChanged: _onPageChanged,
+         children: _children,),
+
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped, // new
         currentIndex: _currentIndex, // new
@@ -48,7 +61,8 @@ class _UserChooseLessonState extends State<UserChooseLesson> {
             title: new Text('Best Movies'),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_border), title: Text('History'))
+              icon: Icon(Icons.bookmark_border),
+              title: Text('History'))
         ],
       ),
     );

@@ -200,7 +200,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     if (lesson_new != null) {
       setState(() {
         //lesson_new need to by from the shape of LessonDB
-        allLesson.add(lesson_new);
+        allLesson.insert(0, lesson_new);
+       // allLesson.add(lesson_new);
       });
     }
   }

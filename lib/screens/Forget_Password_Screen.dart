@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:temp_project/database/auth.dart';
+import 'package:temp_project/screens/LoginScreen.dart';
 import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/utilites/constants.dart';
 
@@ -10,6 +12,10 @@ class ForgetPasswordScreen extends StatefulWidget {
 }
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+  final _formKey=GlobalKey<FormState>();
+  final AuthService _auth=AuthService();
+  String _email='';
+
 
   Widget _buildEmailTF() {
     return Column(
@@ -24,7 +30,14 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
+            onChanged: (input){
+              setState(() =>_email=input);
+            },
+            onSaved: (input){
+              setState(() =>_email=input);
+            },
+            validator: (input)=>input.isEmpty?'Enter an email':null,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -46,22 +59,21 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     );
   }
 
-  Widget _buildText() {
-    return RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: 'The Code Will Send To Email',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-      ]
-    ),
+
+  Widget _buildHaveAccountBtn() {
+    return Container(
+      alignment: Alignment.center,
+      child: FlatButton(
+        onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(emailReset: "",)));},
+        padding: EdgeInsets.only(right: 0.0),
+        child: Text(
+          'Remember the passport?',
+          style: kLabelStyle,
+        ),
+      ),
     );
   }
+
 
   Widget _buildSendCodeBtn() {
     return Container(
@@ -69,9 +81,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () {
-          print('Send Code Button Pressed');
-          Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));},
+        onPressed: ()async {
+          if (_formKey.currentState.validate()) {
+            await _auth.sendPasswordResetEmail(_email);
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                  LoginScreen(emailReset: _email,)));
+            }
+          },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
@@ -99,7 +115,9 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Stack(
+          child: Form(
+            key: _formKey,
+            child:Stack(
             children: <Widget>[
               Container(
                 height: double.infinity,
@@ -141,15 +159,17 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                       SizedBox(height: 30.0),
                       _buildEmailTF(),
                       SizedBox(
-                        height: 60.0,
+                        height: 40.0,
                       ),
-                      _buildText(),
                       _buildSendCodeBtn(),
+                      _buildHaveAccountBtn(),
+
                     ],
                   ),
                 ),
               )
             ],
+          ),
           ),
         ),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:temp_project/database/auth.dart';
+import 'package:temp_project/screens/LoginScreen.dart';
 import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/utilites/constants.dart';
 
@@ -10,6 +12,13 @@ class CreateUserScreen extends StatefulWidget {
 }
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
+  final AuthService _auth=AuthService();
+  final _formKey=GlobalKey<FormState>();
+  String _email='';
+  String _password='';
+  String error='';
+
+  bool notSamePassword=false;
 
   Widget _buildEmailTF() {
     return Column(
@@ -24,7 +33,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
+            onChanged: (input){
+              setState(() =>_email=input);
+            },
+            validator: (input)=>input.isEmpty?'Enter an email':null,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -59,41 +72,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
-            obscureText: true,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'OpenSans',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.lock,
-                color: Colors.white,
-              ),
-              hintText: 'Enter your Password',
-              hintStyle: kHintTextStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  Widget _buildPasswordCheckTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Confirm Password',
-          style: kLabelStyle,
-        ),
-        SizedBox(height: 10.0),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 60.0,
-          child: TextField(
+          child: TextFormField(
+            onChanged: (input){
+              setState(() =>_password=input);
+            },
+            validator: (input)=>input.length<6?'Enter a password with 6 chars long':null,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -115,6 +98,20 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     );
   }
 
+
+  Widget _buildHaveAccountBtn() {
+    return Container(
+      alignment: Alignment.center,
+      child: FlatButton(
+        onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(emailReset: "",)));},
+        padding: EdgeInsets.only(right: 0.0),
+        child: Text(
+          'Do you have alraedy account?',
+          style: kLabelStyle,
+        ),
+      ),
+    );
+  }
 
 
   Widget _buildCreateBtn() {
@@ -123,9 +120,21 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () {
-          print('Create Button Pressed');
-          Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));},
+        onPressed: () async{
+            if (_formKey.currentState.validate()) {
+                dynamic result = await _auth.signUpwithEmailAndPassword(
+                _email, _password);
+                print(_email);
+                print(result.toString());
+                 if (result == null) {
+                    setState(() {
+                    error = 'please supply a valid email';
+                    });
+                } else {
+                   Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
+                }
+            }
+        },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
@@ -153,7 +162,9 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Stack(
+          child: Form(
+            key: _formKey,
+            child:Stack(
             children: <Widget>[
               Container(
                 height: double.infinity,
@@ -201,13 +212,23 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildPasswordCheckTF(),
                       _buildCreateBtn(),
+                      _buildHaveAccountBtn(),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Text(error,style: TextStyle(
+                        color: Colors.red,
+                        fontFamily: 'OpenSans',
+                        fontSize: 15.0,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               )
             ],
+          ),
           ),
         ),
       ),

@@ -3,21 +3,20 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:temp_project/components/video_range_slider.dart';
-import 'create_answer_segment.dart';
 
-class QuestionCreatorScreen extends StatefulWidget {
+class AnswerSegmentScreen extends StatefulWidget {
   static const String id = 'question_creator_screen';
   final QuestionDB question;
   final LessonDB videoData;
 
-  QuestionCreatorScreen({Key key, this.question, @required this.videoData})
+  AnswerSegmentScreen({Key key, @required this.question, @required this.videoData})
       : super(key: key);
 
   @override
-  _QuestionCreatorScreenState createState() => _QuestionCreatorScreenState();
+  _AnswerSegmentScreenState createState() => _AnswerSegmentScreenState();
 }
 
-class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
+class _AnswerSegmentScreenState extends State<AnswerSegmentScreen> {
 //  TextEditingController _startAtController = TextEditingController();
 //  TextEditingController _endAtController = TextEditingController();
   TextEditingController _questionController = TextEditingController();
@@ -29,7 +28,6 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   Duration videoLengthOriginal = Duration(minutes: 1, seconds: 20);
   List<Duration> startAt = [Duration(seconds: 0)];
   List<Duration> endAt = [Duration(minutes: 1, seconds: 20)];
-  QuestionDB temp = QuestionDB();
 
   YoutubePlayerController _controller;
 
@@ -43,34 +41,12 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     });
   }
 
-  void addAnswerSegment() async {
-
-    QuestionDB question_cur = QuestionDB();
-    question_cur.setQuestion(_questionController.text);
-    question_cur.setAnswer(_answerController.text);
-    question_cur.setVideoStartTime(startAt[0].inSeconds);
-    question_cur.setVideoEndTime(endAt[0].inSeconds);
-    question_cur.setVideoURL(widget.videoData.videoURL);
-
-    question_cur = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => AnswerSegmentScreen(
-              videoData: widget.videoData,
-              question: question_cur,
-            )));
-    temp.setAnswerEndTime(question_cur.getAnswerEndTime());
-    temp.setAnsewerStartTime(question_cur.getAnswerStartTime());
-  }
 
   void saveQuestion() {
     if (_questionController.text != '' && _answerController.text != '') {
-
-      temp.setQuestion(_questionController.text);
-      temp.setAnswer(_answerController.text);
-      temp.setVideoStartTime(startAt[0].inSeconds);
-      temp.setVideoEndTime(endAt[0].inSeconds);
-      temp.setVideoURL(widget.videoData.videoURL);
+      QuestionDB temp = QuestionDB();
+      temp.setAnsewerStartTime(startAt[0].inSeconds);
+      temp.setAnswerEndTime(endAt[0].inSeconds);
       Navigator.pop(context, temp);
     }
     print("Add question:" + _questionController.text);
@@ -149,44 +125,14 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 controller: _controller,
                 showVideoProgressIndicator: true,
                 onReady: () {
-                 _controller.seekTo(startAt[0]);
+                  _controller.seekTo(startAt[0]);
                   print('Player is ready.');
                 },
               ),
               SizedBox(
                 height: 15.0,
               ),
-              Text(
-                'Question',
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _questionController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Question'),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Text(
-                'Answer',
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _answerController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Answer'),
-                ),
-              ),
+
               SizedBox(
                 height: 10.0,
               ),
@@ -203,14 +149,6 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 startAt: startAt,
                 endAt: endAt,
                 length: videoLengthOriginal,
-              ),
-              RaisedButton(
-                child: Text("To add segment of answer"),
-                onPressed: addAnswerSegment,
-                color: Colors.green,
-                textColor: Colors.amberAccent,
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                splashColor: Colors.grey,
               ),
             ],
           ),

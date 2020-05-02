@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:temp_project/database/auth.dart';
 import 'package:temp_project/screens/Forget_Password_Screen.dart';
 import 'package:temp_project/screens/SingUpScreen.dart';
+import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/utilites/constants.dart';
 
 class LoginScreen extends StatefulWidget {
-  @override
+  String emailReset;
+  LoginScreen({this.emailReset});
+
+@override
   static const String id = 'login_screen';
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthService _auth=AuthService();
+  final _formKey=GlobalKey<FormState>();
   bool _rememberMe = false;
   String _email='';
   String _password='';
+  String _error='';
+
+  @override
+  void initState() {
+    if(widget.emailReset!=''){
+      setState(() {
+        _email=widget.emailReset;
+      });
+    }
+    super.initState();
+  }
+
 
   Widget _buildEmailTF() {
     return Column(
@@ -29,7 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            onSaved: (input){_email=input;},
+            onChanged: (input){
+              setState(() =>_email=input);
+            },
+            validator: (input)=>input.isEmpty?'Enter an email':null,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -45,8 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
               hintText: 'Enter your Email',
               hintStyle: kHintTextStyle,
             ),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -65,7 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            onSaved: (input){_password=input;},
+            onChanged: (input){
+              setState(() =>_password=input);
+            },
+            validator: (input)=>input.length<6?'Enter a password with 6 chars long':null,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -81,8 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
               hintText: 'Enter your Password',
               hintStyle: kHintTextStyle,
             ),
+           ),
           ),
-        ),
+
       ],
     );
   }
@@ -91,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       alignment: Alignment.centerRight,
       child: FlatButton(
-        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => ForgetPasswordScreen()));},
+        onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => ForgetPasswordScreen()));},
         padding: EdgeInsets.only(right: 0.0),
         child: Text(
           'Forgot Password?',
@@ -101,32 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildRememberMeCheckbox() {
-    return Container(
-      height: 20.0,
-      child: Row(
-        children: <Widget>[
-          Theme(
-            data: ThemeData(unselectedWidgetColor: Colors.white),
-            child: Checkbox(
-              value: _rememberMe,
-              checkColor: Colors.green,
-              activeColor: Colors.white,
-              onChanged: (value) {
-                setState(() {
-                  _rememberMe = value;
-                });
-              },
-            ),
-          ),
-          Text(
-            'Remember me',
-            style: kLabelStyle,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildLoginBtn() {
     return Container(
@@ -134,7 +134,18 @@ class _LoginScreenState extends State<LoginScreen> {
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () => print('Login Button Pressed'),
+        onPressed: () async {
+          if (_formKey.currentState.validate()){
+            dynamic result= await _auth.signInwithEmailAndPassword(_email, _password);
+            print(result);
+            if(result==null){
+              setState(()=>_error='Could not sign in eith those credentials');
+              }else{
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
+
+            }
+            }
+          },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
@@ -182,6 +193,39 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget messageReset(){
+    return Container(
+      width: 350.0,
+      height: 45.0,
+      color: Colors.yellow[700],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              Text("A password reset link has been sent to",
+                style: TextStyle(
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,),
+              ),
+              Text("$_email",
+                style: TextStyle(
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold,),
+                ),
+            ],
+          ),
+          IconButton(icon: Icon(Icons.close),
+            onPressed: (){
+            setState(() {
+              widget.emailReset="";
+            });
+          },)
+        ],
+      ),
+    );
+  }
+
   void move_screen(BuildContext context) async {
     ///change the name of the screen and send the lesson!
     await Navigator.push(context, MaterialPageRoute(builder: (context) => CreateUserScreen()));
@@ -194,8 +238,12 @@ class _LoginScreenState extends State<LoginScreen> {
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Stack(
+          child:
+          Form(
+          key: _formKey,
+          child:Stack(
             children: <Widget>[
+
               Container(
                 height: double.infinity,
                 width: double.infinity,
@@ -220,11 +268,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 40.0,
-                    vertical: 120.0,
+                    vertical: 90.0,
                   ),
-                  child: Column(
+                  child:
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      Visibility(
+                        child: messageReset(),
+                        visible:widget.emailReset==""?false:true ,
+                      ),
+                      SizedBox(height: 20.0),
                       Text(
                         'Sign In',
                         style: TextStyle(
@@ -241,14 +295,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       _buildPasswordTF(),
                       _buildForgotPasswordBtn(),
-                      _buildRememberMeCheckbox(),
                       _buildLoginBtn(),
+                  SizedBox(
+                    height: 3.0,
+                  ),
+                  Text(_error,style: TextStyle(
+                    color: Colors.red,
+                    fontFamily: 'OpenSans',
+                    fontSize: 15.0,
+                    ),
+                  ),
+                      SizedBox(
+                        height: 6.0,
+                      ),
                       _buildSignupBtn(),
                     ],
                   ),
                 ),
               )
             ],
+          ),
           ),
         ),
       ),

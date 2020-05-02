@@ -48,6 +48,10 @@ final kLabelStyle = TextStyle(
   fontFamily: 'OpenSans',
 );
 
+
+
+
+
 final kBoxDecorationStyle = BoxDecoration(
   color: Color(0xFF6CA8F1),
   borderRadius: BorderRadius.circular(10.0),

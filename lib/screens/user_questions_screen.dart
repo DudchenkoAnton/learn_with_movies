@@ -3,6 +3,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
+import 'package:temp_project/database/database_utilities.dart';
 
 
 class UserQuestionsScreen extends StatefulWidget {
@@ -146,7 +147,16 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
               onRatingChanged: (value) {
                 setState(() {
                   rating = value;
+                  DatabaseUtilities db = new DatabaseUtilities();
+                  lesson.setNumberViews(lesson.getNumberViews() + 1);
+                  double lesson_rating = ((lesson.getNumberReviews()
+                      * lesson.getAverageRating()) + rating)
+                      / (lesson.getNumberReviews() + 1);
+                  lesson.setAverageRating(lesson_rating);
+                  lesson.setNumberReviews(lesson.getNumberReviews() + 1);
+                  db.editLessonInDB(lesson);
                   Navigator.of(context).popUntil((route) => route.isFirst);
+
                 });
               },
             ),
@@ -154,6 +164,9 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
             FlatButton(
               child: new Text("Close"),
               onPressed: () {
+                DatabaseUtilities db = new DatabaseUtilities();
+                lesson.setNumberViews(lesson.getNumberViews() + 1);
+                db.editLessonInDB(lesson);
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
             ),

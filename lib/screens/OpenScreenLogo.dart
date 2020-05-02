@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:temp_project/screens/LoginScreen.dart';
+import 'package:temp_project/components/authenticate.dart';
 import 'dart:async';
 
 class OpenScreenLogo extends StatefulWidget {
@@ -12,7 +11,7 @@ class OpenScreenLogo extends StatefulWidget {
 class _OpenScreenLogoState extends State<OpenScreenLogo> {
   void route() async{
    await Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) => LoginScreen()
+        builder: (context) => Authenticate()
     )
     );
   }

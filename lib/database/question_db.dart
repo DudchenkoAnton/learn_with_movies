@@ -13,8 +13,15 @@ class QuestionDB {
       this.answer,
       this.videoEndPoint,
       this.videoStartPoint,
-      this.answerStartPoint,
-      this.answerEndPoint});
+      this.answerStartPoint = 0,
+      this.answerEndPoint = 0});
+
+  bool isAnswerVideoAdded() {
+    if (this.answerStartPoint == 0 && this.answerEndPoint == 0) {
+      return false;
+    }
+    return true;
+  }
 
 //  QuestionDB(String _videoURL, String _question, String _answer,
 //      double _videoStartTime, double _videoEndTime) {

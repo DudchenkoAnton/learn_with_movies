@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
+import 'package:temp_project/screens/LoginScreen.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
-import 'package:temp_project/screens/video_creator_screen.dart';
+import 'package:temp_project/database/auth.dart';
+
 
 class WidgetBar extends StatefulWidget {
   final String show;
@@ -13,8 +15,10 @@ class WidgetBar extends StatefulWidget {
   _WidgetBarState createState() => _WidgetBarState();
 }
 
-class _WidgetBarState extends State<WidgetBar> {
+class _WidgetBarState extends State<WidgetBar>{
+
   DatabaseUtilities db = new DatabaseUtilities();
+  final AuthService _auth=AuthService();
   var _searchView = new TextEditingController();
   List<LessonDB> allLesson = List<LessonDB>();
   var animationOn = true;
@@ -28,9 +32,14 @@ class _WidgetBarState extends State<WidgetBar> {
   }
 
   Future _getThingsOnStartup(show) async {
+    print(show);
     List<LessonDB> list = await db.getLessonsFromDB();
     allLesson.clear();
-    /////////sort by show
+    //sort the element by rating
+    if (show=="Best Movies"){
+      print("show is best");
+     // list.sort((a,b)=>a.getAverageRatingInt().compareTo(b.getAverageRatingInt()));
+    }
     allLesson.addAll(list);
     animationOn = false;
     setState(() {
@@ -43,36 +52,48 @@ class _WidgetBarState extends State<WidgetBar> {
       List<LessonDB> dummyListData = List<LessonDB>();
       allLesson.forEach((item) {
         if (item.getLessonName().contains(query)) {
-          dummyListData.add(item);
-        }
-      });
-      setState(() {
-        allLesson.clear();
-        allLesson.addAll(dummyListData);
-      });
-      return;
-    } else {
-      setState(() async {
-        _getThingsOnStartup(this.widget.show).then((value) {});
-      });
+            dummyListData.add(item);
+          }
+        });
+        setState(() {
+          allLesson.clear();
+          allLesson.addAll(dummyListData);
+        });
+      } else {
+          setState(() {
+            _getThingsOnStartup(this.widget.show).then((value) {});
+         });
     }
   }
+
+
+  Widget appBarWidget(){
+    return AppBar(
+      leading: IconButton(onPressed: () {setState(() {searchAction();});
+      },
+        icon: cusIcon,
+      ),
+      centerTitle: true,
+      title: cusSearchBar,
+      actions: <Widget>[IconButton(
+        onPressed: ()async{
+          await _auth.signOut();
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(emailReset: "",)));
+
+        },
+        icon: Icon(Icons.person,color: Colors.white,),
+      )
+      ],
+    );
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            setState(() {
-              searchAction();
-            });
-          },
-          icon: cusIcon,
-        ),
-        centerTitle: true,
-        title: cusSearchBar,
-      ),
+      appBar: appBarWidget(),
       body: animationOn ? create_animation() : _CardView(context),
     );
   }
@@ -101,8 +122,17 @@ class _WidgetBarState extends State<WidgetBar> {
     } else {
       this.cusIcon = Icon(Icons.search);
       this.cusSearchBar = Text("Learn With Movies");
+      filterSearchResults("");
     }
   }
+
+  bool _visible(index){
+    if(allLesson[index].averageRating==null){
+      return false;
+    }
+    return true;
+  }
+
 
   Widget _CardView(context) {
     return ListView.separated(
@@ -126,7 +156,21 @@ class _WidgetBarState extends State<WidgetBar> {
               ),
               ListTile(
                 title: Text(allLesson[index].lessonName),
-                subtitle: Text("${allLesson[index].getVideoLenght()} min"),
+                subtitle: Row(
+                    children: <Widget>[
+                      Text("${allLesson[index].getVideoLenght()} min"),
+                      Visibility(
+                        child: Row(
+                          children: <Widget>[
+                            Text(",  Rating: ${allLesson[index].averageRating}  "),
+                            Icon(Icons.star,size: 15.0,),
+                          ],
+                        ),
+                        visible: _visible(index)
+                      )
+
+               ]
+              ),
               ),
             ],
           );
@@ -159,13 +203,13 @@ class _WidgetBarState extends State<WidgetBar> {
   Widget create_animation() {
     return Container(
       color: Colors.grey[50],
-      width: 300.0,
-      height: 300.0,
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       child: SpinKitFadingCircle(
         itemBuilder: (_, int index) {
           return DecoratedBox(
             decoration: BoxDecoration(
-              color: index.isEven ? Colors.red : Colors.green,
+              color: index.isEven ? Colors.blueAccent : Colors.white,
             ),
           );
         },
@@ -173,4 +217,5 @@ class _WidgetBarState extends State<WidgetBar> {
       ),
     );
   }
+
 }
