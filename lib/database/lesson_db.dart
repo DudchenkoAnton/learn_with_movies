@@ -67,7 +67,11 @@ class LessonDB {
   }
 
   int getAverageRatingInt(){
-    return this.averageRating.round();
+    if (this.averageRating==null){
+      return 0;
+    }
+    print(((this.averageRating).roundToDouble()).toString());
+    return (this.averageRating).round();
   }
 
   double getAverageRating() {

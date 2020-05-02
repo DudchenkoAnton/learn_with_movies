@@ -37,8 +37,7 @@ class _WidgetBarState extends State<WidgetBar>{
     allLesson.clear();
     //sort the element by rating
     if (show=="Best Movies"){
-      print("show is best");
-     // list.sort((a,b)=>a.getAverageRatingInt().compareTo(b.getAverageRatingInt()));
+      list.sort((b,a)=>a.getAverageRatingInt().compareTo(b.getAverageRatingInt()));
     }
     allLesson.addAll(list);
     animationOn = false;
