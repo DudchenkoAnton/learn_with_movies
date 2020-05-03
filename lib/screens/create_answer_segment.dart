@@ -137,7 +137,7 @@ class _AnswerSegmentScreenState extends State<AnswerSegmentScreen> {
                 height: 10.0,
               ),
               Text(
-                'Choose the range of the question:',
+                'Choose the range of the answer:',
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),

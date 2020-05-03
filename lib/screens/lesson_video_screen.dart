@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/screens/user_questions_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'user_american_questions_screen.dart';
 
 class LessonVideoScreen extends StatefulWidget {
   static const String id = 'lesson_video_screen';
@@ -40,7 +41,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => UserQuestionsScreen(
+            builder: (context) => UserAmericanQuestionsScreen(
                   lessonDB: widget.lessonData,
                   title: "Questions",
                 )));
