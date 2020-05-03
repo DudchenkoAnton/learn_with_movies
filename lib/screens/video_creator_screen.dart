@@ -12,6 +12,7 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:temp_project/components/video_range_slider.dart';
+import 'package:temp_project/components/video_range_text_field.dart';
 
 class VideoCreatorScreen extends StatefulWidget {
   static const String id = 'video_creator_screen';
@@ -130,6 +131,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
       }
       showSpinner = false;
     });
+
+    setState(() {
+      isRange = true;
+      changeRangeSelection();
+    });
   }
 
   void updateVideoProvided() {
@@ -246,6 +252,34 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     _lessonNameFieldController.text = widget.videoData.lessonName;
 
     updateQuestionListOnScreen();
+  }
+
+  Widget selectionWidget = Container();
+  bool isRange = true;
+  void changeRangeSelection() {
+    if (isRange) {
+      selectionWidget = VideoRangeSlider(
+        startAt: startPointValue,
+        endAt: endPointValue,
+        length: videoLength,
+        enabled: videoProvided,
+        callbackToUpdateScreen: () {
+          setState(() {});
+        },
+      );
+    } else {
+      selectionWidget = VideoRangeText(
+        startAt: startPointValue,
+        endAt: endPointValue,
+        length: videoLength,
+        enabled: videoProvided,
+        callback: () {
+          setState(() {});
+        },
+      );
+    }
+
+    isRange = isRange ? false : true;
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -455,14 +489,12 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                           duration: const Duration(seconds: 1),
                           child: _myAnimatedWidget,
                         ),
-                        SizedBox(height: 8.0),
-                        VideoRangeSlider(
-                          startAt: startPointValue,
-                          endAt: endPointValue,
-                          length: videoLength,
-                          enabled: videoProvided,
+                        SizedBox(height: 16.0),
+                        Container(
+                          child: selectionWidget,
+                          height: 40,
                         ),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 16.0),
                         RawMaterialButton(
                           elevation: 6.0,
                           shape: RoundedRectangleBorder(
@@ -474,7 +506,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                             height: 50.0,
                           ),
                           // Todo: write callback, that changes widgets, that's shown on screen
-                          onPressed: null,
+                          onPressed: () {
+                            setState(() {
+                              changeRangeSelection();
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -523,85 +559,3 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     );
   }
 }
-
-//videoProvided
-//? SingleChildScrollView(
-//child: VideoCreatorDetails(
-//controller: _controller,
-//hasInitialVideo: true,
-//videoData: currentVideo,
-//))
-//: SingleChildScrollView(
-//child: VideoCreatorDetails(
-//controller: _controller,
-//hasInitialVideo: false,
-//videoData: currentVideo,
-//)),
-
-//  YoutubeMetaData metaData;
-//  Video currentVideoData;
-//  var selectedRange = RangeValues(0.0, 1.0);
-//
-//  QuestionsList videoWasChosenScreen = QuestionsList();
-
-//  void uploadVideoFromYoutube() {
-//    String videoID;
-//    print(currentVideoData.url);
-//    videoID = YoutubePlayer.convertUrlToId(currentVideoData.url);
-//    print(videoID);
-//    if (videoID == null) {
-//      return;
-//    }
-//    metaDataArrived = false;
-//    dataIsUploaded = true;
-//    _controller.load(videoID);
-//    _controller.pause();
-//  }
-
-//  void metaDataListener() {
-//    if (_controller.metadata == null ||
-//        _controller.metadata.title == null ||
-//        _controller.metadata.title == '') {
-//      metaData = _controller.metadata;
-//      return;
-//    }
-//    if (metaData.title != null &&
-//        metaData.title != _controller.metadata.title) {
-//      metaData = _controller.metadata;
-//      setState(() {
-//        metaDataArrived = true;
-//      });
-//      print('Meta data arrived');
-//      print(metaDataArrived);
-//      print(metaData);
-//      endPointValue = metaData.duration.inSeconds;
-//      videoLength = metaData.duration.inSeconds;
-//    }
-//  }
-
-//
-//  void playSelectedSegment() {
-//    Duration startPoint = Duration(seconds: startPointValue);
-//    _controller.seekTo(startPoint);
-//    _controller.play();
-//  }
-
-//  void checkBoxVideoName(value) {
-//    setState(() {
-//      copyNameCheckBoxValue = value;
-//      if (value == true) {
-//        selectedYoutubeName = true;
-//        nameFieldEnabled = false;
-//        currentVideoData.name = metaData.title;
-//      }
-//      selectedYoutubeName = false;
-//    });
-//  }
-
-//  void rangeSelectionFunction(RangeValues newRange) {
-//    setState(() {
-//      selectedRange = newRange;
-//      startPointValue = (videoLength * newRange.start).round();
-//      endPointValue = (videoLength * newRange.end).round();
-//    });
-//  }

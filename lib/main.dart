@@ -6,6 +6,7 @@ import 'package:temp_project/screens/video_creator_screen.dart';
 import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/screens/LoginScreen.dart';
 import 'screens/lessons_list_screen.dart';
+import 'screens/lessons_list_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -19,10 +20,10 @@ class MyApp extends StatelessWidget {
         VideoCreatorScreen.id: (context) => VideoCreatorScreen(),
         UserChooseLesson.id: (context) => UserChooseLesson(),
         LessonsListScreen.id: (context) => LessonsListScreen(),
-        LoginScreen.id: (context) => LoginScreen(emailReset: "",),
+        LoginScreen.id: (context) => LoginScreen(
+              emailReset: "",
+            ),
         OpenScreenLogo.id: (context) => OpenScreenLogo(),
-
-
       },
     );
   }

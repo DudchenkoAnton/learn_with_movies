@@ -17,6 +17,10 @@ const kTextFieldDecoration = InputDecoration(
   ),
 );
 
+const kTimePickerDecoration = InputDecoration(
+  hintText: '00',
+);
+
 const TextStyle kLabelBigButtonStyle = TextStyle(
   fontSize: 25.0,
   fontWeight: FontWeight.bold,
@@ -47,10 +51,6 @@ final kLabelStyle = TextStyle(
   fontWeight: FontWeight.bold,
   fontFamily: 'OpenSans',
 );
-
-
-
-
 
 final kBoxDecorationStyle = BoxDecoration(
   color: Color(0xFF6CA8F1),

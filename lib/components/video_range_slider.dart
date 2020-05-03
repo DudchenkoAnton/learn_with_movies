@@ -6,9 +6,13 @@ class VideoRangeSlider extends StatefulWidget {
   List<Duration> endAt;
   Duration length;
   bool enabled = true;
+  Function callbackToUpdateScreen;
+  bool lessonCreatorMode;
 
   VideoRangeSlider(
       {this.enabled = true,
+      this.lessonCreatorMode = false,
+      this.callbackToUpdateScreen,
       @required this.startAt,
       @required this.endAt,
       @required this.length});
@@ -20,6 +24,16 @@ class VideoRangeSlider extends StatefulWidget {
 class _VideoRangeSliderState extends State<VideoRangeSlider> {
   double _lowerValue = 0.0;
   double _upperValue = 100.0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.lessonCreatorMode == true) {
+      _lowerValue =
+          (widget.startAt[0].inSeconds * 100) / widget.length.inSeconds;
+      _upperValue = (widget.endAt[0].inSeconds * 100) / widget.length.inSeconds;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +75,11 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
 
                   int cur_minutes2 = (cur_seconds2 / 60).toInt();
                   cur_seconds2 -= cur_minutes * 60;
+
+                  if (widget.lessonCreatorMode &&
+                      widget.callbackToUpdateScreen != null) {
+                    widget.callbackToUpdateScreen();
+                  }
 
                   // print("Add question:" + _lowerValue.toString());
                   // print("Add answer:" + _upperValue.toString());
