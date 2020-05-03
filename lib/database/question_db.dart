@@ -2,6 +2,7 @@ class QuestionDB {
   String videoURL;
   String question;
   String answer;
+  String americanAnswers; // answer1;answer2;...;answerN
   int videoStartPoint;
   int videoEndPoint;
   int answerStartPoint;
@@ -11,6 +12,7 @@ class QuestionDB {
       {this.videoURL,
       this.question,
       this.answer,
+      this.americanAnswers = "",
       this.videoEndPoint,
       this.videoStartPoint,
       this.answerStartPoint = 0,
@@ -44,6 +46,10 @@ class QuestionDB {
     return this.answer;
   }
 
+  String getAmericanAnswers() {
+    return this.americanAnswers;
+  }
+
   int getVideoStartTime() {
     return this.videoStartPoint;
   }
@@ -70,6 +76,10 @@ class QuestionDB {
 
   void setAnswer(String arg) {
     this.answer = arg;
+  }
+
+  void setAmericanAnswers(String arg) {
+    this.americanAnswers = arg;
   }
 
   void setVideoStartTime(int arg) {

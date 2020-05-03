@@ -65,6 +65,7 @@ class DatabaseUtilities {
         'videoURL': question.getVideoURL(),
         'question': question.getQuestion(),
         'answer': question.getAnswer(),
+        'americanAnswers': question.getAmericanAnswers(),
         'videoStartPoint': question.getVideoStartTime(),
         'videoEndPoint': question.getVideoEndTime(),
         'answerStartPoint': question.getAnswerStartTime(),
@@ -150,6 +151,189 @@ class DatabaseUtilities {
             videoURL: data['videoURL'],
             question: data['question'],
             answer: data['answer'],
+            americanAnswers: data["americanAnswers"],
+            videoStartPoint: data['videoStartPoint'],
+            videoEndPoint: data['videoEndPoint'],
+            answerStartPoint: data['answerStartPoint'],
+            answerEndPoint: data['answerEndPoint']));
+      }
+
+      this.lessonsList.add(lesson);
+    }
+    return this.lessonsList;
+  }
+
+  Future<List<LessonDB>> getLessonsFromDBByViews(int lessonsNum) async {
+
+    QuerySnapshot querySnapshot =
+    await Firestore.instance.collection("lessons").orderBy("numberViews").getDocuments();
+    var arrivedLessonsList = querySnapshot.documents;
+
+    this.lessonsList = new List();
+
+    int count = 0;
+
+    for (var currentRow in arrivedLessonsList) {
+      count += 1;
+      if (count > lessonsNum) {
+        break;
+      }
+      var data = Map<String, dynamic>.from(currentRow.data);
+      QuerySnapshot querySnapshot = await Firestore.instance
+          .collection("lessons")
+          .document(currentRow.documentID)
+          .collection("questions")
+          .getDocuments();
+
+      var arrivedQuestionsList = querySnapshot.documents;
+
+      List<String> labels =
+      (data["labels"] as List).map((s) => (s as String)).toList();
+
+      LessonDB lesson = LessonDB(
+          videoURL: data['videoURL'],
+          lessonName: data['lessonName'],
+          videoStartPoint: data['videoStartPoint'],
+          videoEndPoint: data['videoEndPoint'],
+          labelsList: labels,
+          videoID: data['videoID'],
+          numberViews: data['numberViews'],
+          averageRating: data['averageRating'],
+          numberReviews: data['numberReviews']
+      );
+
+      lesson.setDBReference(currentRow.documentID);
+
+      for (var elm in arrivedQuestionsList) {
+        var data = Map<String, dynamic>.from(elm.data);
+        lesson.addQuestion(QuestionDB(
+            videoURL: data['videoURL'],
+            question: data['question'],
+            answer: data['answer'],
+            americanAnswers: data["americanAnswers"],
+            videoStartPoint: data['videoStartPoint'],
+            videoEndPoint: data['videoEndPoint'],
+            answerStartPoint: data['answerStartPoint'],
+            answerEndPoint: data['answerEndPoint']));
+      }
+
+      this.lessonsList.add(lesson);
+    }
+    return this.lessonsList;
+  }
+
+  Future<List<LessonDB>> getLessonsFromDBByRating(int lessonsNum) async {
+
+    QuerySnapshot querySnapshot =
+    await Firestore.instance.collection("lessons").orderBy("averageRating").getDocuments();
+    var arrivedLessonsList = querySnapshot.documents;
+
+    this.lessonsList = new List();
+
+    int count = 0;
+
+    for (var currentRow in arrivedLessonsList) {
+      count += 1;
+      if (count > lessonsNum) {
+        break;
+      }
+      var data = Map<String, dynamic>.from(currentRow.data);
+      QuerySnapshot querySnapshot = await Firestore.instance
+          .collection("lessons")
+          .document(currentRow.documentID)
+          .collection("questions")
+          .getDocuments();
+
+      var arrivedQuestionsList = querySnapshot.documents;
+
+      List<String> labels =
+      (data["labels"] as List).map((s) => (s as String)).toList();
+
+      LessonDB lesson = LessonDB(
+          videoURL: data['videoURL'],
+          lessonName: data['lessonName'],
+          videoStartPoint: data['videoStartPoint'],
+          videoEndPoint: data['videoEndPoint'],
+          labelsList: labels,
+          videoID: data['videoID'],
+          numberViews: data['numberViews'],
+          averageRating: data['averageRating'],
+          numberReviews: data['numberReviews']
+      );
+
+      lesson.setDBReference(currentRow.documentID);
+
+      for (var elm in arrivedQuestionsList) {
+        var data = Map<String, dynamic>.from(elm.data);
+        lesson.addQuestion(QuestionDB(
+            videoURL: data['videoURL'],
+            question: data['question'],
+            answer: data['answer'],
+            americanAnswers: data["americanAnswers"],
+            videoStartPoint: data['videoStartPoint'],
+            videoEndPoint: data['videoEndPoint'],
+            answerStartPoint: data['answerStartPoint'],
+            answerEndPoint: data['answerEndPoint']));
+      }
+
+      this.lessonsList.add(lesson);
+    }
+    return this.lessonsList;
+  }
+
+  Future<List<LessonDB>> getLessonsFromDBByString(String str, int lessonsNum) async {
+
+    String lessonsNumBiggestSubstring = str + "\uF7FF";
+
+    QuerySnapshot querySnapshot =
+    await this.databaseReference.collection("lessons")
+        .where("lessonName", isGreaterThanOrEqualTo: str)
+        .where("lessonName", isLessThanOrEqualTo: lessonsNumBiggestSubstring)
+        .getDocuments();
+    var arrivedLessonsList = querySnapshot.documents;
+
+    this.lessonsList = new List();
+
+    int count = 0;
+
+    for (var currentRow in arrivedLessonsList) {
+      count += 1;
+      if (count > lessonsNum) {
+        break;
+      }
+      var data = Map<String, dynamic>.from(currentRow.data);
+      QuerySnapshot querySnapshot = await Firestore.instance
+          .collection("lessons")
+          .document(currentRow.documentID)
+          .collection("questions")
+          .getDocuments();
+
+      var arrivedQuestionsList = querySnapshot.documents;
+
+      List<String> labels =
+      (data["labels"] as List).map((s) => (s as String)).toList();
+
+      LessonDB lesson = LessonDB(
+          videoURL: data['videoURL'],
+          lessonName: data['lessonName'],
+          videoStartPoint: data['videoStartPoint'],
+          videoEndPoint: data['videoEndPoint'],
+          labelsList: labels,
+          videoID: data['videoID'],
+          numberViews: data['numberViews'],
+          averageRating: data['averageRating'],
+          numberReviews: data['numberReviews']
+      );
+
+      lesson.setDBReference(currentRow.documentID);
+
+      for (var elm in arrivedQuestionsList) {
+        var data = Map<String, dynamic>.from(elm.data);
+        lesson.addQuestion(QuestionDB(
+            videoURL: data['videoURL'],
+            question: data['question'],
+            answer: data['answer'],
+            americanAnswers: data["americanAnswers"],
             videoStartPoint: data['videoStartPoint'],
             videoEndPoint: data['videoEndPoint'],
             answerStartPoint: data['answerStartPoint'],

@@ -22,6 +22,9 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 //  TextEditingController _endAtController = TextEditingController();
   TextEditingController _questionController = TextEditingController();
   TextEditingController _answerController = TextEditingController();
+  TextEditingController _inc_answerController_1 = TextEditingController();
+  TextEditingController _inc_answerController_2 = TextEditingController();
+  TextEditingController _inc_answerController_3 = TextEditingController();
   String id = "https://www.youtube.com/embed/rna7NSJFVy8?&end=50";
 
   double _lowerValue = 0.0;
@@ -68,6 +71,10 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
       temp.setQuestion(_questionController.text);
       temp.setAnswer(_answerController.text);
+      temp.setAmericanAnswers(
+          _inc_answerController_1.text + ";" +
+              _inc_answerController_2.text + ";" +
+              _inc_answerController_3.text);
       temp.setVideoStartTime(startAt[0].inSeconds);
       temp.setVideoEndTime(endAt[0].inSeconds);
       temp.setVideoURL(widget.videoData.videoURL);
@@ -185,6 +192,36 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                   controller: _answerController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(), hintText: 'Enter Answer'),
+                ),
+              ),
+              Text(
+                'Enter 3 incorrect possible answers',
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _inc_answerController_1,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Enter incorrect answer #1'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _inc_answerController_2,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Enter incorrect answer #2'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _inc_answerController_3,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Enter incorrect answer #3'),
                 ),
               ),
               SizedBox(
