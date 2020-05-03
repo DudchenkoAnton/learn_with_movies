@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -6,21 +7,21 @@ import 'package:temp_project/database/question_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 
 
-class UserQuestionsScreen extends StatefulWidget {
+class UserAmericanQuestionsScreen extends StatefulWidget {
   static const String id = 'lesson_video_screen';
 
   LessonDB lessonDB;
 
-  UserQuestionsScreen({Key key, this.title, @required this.lessonDB})
+  UserAmericanQuestionsScreen({Key key, this.title, @required this.lessonDB})
       : super(key: key);
 
   final String title;
 
   @override
-  _UserQuestionsScreenState createState() => _UserQuestionsScreenState();
+  _UserAmericanQuestionsScreenState createState() => _UserAmericanQuestionsScreenState();
 }
 
-class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
+class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScreen> {
   int _counter = 0;
   int _cur_question = 0;
   TextEditingController _answerController = TextEditingController();
@@ -36,6 +37,86 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
   bool isAnswerDisclosed = true;
   var rating = 0.0;
 
+  String answer_option_1 = "";
+  String answer_option_2 = "";
+  String answer_option_3 = "";
+  String answer_option_4 = "";
+
+  List<int> answer_options = [1, 2, 3, 4];
+
+  int correctAnswerNum = 0;
+
+
+  void defineOptionsForAnswers() {
+
+    List<String> incorrectOptionsList = question.getAmericanAnswers().split(";");
+
+    Random random = new Random();
+    correctAnswerNum = answer_options[random.nextInt(answer_options.length)];
+    answer_options.remove(correctAnswerNum);
+    int incorrect_option_1 = answer_options[random.nextInt(answer_options.length)];
+    answer_options.remove(incorrect_option_1);
+    int incorrect_option_2 = answer_options[random.nextInt(answer_options.length)];
+    answer_options.remove(incorrect_option_2);
+    int incorrect_option_3 = answer_options[0];
+
+    if (correctAnswerNum == 1) {
+      answer_option_1 = question.getAnswer();
+    }
+    if (correctAnswerNum == 2) {
+      answer_option_2 = question.getAnswer();
+    }
+    if (correctAnswerNum == 3) {
+      answer_option_3 = question.getAnswer();
+    }
+    if (correctAnswerNum == 4) {
+      answer_option_4 = question.getAnswer();
+    }
+
+    if (incorrect_option_1 == 1) {
+      answer_option_1 = incorrectOptionsList[0];
+    }
+    if (incorrect_option_1 == 2) {
+      answer_option_2 = incorrectOptionsList[0];
+    }
+    if (incorrect_option_1 == 3) {
+      answer_option_3 = incorrectOptionsList[0];
+    }
+    if (incorrect_option_1 == 4) {
+      answer_option_4 = incorrectOptionsList[0];
+    }
+
+    if (incorrect_option_2 == 1) {
+      answer_option_1 = incorrectOptionsList[1];
+    }
+    if (incorrect_option_2 == 2) {
+      answer_option_2 = incorrectOptionsList[1];
+    }
+    if (incorrect_option_2 == 3) {
+      answer_option_3 = incorrectOptionsList[1];
+    }
+    if (incorrect_option_2 == 4) {
+      answer_option_4 = incorrectOptionsList[1];
+    }
+
+    if (incorrect_option_3 == 1) {
+      answer_option_1 = incorrectOptionsList[2];
+    }
+    if (incorrect_option_3 == 2) {
+      answer_option_2 = incorrectOptionsList[2];
+    }
+    if (incorrect_option_3 == 3) {
+      answer_option_3 = incorrectOptionsList[2];
+    }
+    if (incorrect_option_3 == 4) {
+      answer_option_4 = incorrectOptionsList[2];
+    }
+
+    answer_options = [1, 2, 3, 4];
+
+  }
+
+
   @override
   void initState() {
     //TODO: update videoLengthOriginal, startAt, endAt, depending on received video data
@@ -43,6 +124,8 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
     questions = lesson.getQuestionsList();
 
     QuestionDB question = questions[0];
+
+    //defineOptionsForAnswers();
 
     curQuestionStartPoint = question.getVideoStartTime();
     curQuestionEndPoint = question.getVideoEndTime();
@@ -73,6 +156,74 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
     super.initState();
   }
 
+  void handle_option_1() {
+    setState(() {
+      if (correctAnswerNum == 1) {
+        result = "Correct!";
+      }
+      if (correctAnswerNum == 2) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 3) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 4) {
+        result = "Incorrect!";
+      }
+    });
+  }
+
+  void handle_option_2() {
+    setState(() {
+      if (correctAnswerNum == 1) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 2) {
+        result = "Correct!";
+      }
+      if (correctAnswerNum == 3) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 4) {
+        result = "Incorrect!";
+      }
+    });
+  }
+
+  void handle_option_3() {
+    setState(() {
+      if (correctAnswerNum == 1) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 2) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 3) {
+        result = "Correct!";
+      }
+      if (correctAnswerNum == 4) {
+        result = "Incorrect!";
+      }
+    });
+  }
+
+  void handle_option_4() {
+    setState(() {
+      if (correctAnswerNum == 1) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 2) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 3) {
+        result = "Incorrect!";
+      }
+      if (correctAnswerNum == 4) {
+        result = "Correct!";
+      }
+    });
+  }
+
   void nextQuestion() {
     disclossedAnswer = "";
     isAnswerDisclosed = true;
@@ -92,6 +243,8 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
     } else {
       question = lesson.getQuestionsList()[_cur_question];
       _cur_question += 1;
+
+      //defineOptionsForAnswers();
 
       setState(() {
         curQuestionText = question.getQuestion();
@@ -232,6 +385,7 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
   @override
   Widget build(BuildContext context) {
     question = lesson.getQuestionsList()[_cur_question - 1];
+    defineOptionsForAnswers();
 
     return Scaffold(
       appBar: AppBar(
@@ -269,51 +423,55 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-
-            YoutubePlayer(
-              controller: _controller,
-              showVideoProgressIndicator: true,
-              onReady: () {
-                _controller.seekTo(Duration(seconds: curQuestionStartPoint));
-                print('Player is ready.');
-              },
-            ),
             Text(
               '$curQuestionText',
               style: Theme.of(context).textTheme.display1,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: _answerController,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter Answer'),
-              ),
-            ),
+
             RaisedButton(
-              child: Text("Check Answer"),
-              onPressed: checkAnswer,
-              color: Colors.green,
-              textColor: Colors.amberAccent,
+              child: Text(answer_option_1),
+              onPressed: handle_option_1,
+              //onPressed: discloseAnswer,
+              color: Colors.grey,
+              textColor: Colors.white,
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              splashColor: Colors.grey,
+              splashColor: Colors.blueGrey,
+            ),
+
+
+            RaisedButton(
+              child: Text(answer_option_2),
+              onPressed: handle_option_2,
+              //onPressed: discloseAnswer,
+              color: Colors.grey,
+              textColor: Colors.white,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              splashColor: Colors.blueGrey,
+            ),
+
+
+            RaisedButton(
+              child: Text(answer_option_3),
+              onPressed: handle_option_3,
+              //onPressed: discloseAnswer,
+              color: Colors.grey,
+              textColor: Colors.white,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              splashColor: Colors.blueGrey,
+            ),
+
+
+            RaisedButton(
+              child: Text(answer_option_4),
+              onPressed: handle_option_4,
+              //onPressed: discloseAnswer,
+              color: Colors.grey,
+              textColor: Colors.white,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              splashColor: Colors.blueGrey,
             ),
             Text(
               '$result',
-              style: Theme.of(context).textTheme.display1,
-            ),
-
-            RaisedButton(
-              child: Text("Disclose the answer"),
-              onPressed: isAnswerDisclosed ? null : _showAnswer,
-              //onPressed: discloseAnswer,
-              color: Colors.green,
-              textColor: Colors.amberAccent,
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              splashColor: Colors.grey,
-            ),
-            Text(
-              '$disclossedAnswer',
               style: Theme.of(context).textTheme.display1,
             ),
           ],

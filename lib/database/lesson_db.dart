@@ -12,7 +12,7 @@ class LessonDB {
   String videoID;
   String dbDocumentID;
   int numberViews; // amount of views of lesson
-  double averageRating;
+  double averageRating ;
   int numberReviews; // amount of users that leaves a rating
 
   LessonDB({
@@ -25,9 +25,9 @@ class LessonDB {
     this.youtubeOriginalName,
     this.videoID,
     this.questionsList,
-    this.numberViews,
-    this.averageRating,
-    this.numberReviews
+    this.numberViews = 0,
+    this.averageRating = 0,
+    this.numberReviews = 0
   });
 
   String getVideoID() {

@@ -2,6 +2,7 @@ class QuestionDB {
   String videoURL;
   String question;
   String answer;
+  String americanAnswers; // answer1;answer2;...;answerN
   int videoStartPoint;
   int videoEndPoint;
   int answerStartPoint;
@@ -11,10 +12,18 @@ class QuestionDB {
       {this.videoURL,
       this.question,
       this.answer,
+      this.americanAnswers = "",
       this.videoEndPoint,
       this.videoStartPoint,
-      this.answerStartPoint,
-      this.answerEndPoint});
+      this.answerStartPoint = 0,
+      this.answerEndPoint = 0});
+
+  bool isAnswerVideoAdded() {
+    if (this.answerStartPoint == 0 && this.answerEndPoint == 0) {
+      return false;
+    }
+    return true;
+  }
 
 //  QuestionDB(String _videoURL, String _question, String _answer,
 //      double _videoStartTime, double _videoEndTime) {
@@ -35,6 +44,10 @@ class QuestionDB {
 
   String getAnswer() {
     return this.answer;
+  }
+
+  String getAmericanAnswers() {
+    return this.americanAnswers;
   }
 
   int getVideoStartTime() {
@@ -63,6 +76,10 @@ class QuestionDB {
 
   void setAnswer(String arg) {
     this.answer = arg;
+  }
+
+  void setAmericanAnswers(String arg) {
+    this.americanAnswers = arg;
   }
 
   void setVideoStartTime(int arg) {
