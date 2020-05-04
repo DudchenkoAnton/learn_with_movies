@@ -187,9 +187,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
     _questionsList.clear();
     for (int i = 0; i < currentLesson.questionsList.length; i++) {
       _questionsList.add(QuestionDataContainer(
-        mainInfo: currentLesson.questionsList[i].answer,
-        secondaryInfo:
-            '${currentLesson.questionsList[i].getVideoStartTime()}-${currentLesson.questionsList[i].getVideoEndTime()}',
+        numberOfQuestion: (i + 1).toString(),
+        questionText: currentLesson.questionsList[i].question,
+        answerText: currentLesson.questionsList[i].answer,
         onRemove: () {
           currentLesson.questionsList.removeAt(i);
           setState(() {
