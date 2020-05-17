@@ -156,7 +156,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
         itemBuilder: (_, int index) {
           return DecoratedBox(
             decoration: BoxDecoration(
-              color: index.isEven ? Colors.red : Colors.green,
+              color: index.isEven ? Colors.blueAccent : Colors.white,
             ),
           );
         },

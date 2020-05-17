@@ -19,13 +19,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: OpenScreenLogo.id,
       routes: {
-        VideoCreatorScreen.id: (context) => VideoCreatorScreen(),
         UserChooseLesson.id: (context) => UserChooseLesson(),
-        LessonsListScreen.id: (context) => LessonsListScreen(),
         LoginScreen.id: (context) => LoginScreen(
               emailReset: "",
             ),
+        VideoCreatorScreen.id: (context) => VideoCreatorScreen(),
+        LessonsListScreen.id: (context) => LessonsListScreen(),
         OpenScreenLogo.id: (context) => OpenScreenLogo(),
+
       },
     );
   }

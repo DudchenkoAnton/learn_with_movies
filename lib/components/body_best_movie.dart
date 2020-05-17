@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:temp_project/components/side_menu.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/LoginScreen.dart';
@@ -7,15 +8,12 @@ import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
 
 
-class WidgetBar extends StatefulWidget {
-  final String show;
-  WidgetBar({Key key, this.show}) : super(key: key);
-
+class BodyBestMovie extends StatefulWidget {
   @override
-  _WidgetBarState createState() => _WidgetBarState();
+  _BodyBestMovieState createState() => _BodyBestMovieState();
 }
 
-class _WidgetBarState extends State<WidgetBar>{
+class _BodyBestMovieState extends State<BodyBestMovie>{
 
   DatabaseUtilities db = new DatabaseUtilities();
   final AuthService _auth=AuthService();
@@ -27,18 +25,15 @@ class _WidgetBarState extends State<WidgetBar>{
 
   @override
   void initState() {
-    _getThingsOnStartup(this.widget.show).then((value) {});
+    _getThingsOnStartup().then((value) {});
     super.initState();
   }
 
-  Future _getThingsOnStartup(show) async {
-    print(show);
+  Future _getThingsOnStartup() async {
     List<LessonDB> list = await db.getLessonsFromDB();
     allLesson.clear();
     //sort the element by rating
-    if (show=="Best Movies"){
-      list.sort((b,a)=>a.getAverageRatingInt().compareTo(b.getAverageRatingInt()));
-    }
+    list.sort((b,a)=>a.getAverageRatingInt().compareTo(b.getAverageRatingInt()));
     allLesson.addAll(list);
     animationOn = false;
     setState(() {
@@ -60,7 +55,7 @@ class _WidgetBarState extends State<WidgetBar>{
         });
       } else {
           setState(() {
-            _getThingsOnStartup(this.widget.show).then((value) {});
+            _getThingsOnStartup().then((value) {});
          });
     }
   }
@@ -68,21 +63,13 @@ class _WidgetBarState extends State<WidgetBar>{
 
   Widget appBarWidget(){
     return AppBar(
-      leading: IconButton(onPressed: () {setState(() {searchAction();});
+      actions:<Widget>[IconButton(onPressed: () {setState(() {searchAction();});
       },
         icon: cusIcon,
       ),
+      ],
       centerTitle: true,
       title: cusSearchBar,
-      actions: <Widget>[IconButton(
-        onPressed: ()async{
-          await _auth.signOut();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(emailReset: "",)));
-
-        },
-        icon: Icon(Icons.person,color: Colors.white,),
-      )
-      ],
     );
   }
 
@@ -92,7 +79,8 @@ class _WidgetBarState extends State<WidgetBar>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(),
+      appBar: appBarWidget(),drawer: SideMenu(),
+
       body: animationOn ? create_animation() : _CardView(context),
     );
   }

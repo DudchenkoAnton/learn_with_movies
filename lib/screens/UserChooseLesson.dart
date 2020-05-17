@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:temp_project/components/WidgetBar.dart';
+import 'package:temp_project/components/body_best_movie.dart';
+import 'package:temp_project/components/body_history.dart';
+import 'package:temp_project/components/side_menu.dart';
 class UserChooseLesson extends StatefulWidget {
   static const String id = 'user_choose_lesson_screen';
 
@@ -11,9 +13,8 @@ class _UserChooseLessonState extends State<UserChooseLesson> {
 
 
   final List<Widget> _children = [
-   new WidgetBar(show: "Home",),
-   new WidgetBar(show: "Best Movies",),
-    new WidgetBar(show: "History",),
+    new BodyBestMovie(),
+    new BodyHistory(),
   ];
 
 
@@ -30,20 +31,10 @@ class _UserChooseLessonState extends State<UserChooseLesson> {
     });
   }
 
-/*
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-      print(_currentIndex);
-    });
-  }
-*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     // body: _children.elementAt(_currentIndex), // new
-
-     body: PageView(
+      body: PageView(
          controller: pageController,
          onPageChanged: _onPageChanged,
          children: _children,),
@@ -52,10 +43,6 @@ class _UserChooseLessonState extends State<UserChooseLesson> {
         onTap: onTabTapped, // new
         currentIndex: _currentIndex, // new
         items: [
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.home),
-            title: new Text('Home'),
-          ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.star_border),
             title: new Text('Best Movies'),
