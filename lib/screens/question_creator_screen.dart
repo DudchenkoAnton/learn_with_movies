@@ -22,9 +22,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 //  TextEditingController _endAtController = TextEditingController();
   TextEditingController _questionController = TextEditingController();
   TextEditingController _answerController = TextEditingController();
-  TextEditingController _inc_answerController_1 = TextEditingController();
-  TextEditingController _inc_answerController_2 = TextEditingController();
-  TextEditingController _inc_answerController_3 = TextEditingController();
+  TextEditingController _answerController2 = TextEditingController();
+  TextEditingController _answerController3 = TextEditingController();
+  TextEditingController _answerController4 = TextEditingController();
+  TextEditingController _answer_open_format = TextEditingController();
+
   String id = "https://www.youtube.com/embed/rna7NSJFVy8?&end=50";
 
   double _lowerValue = 0.0;
@@ -35,6 +37,22 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   QuestionDB temp = QuestionDB();
 
   YoutubePlayerController _controller;
+
+  Color option_color_1 = Colors.green;
+  Color option_color_2 = Colors.white;
+  Color option_color_3 = Colors.white;
+  Color option_color_4 = Colors.white;
+
+  String option_text_1 = "o";
+  String option_text_2 = "o";
+  String option_text_3 = "o";
+  String option_text_4 = "o";
+
+  int correct_answer = 1;
+
+  int format_of_question = 0;
+
+  Widget selectedWidget = Container();
 
   void _incrementCounter() {
     setState(() {
@@ -67,19 +85,47 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   }
 
   void saveQuestion() {
-    if (_questionController.text != '' && _answerController.text != '') {
+
+
+    if (format_of_question == 1) {
+      List<String> answers = [_answerController.text, _answerController2.text,
+        _answerController3.text, _answerController4.text];
+
+      String correct_answer_str = "";
+
+      if (correct_answer == 1) {
+        correct_answer_str= answers.removeAt(0);
+      }
+      if (correct_answer == 2) {
+        correct_answer_str = answers.removeAt(1);
+      }
+      if (correct_answer == 3) {
+        correct_answer_str = answers.removeAt(2);
+      }
+      if (correct_answer == 4) {
+        correct_answer_str = answers.removeAt(3);
+      }
 
       temp.setQuestion(_questionController.text);
-      temp.setAnswer(_answerController.text);
+      temp.setAnswer(correct_answer_str);
       temp.setAmericanAnswers(
-          _inc_answerController_1.text + ";" +
-              _inc_answerController_2.text + ";" +
-              _inc_answerController_3.text);
-      temp.setVideoStartTime(startAt[0].inSeconds);
-      temp.setVideoEndTime(endAt[0].inSeconds);
-      temp.setVideoURL(widget.videoData.videoURL);
-      Navigator.pop(context, temp);
+          answers[0] + ";" +
+              answers[1] + ";" +
+              answers[2]);
     }
+
+    if (format_of_question == 2) {
+
+      temp.setQuestion(_questionController.text);
+      temp.setAnswer(_answer_open_format.text);
+    }
+
+
+    temp.setVideoStartTime(startAt[0].inSeconds);
+    temp.setVideoEndTime(endAt[0].inSeconds);
+    temp.setVideoURL(widget.videoData.videoURL);
+    Navigator.pop(context, temp);
+
     print("Add question:" + _questionController.text);
     print("Add answer:" + _answerController.text);
 
@@ -130,10 +176,48 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       }
     });
     super.initState();
+
+
+    selectedWidget = Container(
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+
+            YoutubePlayer(
+              controller: _controller,
+              showVideoProgressIndicator: true,
+              onReady: () {
+                _controller.seekTo(startAt[0]);
+                print('Player is ready.');
+              },
+            ),
+            Text(
+              'Range video for answer',
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
+            VideoRangeSlider(
+              startAt: startAt,
+              endAt: endAt,
+              length: videoLengthOriginal,
+            ),
+          ],
+        ),
+      ),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
+
+
+
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -148,110 +232,384 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
           )
         ],
       ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
+      body: ListView(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              YoutubePlayer(
-                controller: _controller,
-                showVideoProgressIndicator: true,
-                onReady: () {
-                 _controller.seekTo(startAt[0]);
-                  print('Player is ready.');
+
+              Padding(padding: const EdgeInsets.all(8.0),
+                  child:FlatButton(
+                    onPressed: () {
+
+                      format_of_question = 1;
+
+                      setState(() {
+                        selectedWidget = Container(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: _questionController,
+                                    decoration: InputDecoration(
+                                        enabledBorder: const OutlineInputBorder(
+                                          borderRadius: const BorderRadius.all(
+                                            const Radius.circular(8.0),
+                                          ),
+                                          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                                        ),
+                                        contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                          borderSide: BorderSide(
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                        hintText: 'Enter the Question'),
+                                  ),
+                                ),
+                                Text(
+                                  'Marker one correct answer:',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                                ),
+
+                                Row(
+                                  children: <Widget>[
+
+                                    RawMaterialButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          option_color_4 = Colors.green;
+                                          option_color_1 = Colors.white;
+                                          option_color_2 = Colors.white;
+                                          option_color_3 = Colors.white;
+
+                                          correct_answer = 1;
+                                        });
+                                      },
+                                      elevation: 2.0,
+                                      fillColor: option_color_1,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        size: 17.0,
+                                      ),
+                                      padding: EdgeInsets.all(15.0),
+                                      shape: CircleBorder(),
+                                    ),
+
+
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: _answerController,
+                                          decoration: InputDecoration(
+                                              enabledBorder: const OutlineInputBorder(
+                                                borderRadius: const BorderRadius.all(
+                                                  const Radius.circular(8.0),
+                                                ),
+                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                                              ),
+                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8.0),
+                                                borderSide: BorderSide(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              hintText: 'Enter answer #1'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+
+                                Row(
+                                  children: <Widget>[
+
+                                    RawMaterialButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          option_color_2 = Colors.green;
+                                          option_color_1 = Colors.white;
+                                          option_color_4 = Colors.white;
+                                          option_color_3 = Colors.white;
+
+                                          correct_answer = 2;
+                                        });
+                                      },
+                                      elevation: 2.0,
+                                      fillColor: option_color_2,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        size: 17.0,
+                                      ),
+                                      padding: EdgeInsets.all(15.0),
+                                      shape: CircleBorder(),
+                                    ),
+
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: _answerController2,
+                                          decoration: InputDecoration(
+                                              enabledBorder: const OutlineInputBorder(
+                                                borderRadius: const BorderRadius.all(
+                                                  const Radius.circular(8.0),
+                                                ),
+                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                                              ),
+                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8.0),
+                                                borderSide: BorderSide(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              hintText: 'Enter answer #2'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: <Widget>[
+
+                                    RawMaterialButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          option_color_3 = Colors.green;
+                                          option_color_1 = Colors.white;
+                                          option_color_2 = Colors.white;
+                                          option_color_4 = Colors.white;
+
+                                          correct_answer = 3;
+                                        });
+                                      },
+                                      elevation: 2.0,
+                                      fillColor: option_color_3,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        size: 17.0,
+                                      ),
+                                      padding: EdgeInsets.all(15.0),
+                                      shape: CircleBorder(),
+                                    ),
+
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: _answerController3,
+                                          decoration: InputDecoration(
+                                              enabledBorder: const OutlineInputBorder(
+                                                borderRadius: const BorderRadius.all(
+                                                  const Radius.circular(8.0),
+                                                ),
+                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                                              ),
+                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8.0),
+                                                borderSide: BorderSide(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              hintText: 'Enter answer #3'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: <Widget>[
+
+                                    RawMaterialButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          option_color_4 = Colors.green;
+                                          option_color_1 = Colors.white;
+                                          option_color_2 = Colors.white;
+                                          option_color_3 = Colors.white;
+
+                                          correct_answer = 4;
+                                        });
+                                      },
+                                      elevation: 2.0,
+                                      fillColor: option_color_4,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        size: 17.0,
+                                      ),
+                                      padding: EdgeInsets.all(15.0),
+                                      shape: CircleBorder(),
+                                    ),
+
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: _answerController4,
+                                          decoration: InputDecoration(
+                                              enabledBorder: const OutlineInputBorder(
+                                                borderRadius: const BorderRadius.all(
+                                                  const Radius.circular(8.0),
+                                                ),
+                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                                              ),
+                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8.0),
+                                                borderSide: BorderSide(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              hintText: 'Enter answer #4'),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                YoutubePlayer(
+                                  controller: _controller,
+                                  showVideoProgressIndicator: true,
+                                  onReady: () {
+                                    _controller.seekTo(startAt[0]);
+                                    print('Player is ready.');
+                                  },
+                                ),
+                                Text(
+                                  'Range video for answer',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                                ),
+                                SizedBox(
+                                  height: 10.0,
+                                ),
+                                VideoRangeSlider(
+                                  startAt: startAt,
+                                  endAt: endAt,
+                                  length: videoLengthOriginal,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      });
+                    },
+                    child: Text("\nmultiple\nchoise\nquestion\n", style: TextStyle(color: Colors.black, fontSize: 20),),
+                    shape: RoundedRectangleBorder(side: BorderSide(
+                        color: Colors.blue,
+                        width: 4,
+                        style: BorderStyle.solid
+                    ), borderRadius: BorderRadius.circular(20)),
+                  ),),
+
+
+
+
+
+              FlatButton(
+                onPressed: () {
+                  format_of_question = 2;
+                  setState(() {
+    selectedWidget = Container(
+    child: SingleChildScrollView(
+    child: Column(
+    children: <Widget>[
+    Padding(
+
+    padding: const EdgeInsets.all(8.0),
+    child: TextFormField(
+    controller: _questionController,
+    decoration: InputDecoration(
+    enabledBorder: const OutlineInputBorder(
+    borderRadius: const BorderRadius.all(
+    const Radius.circular(8.0),
+    ),
+    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+    ),
+    contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
+    border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8.0),
+    borderSide: BorderSide(
+    color: Colors.blue,
+    ),
+    ),
+    hintText: 'Enter the Question'),
+    ),
+    ),
+      Padding (
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        controller: _answer_open_format,
+        decoration: InputDecoration(
+            enabledBorder: const OutlineInputBorder(
+              borderRadius: const BorderRadius.all(
+                const Radius.circular(8.0),
+              ),
+              borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+            ),
+            contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(
+                color: Colors.blue,
+              ),
+            ),
+            hintText: 'Enter the Answer'),
+      ),
+    ),
+    YoutubePlayer(
+    controller: _controller,
+    showVideoProgressIndicator: true,
+    onReady: () {
+    _controller.seekTo(startAt[0]);
+    print('Player is ready.');
+    },
+    ),
+    Text(
+    'Range video for answer',
+    textAlign: TextAlign.center,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+    ),
+    SizedBox(
+    height: 10.0,
+    ),
+    VideoRangeSlider(
+    startAt: startAt,
+    endAt: endAt,
+    length: videoLengthOriginal,
+    ),
+    ],
+    ),
+    ),
+    );
+    });
+
                 },
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              Text(
-                'Question',
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _questionController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Question'),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Text(
-                'Answer',
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _answerController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Answer'),
-                ),
-              ),
-              Text(
-                'Enter 3 incorrect possible answers',
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _inc_answerController_1,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter incorrect answer #1'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _inc_answerController_2,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter incorrect answer #2'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: _inc_answerController_3,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter incorrect answer #3'),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Text(
-                'Choose the range of the question:',
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              VideoRangeSlider(
-                startAt: startAt,
-                endAt: endAt,
-                length: videoLengthOriginal,
-              ),
-              RaisedButton(
-                child: Text("To add segment of answer"),
-                onPressed: addAnswerSegment,
-                color: Colors.green,
-                textColor: Colors.amberAccent,
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                splashColor: Colors.grey,
+
+                child: Text("\nopen\nquestion\n\n", style: TextStyle(color: Colors.black, fontSize: 20),),
+                shape: RoundedRectangleBorder(side: BorderSide(
+                    color: Colors.blue,
+                    width: 4,
+                    style: BorderStyle.solid
+                ), borderRadius: BorderRadius.circular(20)),
               ),
             ],
           ),
-        ),
+          Container(
+            child: selectedWidget,
+          )
+        ],
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
