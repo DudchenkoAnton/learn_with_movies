@@ -5,6 +5,8 @@ import 'package:temp_project/screens/LoginScreen.dart';
 import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/utilites/constants.dart';
 
+import '../database/database_utilities.dart';
+
 class CreateUserScreen extends StatefulWidget {
   @override
   static const String id = 'CreateUserScreen';
@@ -12,13 +14,14 @@ class CreateUserScreen extends StatefulWidget {
 }
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
-  final AuthService _auth=AuthService();
-  final _formKey=GlobalKey<FormState>();
-  String _email='';
-  String _password='';
-  String error='';
+  DatabaseUtilities db = new DatabaseUtilities();
+  final AuthService _auth = AuthService();
+  final _formKey = GlobalKey<FormState>();
+  String _email = '';
+  String _password = '';
+  String error = '';
 
-  bool notSamePassword=false;
+  bool notSamePassword = false;
 
   Widget _buildEmailTF() {
     return Column(
@@ -34,10 +37,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            onChanged: (input){
-              setState(() =>_email=input);
+            onChanged: (input) {
+              setState(() => _email = input);
             },
-            validator: (input)=>input.isEmpty?'Enter an email':null,
+            validator: (input) => input.isEmpty ? 'Enter an email' : null,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -73,10 +76,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextFormField(
-            onChanged: (input){
-              setState(() =>_password=input);
+            onChanged: (input) {
+              setState(() => _password = input);
             },
-            validator: (input)=>input.length<6?'Enter a password with 6 chars long':null,
+            validator: (input) =>
+                input.length < 6 ? 'Enter a password with 6 chars long' : null,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -98,12 +102,18 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     );
   }
 
-
   Widget _buildHaveAccountBtn() {
     return Container(
       alignment: Alignment.center,
       child: FlatButton(
-        onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(emailReset: "",)));},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LoginScreen(
+                        emailReset: "",
+                      )));
+        },
         padding: EdgeInsets.only(right: 0.0),
         child: Text(
           'Do you have alraedy account?',
@@ -113,27 +123,35 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     );
   }
 
-
   Widget _buildCreateBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () async{
-            if (_formKey.currentState.validate()) {
-                dynamic result = await _auth.signUpwithEmailAndPassword(
-                _email, _password);
-                print(_email);
-                print(result.toString());
-                 if (result == null) {
-                    setState(() {
-                    error = 'please supply a valid email';
-                    });
-                } else {
-                   Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
-                }
+        onPressed: () async {
+          if (_formKey.currentState.validate()) {
+            final newUser =
+                await _auth.signUpwithEmailAndPassword(_email, _password);
+//            print(_email);
+//            print(newUser.toString());
+            if (newUser == null) {
+              setState(() {
+                error = 'please supply a valid email';
+              });
+              return;
             }
+
+            if (await db.createUserDocument()) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => UserChooseLesson()));
+            } else {
+              setState(() {
+                error = 'there is problems with internet connection';
+              });
+              return;
+            }
+          }
         },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
@@ -154,7 +172,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,71 +181,73 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Form(
             key: _formKey,
-            child:Stack(
-            children: <Widget>[
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF73AEF5),
-                      Color(0xFF61A4F1),
-                      Color(0xFF478DE0),
-                      Color(0xFF398AE5),
-                    ],
-                    stops: [0.1, 0.4, 0.7, 0.9],
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF73AEF5),
+                        Color(0xFF61A4F1),
+                        Color(0xFF478DE0),
+                        Color(0xFF398AE5),
+                      ],
+                      stops: [0.1, 0.4, 0.7, 0.9],
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                height: double.infinity,
-                child: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 40.0,
-                    vertical: 120.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'OpenSans',
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.bold,
+                Container(
+                  height: double.infinity,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 40.0,
+                      vertical: 120.0,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'OpenSans',
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 30.0),
-                      _buildEmailTF(),
-                      SizedBox(
-                        height: 30.0,
-                      ),
-                      _buildPasswordTF(),
-                      SizedBox(
-                        height: 30.0,
-                      ),
-                      _buildCreateBtn(),
-                      _buildHaveAccountBtn(),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(error,style: TextStyle(
-                        color: Colors.red,
-                        fontFamily: 'OpenSans',
-                        fontSize: 15.0,
+                        SizedBox(height: 30.0),
+                        _buildEmailTF(),
+                        SizedBox(
+                          height: 30.0,
                         ),
-                      ),
-                    ],
+                        _buildPasswordTF(),
+                        SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildCreateBtn(),
+                        _buildHaveAccountBtn(),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          error,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontFamily: 'OpenSans',
+                            fontSize: 15.0,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
-          ),
+                )
+              ],
+            ),
           ),
         ),
       ),

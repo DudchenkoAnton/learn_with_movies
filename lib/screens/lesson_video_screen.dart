@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/screens/user_questions_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import '../database/database_utilities.dart';
 import 'user_american_questions_screen.dart';
 
 class LessonVideoScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class LessonVideoScreen extends StatefulWidget {
 
 class _LessonVideoScreenState extends State<LessonVideoScreen> {
   YoutubePlayerController _youtubePlayerController;
+  DatabaseUtilities db = new DatabaseUtilities();
 
   @override
   void initState() {
@@ -69,6 +71,8 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                     FlatButton(
                       child: Text("No"),
                       onPressed: () {
+                        db.addLessonToUserHistory(widget.lessonData);
+                        print('got rejected about video questions');
                         Navigator.pop(context);
                         returnButton();
                       },
