@@ -12,15 +12,28 @@ class SideMenu extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text(
-              ''
+            child: Container(
+              child: Column(
+                children: <Widget>[
+                  Material(
+                    borderRadius:BorderRadius.all(Radius.circular(50.0)),
+                    elevation: 10.0,
+                    child:Padding(padding: EdgeInsets.all(11.0),
+                    child: Image.asset('images/logo2.jpg',width: 55.0,height: 55.0,),),
+                  ),
+                  Text("Learn With Movies",style: TextStyle(color:Colors.white,fontSize: 25.0),)
+                ],
+              ),
             ),
             decoration: BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('images/img.jpg'))),
+              gradient: LinearGradient(
+                colors: <Color>[
+                  Colors.indigo,
+                  Colors.blueAccent
+                ]
+              ),
+            )
+
           ),
           ListTile(
             leading: Icon(Icons.create),
