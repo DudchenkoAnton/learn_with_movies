@@ -7,6 +7,11 @@ import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
 
+import '../database/database_utilities.dart';
+import '../database/database_utilities.dart';
+import '../database/database_utilities.dart';
+import '../database/database_utilities.dart';
+
 class BodyBestMovie extends StatefulWidget {
   @override
   _BodyBestMovieState createState() => _BodyBestMovieState();
@@ -25,6 +30,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   ScrollController _scrollController;
   bool endOfList = false;
   Lock lock = new Lock();
+  List<String> categories = [];
 
   @override
   void initState() {
@@ -35,7 +41,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   }
 
   Future _getThingsOnStartup() async {
-    List<LessonDB> list = await db.getFirstLessonsChunk("averageRating");
+    List<LessonDB> list =
+        await db.getFirstLessonsChunk("averageRating", categories);
     allLesson.clear();
     allLesson.addAll(list);
     animationOn = false;
@@ -311,7 +318,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
       // TODO: add to here pagination function invocation
       await lock.synchronized(() async {
         print(' --------------REACHED THE END OF THE LIST ----------');
-        List<LessonDB> list = await db.getNextLessonsChunk('averageRating');
+        List<LessonDB> list =
+            await db.getNextLessonsChunk('averageRating', categories);
         if (list.length > 0) {
           setState(() {
             allLesson.addAll(list);
@@ -326,7 +334,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   }
 
   Future<void> refreshAllVideos() async {
-    List<LessonDB> list = await db.getFirstLessonsChunk("averageRating");
+    List<LessonDB> list =
+        await db.getFirstLessonsChunk("averageRating", categories);
     setState(() {
       allLesson.clear();
       allLesson.addAll(list);
