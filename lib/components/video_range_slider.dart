@@ -11,7 +11,7 @@ class VideoRangeSlider extends StatefulWidget {
 
   VideoRangeSlider(
       {this.enabled = true,
-      this.lessonCreatorMode = false,
+      this.lessonCreatorMode = true,
       this.callbackToUpdateScreen,
       @required this.startAt,
       @required this.endAt,
@@ -56,6 +56,7 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
         },
         onChanged: widget.enabled
             ? (double newLowerValue, double newUpperValue) {
+                print('got to video range slider callback!');
                 setState(() {
                   _lowerValue = newLowerValue;
                   _upperValue = newUpperValue;
@@ -78,6 +79,8 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
 
                   if (widget.lessonCreatorMode &&
                       widget.callbackToUpdateScreen != null) {
+                    print(
+                        'called range slider outer callback ----------------------- ');
                     widget.callbackToUpdateScreen();
                   }
 

@@ -230,6 +230,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
   }
 
   void saveAndExit() async {
+    print('Start of a video is - ${currentLesson.getVideoStartPoint()}');
+    print('Start of a video is - ${currentLesson.getVideoEndPoint()}');
+
     if (!allDataIsEntered()) {
       return;
     }
@@ -264,7 +267,12 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
         length: videoLength,
         enabled: videoProvided,
         callbackToUpdateScreen: () {
-          setState(() {});
+          setState(() {
+            currentLesson.setVideoStartPoint(startPointValue[0].inSeconds);
+            print(currentLesson.getVideoStartPoint());
+            currentLesson.setVideoEndPoint(endPointValue[0].inSeconds);
+            print(currentLesson.getVideoEndPoint());
+          });
         },
       );
     } else {
@@ -274,7 +282,10 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
         length: videoLength,
         enabled: videoProvided,
         callback: () {
-          setState(() {});
+          setState(() {
+            currentLesson.setVideoStartPoint(startPointValue[0].inSeconds);
+            currentLesson.setVideoEndPoint(endPointValue[0].inSeconds);
+          });
         },
       );
     }
@@ -532,6 +543,8 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                           icon: Icons.add,
                           // Todo: write callback, that responsible for adding question widget to screen
                           onPressed: () async {
+                            print(
+                                'current start time - ${currentLesson.getVideoStartPoint()} - and end time - ${currentLesson.getVideoEndPoint()}');
                             QuestionDB newQuestion = await Navigator.push(
                                 context,
                                 MaterialPageRoute(

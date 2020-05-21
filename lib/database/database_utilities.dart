@@ -5,6 +5,12 @@ import 'question_db.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseUtilities {
+  static const String MEDICINE = 'Medicine';
+  static const String LAW = 'Law';
+  static const String ENTERTAINMENT = 'Entertainment';
+  static const String SPORT = 'Sport';
+  static const String HISTORY = 'History';
+
   final databaseReference = Firestore.instance;
   List<LessonDB> lessonsList = new List<LessonDB>();
 
@@ -439,26 +445,47 @@ class DatabaseUtilities {
     }
   }
 
+//  Future<List<LessonDB>> getFirstLessonsChunk(
+//    String orderBy,
+//  ) async {
+//    currentQuery = Firestore.instance
+//        .collection("lessons")
+//        .orderBy(orderBy, descending: true)
+//        .limit(lessonsNumber);
+//
+//    QuerySnapshot querySnapshot = await currentQuery.getDocuments();
+//    return (await createLessonsList(querySnapshot.documents, lessonsNumber));
+//  }
+
   Future<List<LessonDB>> getFirstLessonsChunk(
-    String orderBy,
-  ) async {
-    currentQuery = Firestore.instance
-        .collection("lessons")
-        .orderBy(orderBy, descending: true)
-        .limit(lessonsNumber);
+      String orderBy, List<String> categories) async {
+    currentQuery = Firestore.instance.collection("lessons");
+    for (String category in categories) {
+      print('added to query a label ----------- $category');
+      currentQuery = currentQuery.where('labels', arrayContains: category);
+    }
+    currentQuery =
+        currentQuery.orderBy(orderBy, descending: true).limit(lessonsNumber);
 
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
+    print(
+        'Length of the query snapshot array ----- ${querySnapshot.documents.length}');
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
   }
 
-  Future<List<LessonDB>> getNextLessonsChunk(String orderBy) async {
+  Future<List<LessonDB>> getNextLessonsChunk(
+      String orderBy, List<String> categories) async {
     if (lastOrderedDocument == null) {
       return [];
     }
 
     print('A LAST DOCUMENT - ${lastOrderedDocument.data}');
-    currentQuery = Firestore.instance
-        .collection("lessons")
+    currentQuery = Firestore.instance.collection("lessons");
+    for (String category in categories) {
+      print('added to query a label ----------- $category');
+      currentQuery = currentQuery.where('labels', arrayContains: category);
+    }
+    currentQuery = currentQuery
         .orderBy(orderBy, descending: true)
         .limit(lessonsNumber)
         .startAfterDocument(lastOrderedDocument);

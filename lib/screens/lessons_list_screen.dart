@@ -21,6 +21,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   bool endOfList = false;
   ScrollController _scrollController;
   Lock lock = new Lock();
+  List<String> categories = [];
 
   @override
   void initState() {
@@ -31,7 +32,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   Future _getThingsOnStartup() async {
-    List<LessonDB> list = await db.getFirstLessonsChunk("averageRating");
+    List<LessonDB> list =
+        await db.getFirstLessonsChunk("averageRating", categories);
     allLesson.clear();
     allLesson.addAll(list);
     animationOn = false;
@@ -239,7 +241,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       // TODO: add to here pagination function invocation
       await lock.synchronized(() async {
         print(' --------------REACHED THE END OF THE LIST ----------');
-        List<LessonDB> list = await db.getNextLessonsChunk('averageRating');
+        List<LessonDB> list =
+            await db.getNextLessonsChunk('averageRating', categories);
         if (list.length > 0) {
           setState(() {
             allLesson.addAll(list);
@@ -254,7 +257,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   Future<void> refreshAllVideos() async {
-    List<LessonDB> list = await db.getFirstLessonsChunk("averageRating");
+    List<LessonDB> list =
+        await db.getFirstLessonsChunk("averageRating", categories);
     setState(() {
       allLesson.clear();
       allLesson.addAll(list);
