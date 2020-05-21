@@ -544,7 +544,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                           // Todo: write callback, that responsible for adding question widget to screen
                           onPressed: () async {
                             print(
-                                'current start time - ${currentLesson.getVideoStartPoint()} - and end time - ${currentLesson.getVideoEndPoint()}');
+                                'current start time - ${currentLesson.getVideoStartPoint()} - and end time - ${currentLesson.getVideoEndPoint()} - and current length - ${currentLesson.getVideoLenght()}');
                             QuestionDB newQuestion = await Navigator.push(
                                 context,
                                 MaterialPageRoute(

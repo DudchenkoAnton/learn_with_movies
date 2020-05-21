@@ -24,6 +24,8 @@ class VideoRangeSlider extends StatefulWidget {
 class _VideoRangeSliderState extends State<VideoRangeSlider> {
   double _lowerValue = 0.0;
   double _upperValue = 100.0;
+  double _lowerBoundValue = 0.0;
+  double _upperBoundValue = 100.0;
 
   @override
   void initState() {
@@ -32,14 +34,16 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
       _lowerValue =
           (widget.startAt[0].inSeconds * 100) / widget.length.inSeconds;
       _upperValue = (widget.endAt[0].inSeconds * 100) / widget.length.inSeconds;
+      _lowerBoundValue = _lowerValue;
+      _upperBoundValue = _upperValue;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return frs.RangeSlider(
-        min: 0.0,
-        max: 100.0,
+        min: _lowerBoundValue,
+        max: _upperBoundValue,
         lowerValue: _lowerValue,
         upperValue: _upperValue,
         divisions: 10000,
