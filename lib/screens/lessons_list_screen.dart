@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,15 +18,20 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   var _searchView = new TextEditingController();
   List<LessonDB> allLesson = List<LessonDB>();
   var animationOn = true;
+  bool endOfList = false;
+  ScrollController _scrollController;
+  Lock lock = new Lock();
 
   @override
   void initState() {
     _getThingsOnStartup().then((value) {});
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     super.initState();
   }
 
   Future _getThingsOnStartup() async {
-    List<LessonDB> list = await db.getLessonsFromDB();
+    List<LessonDB> list = await db.getFirstLessonsChunk("averageRating");
     allLesson.clear();
     allLesson.addAll(list);
     animationOn = false;
@@ -64,9 +70,13 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
           margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
           child: Column(
             children: <Widget>[
-              SizedBox(height: 8.0,),
+              SizedBox(
+                height: 8.0,
+              ),
               _createSearchView(),
-              SizedBox(height: 8.0,),
+              SizedBox(
+                height: 8.0,
+              ),
               animationOn ? create_animation() : _LessonView(context),
             ],
           )),
@@ -79,6 +89,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       ),
     );
   }
+
   String url_image(youtubeUrl) {
     Uri uri = Uri.parse(youtubeUrl);
     String videoID = uri.queryParameters["v"];
@@ -86,59 +97,74 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     return url;
   }
 
-
-  Widget _LessonView(context){
-    return
-      Container(
-        child:  ListView.separated(
-          shrinkWrap: true,
-        itemBuilder: (context,index){
-          return Row(
-            children: <Widget>[
-              Container(
-                  width: 140.0,
-                  height: 100.0,
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: NetworkImage(url_image(allLesson[index].videoURL))
-                          ,fit: BoxFit.cover)
+  Widget _LessonView(context) {
+    return Expanded(
+      child: RefreshIndicator(
+        onRefresh: refreshAllVideos,
+        child: ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            controller: _scrollController,
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              if (index == allLesson.length) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
+                );
+              }
+
+              return Row(
+                children: <Widget>[
+                  Container(
+                    width: 140.0,
+                    height: 100.0,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(
+                                url_image(allLesson[index].videoURL)),
+                            fit: BoxFit.cover)),
+                  ),
+                  Column(children: <Widget>[
+                    Container(
+                      width: MediaQuery.of(context).size.width - 200.0,
+                      height: 70.0,
+                      child: ListTile(
+                        title: Text(allLesson[index].getLessonName()),
+                        subtitle:
+                            Text(allLesson[index].getVideoLenght() + ' min'),
+                      ),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          onPressed: () => setState(() {
+                            edit_card(context, allLesson[index]);
+                          }),
+                          icon: Icon(Icons.edit),
+                        ),
+                        IconButton(
+                          onPressed: () => setState(() {
+                            delete_card(context, allLesson[index]);
+                          }),
+                          icon: Icon(Icons.delete),
+                        ),
+                      ],
+                    )
+                  ]),
+                ],
+              );
+            },
+            separatorBuilder: (context, index) => Divider(
+                  height: 4.0,
+                  color: Colors.grey,
                 ),
-              Column(
-              children: <Widget>[
-              Container(
-               width: MediaQuery.of(context).size.width-200.0,
-                height: 70.0,
-                child: ListTile(
-                  title: Text(allLesson[index].getLessonName()),
-                  subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
-                ),
-              ),
-                     Row(
-                        children: <Widget>[
-                          IconButton(
-          onPressed: ()=>setState(() {
-          edit_card(context, allLesson[index]);
-          }),
-          icon: Icon(Icons.edit),
-          ),
-          IconButton(
-          onPressed: ()=> setState(() {
-          delete_card(context, allLesson[index]);
-          }),
-          icon: Icon(Icons.delete),
-          ),
-          ],
-                     )]),
-            ],
-          );
-        },
-        separatorBuilder: (context,index)=>Divider(
-          height: 4.0,
-          color: Colors.grey,
-        ),
-        itemCount: allLesson.length),
-      );
+            itemCount: (!endOfList && allLesson.length > 4)
+                ? allLesson.length + 1
+                : allLesson.length),
+      ),
+    );
   }
 
   void delete_card(BuildContext context, lesson_object) async {
@@ -201,8 +227,38 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       setState(() {
         //lesson_new need to by from the shape of LessonDB
         allLesson.insert(0, lesson_new);
-       // allLesson.add(lesson_new);
+        // allLesson.add(lesson_new);
       });
     }
+  }
+
+  void _scrollListener() async {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      // TODO: add to here pagination function invocation
+      await lock.synchronized(() async {
+        print(' --------------REACHED THE END OF THE LIST ----------');
+        List<LessonDB> list = await db.getNextLessonsChunk('averageRating');
+        if (list.length > 0) {
+          setState(() {
+            allLesson.addAll(list);
+          });
+        } else {
+          setState(() {
+            endOfList = true;
+          });
+        }
+      });
+    }
+  }
+
+  Future<void> refreshAllVideos() async {
+    List<LessonDB> list = await db.getFirstLessonsChunk("averageRating");
+    setState(() {
+      allLesson.clear();
+      allLesson.addAll(list);
+      endOfList = false;
+    });
   }
 }
