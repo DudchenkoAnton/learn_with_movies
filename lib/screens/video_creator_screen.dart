@@ -517,11 +517,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen>
                             height: 50.0,
                           ),
                           // Todo: write callback, that changes widgets, that's shown on screen
-                          onPressed: () {
-                            setState(() {
-                              changeRangeSelection();
-                            });
-                          },
+                          onPressed: null,
                         ),
                       ],
                     ),
