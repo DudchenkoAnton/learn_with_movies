@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:temp_project/components/side_menu.dart';
 import 'package:temp_project/database/lesson_db.dart';
@@ -31,7 +32,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   bool endOfList = false;
   Lock lock = new Lock();
   List<String> categories = [];
-
+  bool change_category=false;
   @override
   void initState() {
     _getThingsOnStartup().then((value) {});
@@ -177,21 +178,33 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                             child: Center(child: Text(labels[index],
                               style: TextStyle(
                                   color: Colors.white, fontSize: 13.0),),),
-                            onPressed: () {
+                            onPressed: () async {
                               if (!isPress[index] && !isPress.contains(true)) {
-                                //the button is on!
-
-
-                                setState(() {
+                                //the button is on
+                                setState(()  {
                                   colorRangeButton[index] = Colors.black;
+                                  categories.add(labels[index]);
                                   isPress[index] = true;
+                                  change_category = true;
                                 });
+                                await refreshAllVideos();
+                                setState(() {
+                                  change_category = false;
+                                });
+
                               }
                               else if (isPress[index]) {
                                 //the button is off!
                                 setState(() {
                                   colorRangeButton[index] = Colors.white;
+                                  categories.remove(labels[index]);
                                   isPress[index] = false;
+                                  change_category = true;
+
+                                });
+                                await refreshAllVideos();
+                                setState(() {
+                                  change_category = false;
                                 });
                               }
                             },
@@ -207,63 +220,66 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                       .height - 200.0,
                   child: RefreshIndicator(
                     onRefresh: refreshAllVideos,
-                    child: ListView.separated(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                        controller: _scrollController,
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          if (index == allLesson.length) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 32),
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          }
+                    child: ModalProgressHUD(
+                      inAsyncCall:change_category,
+                      child: ListView.separated(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                          controller: _scrollController,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            if (index == allLesson.length) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 32),
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
 
-                          return Column(
-                            children: <Widget>[
-                              SizedBox(height: 4),
-                              GestureDetector(
-                                onTap: () {
-                                  move_screen(context, index);
-                                },
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width - 10.0,
-                                  height: 200.0,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: NetworkImage(
-                                              url_image(allLesson[index].videoURL)),
-                                          fit: BoxFit.cover)),
+                            return Column(
+                              children: <Widget>[
+                                SizedBox(height: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    move_screen(context, index);
+                                  },
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width - 10.0,
+                                    height: 200.0,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                url_image(allLesson[index].videoURL)),
+                                            fit: BoxFit.cover)),
+                                  ),
                                 ),
-                              ),
-                              ListTile(
-                                title: Text(allLesson[index].lessonName),
-                                subtitle: Row(children: <Widget>[
-                                  Text("${allLesson[index].getVideoLenght()} min"),
-                                  Visibility(
-                                      child: Row(
-                                        children: <Widget>[
-                                          Text(
-                                              ",  Rating: ${allLesson[index].averageRating}  "),
-                                          Icon(
-                                            Icons.star,
-                                            size: 15.0,
-                                          ),
-                                        ],
-                                      ),
-                                      visible: _visible(index))
-                                ]),
-                              ),
-                            ],
-                          );
-                        },
-                        separatorBuilder: (context, index) => Divider(
-                          height: 1.0,
-                          color: Colors.grey,
-                        ),
-                        itemCount: (!endOfList && allLesson.length > 4)
-                            ? allLesson.length + 1
-                            : allLesson.length),
+                                ListTile(
+                                  title: Text(allLesson[index].lessonName),
+                                  subtitle: Row(children: <Widget>[
+                                    Text("${allLesson[index].getVideoLenght()} min"),
+                                    Visibility(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text(
+                                                ",  Rating: ${allLesson[index].averageRating}  "),
+                                            Icon(
+                                              Icons.star,
+                                              size: 15.0,
+                                            ),
+                                          ],
+                                        ),
+                                        visible: _visible(index))
+                                  ]),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, index) => Divider(
+                            height: 1.0,
+                            color: Colors.grey,
+                          ),
+                          itemCount: (!endOfList && allLesson.length > 4)
+                              ? allLesson.length + 1
+                              : allLesson.length),
+                    ),
                   ),
               ),
             ],
