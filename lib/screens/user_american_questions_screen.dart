@@ -441,6 +441,15 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
             ),
           ),
+          Padding (
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              question.answer,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0, color: Colors.green),
+            ),
+          ),
           YoutubePlayer(
             controller: _controller,
             showVideoProgressIndicator: true,
@@ -926,8 +935,19 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
 
     return Scaffold(
       appBar: AppBar(
+        /*
+        leading: new IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          }
+        ),
+
+         */
         title: Text(widget.title),
         actions: <Widget>[
+
           RawMaterialButton(
             child: Text(
               '$next_question_label',

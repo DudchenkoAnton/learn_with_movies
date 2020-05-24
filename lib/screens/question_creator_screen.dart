@@ -53,6 +53,13 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   bool is_pressed_3 = false;
   bool is_pressed_4 = false;
 
+  bool activate_button_1 = true;
+  bool activate_button_2 = true;
+  bool activate_button_3 = true;
+  bool activate_button_4 = true;
+
+  int american_function_counter = 0;
+
   int correct_answer = 1;
 
   int format_of_question = 0;
@@ -157,6 +164,15 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
     } else {
       _answerController.text = widget.question.answer;
+      _answer_open_format.text = widget.question.answer;
+      List<String> options = widget.question.americanAnswers.split(";");
+
+      if (options.length >= 3 && options[0].length > 0 && options[1].length > 0 && options[2].length > 0) {
+        _answerController2.text = options[0];
+        _answerController3.text = options[1];
+        _answerController4.text = options[2];
+      }
+
       _questionController.text = widget.question.question;
       startAt[0] = Duration(seconds: widget.question.getVideoStartTime());
       endAt[0] = Duration(seconds: widget.question.getVideoEndTime());
@@ -221,6 +237,325 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   Widget build(BuildContext context) {
 
 
+    void american_button_action() {
+
+      if (american_function_counter > 1) {
+        return;
+      }
+
+
+      setState(() {
+        format_of_question = 1;
+        selectedWidget = Container(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Padding(
+
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: _questionController,
+                    decoration: InputDecoration(
+                        enabledBorder: const OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(8.0),
+                          ),
+                          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                        ),
+                        contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(
+                            color: Colors.blue,
+                          ),
+                        ),
+                        hintText: 'Enter the Question'),
+                  ),
+                ),
+                Text(
+                  'Marker one correct answer:',
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+
+                Row(
+                  children: <Widget>[
+
+                    RawMaterialButton(
+                      onPressed: () {
+                        setState(() {
+                          is_pressed_4 = false;
+                          is_pressed_2 = false;
+                          is_pressed_3 = false;
+                          is_pressed_1 = true;
+
+                          correct_answer = 1;
+
+                          if (activate_button_1 == true) {
+                            american_button_action();
+                            activate_button_1 = false;
+                            activate_button_4 = true;
+                            activate_button_2 = true;
+                            activate_button_3 = true;
+
+                            american_function_counter += 1;
+                          }
+                        });
+                      },
+                      elevation: 2.0,
+                      fillColor: (is_pressed_1 == true) ? Colors.green : Colors.grey,
+                      child: Icon(
+                        Icons.check_circle,
+                        size: 17.0,
+                        //color: (is_pressed_1) ? Colors.green : Colors.grey,
+                      ),
+                      padding: EdgeInsets.all(15.0),
+                      shape: CircleBorder(),
+                    ),
+
+
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          controller: _answerController,
+                          decoration: InputDecoration(
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(8.0),
+                                ),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              hintText: 'Enter answer #1'),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+
+                Row(
+                  children: <Widget>[
+
+                    RawMaterialButton(
+                      onPressed: () {
+                        setState(() {
+                          is_pressed_1 = false;
+                          is_pressed_4 = false;
+                          is_pressed_3 = false;
+                          is_pressed_2 = true;
+
+                          correct_answer = 2;
+
+                          if (activate_button_2 == true) {
+                            american_button_action();
+                            activate_button_2 = false;
+                            activate_button_1 = true;
+                            activate_button_4 = true;
+                            activate_button_3 = true;
+
+                            american_function_counter += 1;
+                          }
+                        });
+                      },
+                      elevation: 2.0,
+                      fillColor: (is_pressed_2 == true) ? Colors.green : Colors.grey,
+                      child: Icon(
+                        Icons.check_circle,
+                        size: 17.0,
+                        //color: (is_pressed_2) ? Colors.green : Colors.grey,
+                      ),
+                      padding: EdgeInsets.all(15.0),
+                      shape: CircleBorder(),
+                    ),
+
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          controller: _answerController2,
+                          decoration: InputDecoration(
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(8.0),
+                                ),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              hintText: 'Enter answer #2'),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+
+                    RawMaterialButton(
+                      onPressed: () {
+                        setState(() {
+                          is_pressed_1 = false;
+                          is_pressed_2 = false;
+                          is_pressed_4 = false;
+                          is_pressed_3 = true;
+
+                          correct_answer = 3;
+
+                          if (activate_button_3 == true) {
+                            american_button_action();
+                            activate_button_3 = false;
+                            activate_button_1 = true;
+                            activate_button_2 = true;
+                            activate_button_4 = true;
+
+                            american_function_counter += 1;
+                          }
+                        });
+                      },
+                      elevation: 2.0,
+                      fillColor: (is_pressed_3 == true) ? Colors.green : Colors.grey,
+                      child: Icon(
+                        Icons.check_circle,
+                        size: 17.0,
+                        //color: (is_pressed_3) ? Colors.green : Colors.grey,
+                      ),
+                      padding: EdgeInsets.all(15.0),
+                      shape: CircleBorder(),
+                    ),
+
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          controller: _answerController3,
+                          decoration: InputDecoration(
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(8.0),
+                                ),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              hintText: 'Enter answer #3'),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+
+                    RawMaterialButton(
+                      onPressed: () {
+                        setState(() {
+
+
+
+                          is_pressed_1 = false;
+                          is_pressed_2 = false;
+                          is_pressed_3 = false;
+                          is_pressed_4 = true;
+
+                          correct_answer = 4;
+
+                          if (activate_button_4 == true) {
+                            american_button_action();
+                            activate_button_4 = false;
+                            activate_button_1 = true;
+                            activate_button_2 = true;
+                            activate_button_3 = true;
+                          }
+
+                        });
+                      },
+                      elevation: 2.0,
+                      fillColor: (is_pressed_4 == true) ? Colors.green : Colors.grey,
+                      child: Icon(
+                        Icons.check_circle,
+                        size: 17.0,
+                        //color: (is_pressed_4) ? Colors.green : Colors.grey,
+                      ),
+                      padding: EdgeInsets.all(15.0),
+                      shape: CircleBorder(),
+                    ),
+
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          controller: _answerController4,
+                          decoration: InputDecoration(
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(8.0),
+                                ),
+                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              hintText: 'Enter answer #4'),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: true,
+                  onReady: () {
+                    _controller.seekTo(startAt[0]);
+                    print('Player is ready.');
+                  },
+                ),
+                Text(
+                  'Range video for answer',
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                VideoRangeSlider(
+                  startAt: startAt,
+                  endAt: endAt,
+                  length: videoLengthOriginal,
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+
+      american_function_counter = 0;
+
+    }
+
+
 
 
     return Scaffold(
@@ -237,7 +572,9 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
           )
         ],
       ),
-      body: ListView(
+      body:
+
+      ListView(
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -245,280 +582,14 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
               Padding(padding: const EdgeInsets.all(8.0),
                   child:FlatButton(
-                    onPressed: () {
-
-                      format_of_question = 1;
-
-                      setState(() {
-                        selectedWidget = Container(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: <Widget>[
-                                Padding(
-
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    controller: _questionController,
-                                    decoration: InputDecoration(
-                                        enabledBorder: const OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                            const Radius.circular(8.0),
-                                          ),
-                                          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                        ),
-                                        contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                          borderSide: BorderSide(
-                                            color: Colors.blue,
-                                          ),
-                                        ),
-                                        hintText: 'Enter the Question'),
-                                  ),
-                                ),
-                                Text(
-                                  'Marker one correct answer:',
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-                                ),
-
-                                Row(
-                                  children: <Widget>[
-
-                                    RawMaterialButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          is_pressed_4 = false;
-                                          is_pressed_2 = false;
-                                          is_pressed_3 = false;
-                                          is_pressed_1 = true;
-
-                                          correct_answer = 1;
-                                        });
-                                      },
-                                      elevation: 2.0,
-                                      fillColor: (is_pressed_1) ? Colors.green : Colors.grey,
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        size: 17.0,
-                                        //color: (is_pressed_1) ? Colors.green : Colors.grey,
-                                      ),
-                                      padding: EdgeInsets.all(15.0),
-                                      shape: CircleBorder(),
-                                    ),
-
-
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: TextFormField(
-                                          controller: _answerController,
-                                          decoration: InputDecoration(
-                                              enabledBorder: const OutlineInputBorder(
-                                                borderRadius: const BorderRadius.all(
-                                                  const Radius.circular(8.0),
-                                                ),
-                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                              ),
-                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8.0),
-                                                borderSide: BorderSide(
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                              hintText: 'Enter answer #1'),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-
-                                Row(
-                                  children: <Widget>[
-
-                                    RawMaterialButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          is_pressed_1 = false;
-                                          is_pressed_4 = false;
-                                          is_pressed_3 = false;
-                                          is_pressed_2 = true;
-
-                                          correct_answer = 2;
-                                        });
-                                      },
-                                      elevation: 2.0,
-                                      fillColor: (is_pressed_2) ? Colors.green : Colors.grey,
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        size: 17.0,
-                                        //color: (is_pressed_2) ? Colors.green : Colors.grey,
-                                      ),
-                                      padding: EdgeInsets.all(15.0),
-                                      shape: CircleBorder(),
-                                    ),
-
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: TextFormField(
-                                          controller: _answerController2,
-                                          decoration: InputDecoration(
-                                              enabledBorder: const OutlineInputBorder(
-                                                borderRadius: const BorderRadius.all(
-                                                  const Radius.circular(8.0),
-                                                ),
-                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                              ),
-                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8.0),
-                                                borderSide: BorderSide(
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                              hintText: 'Enter answer #2'),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-
-                                    RawMaterialButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          is_pressed_1 = false;
-                                          is_pressed_2 = false;
-                                          is_pressed_4 = false;
-                                          is_pressed_3 = true;
-
-                                          correct_answer = 3;
-                                        });
-                                      },
-                                      elevation: 2.0,
-                                      fillColor: (is_pressed_3) ? Colors.green : Colors.grey,
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        size: 17.0,
-                                        //color: (is_pressed_3) ? Colors.green : Colors.grey,
-                                      ),
-                                      padding: EdgeInsets.all(15.0),
-                                      shape: CircleBorder(),
-                                    ),
-
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: TextFormField(
-                                          controller: _answerController3,
-                                          decoration: InputDecoration(
-                                              enabledBorder: const OutlineInputBorder(
-                                                borderRadius: const BorderRadius.all(
-                                                  const Radius.circular(8.0),
-                                                ),
-                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                              ),
-                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8.0),
-                                                borderSide: BorderSide(
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                              hintText: 'Enter answer #3'),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-
-                                    RawMaterialButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          is_pressed_1 = false;
-                                          is_pressed_2 = false;
-                                          is_pressed_3 = false;
-                                          is_pressed_4 = true;
-
-                                          correct_answer = 4;
-                                        });
-                                      },
-                                      elevation: 2.0,
-                                      fillColor: (is_pressed_4) ? Colors.green : Colors.grey,
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        size: 17.0,
-                                        //color: (is_pressed_4) ? Colors.green : Colors.grey,
-                                      ),
-                                      padding: EdgeInsets.all(15.0),
-                                      shape: CircleBorder(),
-                                    ),
-
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: TextFormField(
-                                          controller: _answerController4,
-                                          decoration: InputDecoration(
-                                              enabledBorder: const OutlineInputBorder(
-                                                borderRadius: const BorderRadius.all(
-                                                  const Radius.circular(8.0),
-                                                ),
-                                                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                              ),
-                                              contentPadding: new EdgeInsets.symmetric(vertical: 17.0, horizontal: 10.0),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8.0),
-                                                borderSide: BorderSide(
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                              hintText: 'Enter answer #4'),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                YoutubePlayer(
-                                  controller: _controller,
-                                  showVideoProgressIndicator: true,
-                                  onReady: () {
-                                    _controller.seekTo(startAt[0]);
-                                    print('Player is ready.');
-                                  },
-                                ),
-                                Text(
-                                  'Range video for answer',
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-                                ),
-                                SizedBox(
-                                  height: 10.0,
-                                ),
-                                VideoRangeSlider(
-                                  startAt: startAt,
-                                  endAt: endAt,
-                                  length: videoLengthOriginal,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      });
-                    },
-                    child: Text("\nmultiple\nchoise\nquestion\n", style: TextStyle(color: Colors.black, fontSize: 20),),
+                    onPressed: american_button_action,
+                    child: Text("\nmultiple\n choice\nquestion\n", style: TextStyle(color: Colors.black, fontSize: 20),),
                     shape: RoundedRectangleBorder(side: BorderSide(
                         color: Colors.blue,
                         width: 4,
                         style: BorderStyle.solid
                     ), borderRadius: BorderRadius.circular(20)),
+                    color: (format_of_question == 1) ? Colors.blue: Colors.white,
                   ),),
 
 
@@ -527,8 +598,9 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
               FlatButton(
                 onPressed: () {
-                  format_of_question = 2;
+
                   setState(() {
+                    format_of_question = 2;
     selectedWidget = Container(
     child: SingleChildScrollView(
     child: Column(
@@ -606,12 +678,13 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
                 },
 
-                child: Text("\nopen\nquestion\n\n", style: TextStyle(color: Colors.black, fontSize: 20),),
+                child: Text("\n  open\nquestion\n\n", style: TextStyle(color: Colors.black, fontSize: 20),),
                 shape: RoundedRectangleBorder(side: BorderSide(
                     color: Colors.blue,
                     width: 4,
                     style: BorderStyle.solid
                 ), borderRadius: BorderRadius.circular(20)),
+                color: (format_of_question == 2) ? Colors.blue: Colors.white,
               ),
             ],
           ),
