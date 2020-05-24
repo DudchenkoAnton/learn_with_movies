@@ -48,6 +48,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   String option_text_3 = "o";
   String option_text_4 = "o";
 
+  bool is_pressed_1 = true;
+  bool is_pressed_2 = false;
+  bool is_pressed_3 = false;
+  bool is_pressed_4 = false;
+
   int correct_answer = 1;
 
   int format_of_question = 0;
@@ -284,19 +289,20 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                                     RawMaterialButton(
                                       onPressed: () {
                                         setState(() {
-                                          option_color_4 = Colors.green;
-                                          option_color_1 = Colors.white;
-                                          option_color_2 = Colors.white;
-                                          option_color_3 = Colors.white;
+                                          is_pressed_4 = false;
+                                          is_pressed_2 = false;
+                                          is_pressed_3 = false;
+                                          is_pressed_1 = true;
 
                                           correct_answer = 1;
                                         });
                                       },
                                       elevation: 2.0,
-                                      fillColor: option_color_1,
+                                      fillColor: (is_pressed_1) ? Colors.green : Colors.grey,
                                       child: Icon(
                                         Icons.check_circle,
                                         size: 17.0,
+                                        //color: (is_pressed_1) ? Colors.green : Colors.grey,
                                       ),
                                       padding: EdgeInsets.all(15.0),
                                       shape: CircleBorder(),
@@ -335,19 +341,20 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                                     RawMaterialButton(
                                       onPressed: () {
                                         setState(() {
-                                          option_color_2 = Colors.green;
-                                          option_color_1 = Colors.white;
-                                          option_color_4 = Colors.white;
-                                          option_color_3 = Colors.white;
+                                          is_pressed_1 = false;
+                                          is_pressed_4 = false;
+                                          is_pressed_3 = false;
+                                          is_pressed_2 = true;
 
                                           correct_answer = 2;
                                         });
                                       },
                                       elevation: 2.0,
-                                      fillColor: option_color_2,
+                                      fillColor: (is_pressed_2) ? Colors.green : Colors.grey,
                                       child: Icon(
                                         Icons.check_circle,
                                         size: 17.0,
+                                        //color: (is_pressed_2) ? Colors.green : Colors.grey,
                                       ),
                                       padding: EdgeInsets.all(15.0),
                                       shape: CircleBorder(),
@@ -384,19 +391,20 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                                     RawMaterialButton(
                                       onPressed: () {
                                         setState(() {
-                                          option_color_3 = Colors.green;
-                                          option_color_1 = Colors.white;
-                                          option_color_2 = Colors.white;
-                                          option_color_4 = Colors.white;
+                                          is_pressed_1 = false;
+                                          is_pressed_2 = false;
+                                          is_pressed_4 = false;
+                                          is_pressed_3 = true;
 
                                           correct_answer = 3;
                                         });
                                       },
                                       elevation: 2.0,
-                                      fillColor: option_color_3,
+                                      fillColor: (is_pressed_3) ? Colors.green : Colors.grey,
                                       child: Icon(
                                         Icons.check_circle,
                                         size: 17.0,
+                                        //color: (is_pressed_3) ? Colors.green : Colors.grey,
                                       ),
                                       padding: EdgeInsets.all(15.0),
                                       shape: CircleBorder(),
@@ -433,19 +441,20 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                                     RawMaterialButton(
                                       onPressed: () {
                                         setState(() {
-                                          option_color_4 = Colors.green;
-                                          option_color_1 = Colors.white;
-                                          option_color_2 = Colors.white;
-                                          option_color_3 = Colors.white;
+                                          is_pressed_1 = false;
+                                          is_pressed_2 = false;
+                                          is_pressed_3 = false;
+                                          is_pressed_4 = true;
 
                                           correct_answer = 4;
                                         });
                                       },
                                       elevation: 2.0,
-                                      fillColor: option_color_4,
+                                      fillColor: (is_pressed_4) ? Colors.green : Colors.grey,
                                       child: Icon(
                                         Icons.check_circle,
                                         size: 17.0,
+                                        //color: (is_pressed_4) ? Colors.green : Colors.grey,
                                       ),
                                       padding: EdgeInsets.all(15.0),
                                       shape: CircleBorder(),
