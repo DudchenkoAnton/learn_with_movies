@@ -351,7 +351,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
 
   @override
   void dispose() {
-    youtubePlayerController.dispose();
+    if (youtubePlayerController != null) youtubePlayerController.dispose();
     super.dispose();
   }
 
@@ -468,6 +468,8 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
   }
 
   void saveLessonDataAndExit() async {
+    bool isEdited = false;
+
     if (currentStep != 0 || _firstStepFormKey.currentState.validate()) {
       currentLesson.setLessonName(lessonNameController.text);
       currentLesson.setVideoURL(currentLoadedLink);
@@ -494,7 +496,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
         String documentID = await dbHelper.addLessonToDB(currentLesson);
         currentLesson.setDBReference(documentID);
       } else {
-        currentLesson = await dbHelper.editLessonInDB(currentLesson);
+        while (!isEdited) {
+          isEdited = await dbHelper.editLessonInDB(currentLesson);
+        }
       }
       Navigator.pop(context, currentLesson);
     } catch (e) {

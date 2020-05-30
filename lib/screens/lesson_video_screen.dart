@@ -24,14 +24,13 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _youtubePlayerController = YoutubePlayerController(
-        initialVideoId: widget.lessonData.videoID, flags: YoutubePlayerFlags());
+    _youtubePlayerController = YoutubePlayerController(initialVideoId: widget.lessonData.videoID);
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    _youtubePlayerController.dispose();
+    if (_youtubePlayerController != null) _youtubePlayerController.dispose();
     super.dispose();
   }
 
@@ -70,26 +69,28 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                   title: Text("Are you ready for quezze?"),
                   actions: <Widget>[
                     FlatButton(
-                      child: Icon(Icons.home,color: Colors.blue,),
+                      child: Icon(
+                        Icons.home,
+                        color: Colors.blue,
+                      ),
                       onPressed: () {
                         Navigator.pop(context);
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
+                        returnButton();
                       },
                     ),
                     FlatButton(
-                      child: Icon(Icons.replay,color: Colors.blue),
+                      child: Icon(Icons.replay, color: Colors.blue),
                       onPressed: () {
                         db.addLessonToUserHistory(widget.lessonData);
-                        print('got rejected about video questions');
-                       // _youtubePlayerController.reset();
                         Navigator.pop(context, true);
+                        _youtubePlayerController.seekTo(Duration(seconds: widget.lessonData.getVideoStartPoint()));
                       },
                     ),
                     FlatButton(
                       child: Text("Yes!"),
                       onPressed: () {
                         Navigator.pop(context);
+                        _youtubePlayerController.seekTo(Duration(seconds: widget.lessonData.getVideoStartPoint()));
                         proceedToQuestionsButton();
                       },
                     ),

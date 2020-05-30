@@ -45,15 +45,77 @@ class DatabaseUtilities {
       return true;
     } catch (e) {
       print(e.toString());
+      return false;
     }
   }
 
-  Future<LessonDB> editLessonInDB(LessonDB lesson) async {
-    this.deleteLessonFromDB(lesson);
-    String documentID = await this.addLessonToDB(lesson);
-    lesson.setDBReference(documentID);
+  Future<bool> updateLessonRating(LessonDB lesson) async {
+    DocumentSnapshot snapshot = await databaseReference.collection('lessons').document(lesson.getDBReference()).get();
+    if (snapshot != null) {
+      snapshot.reference.updateData({
+        'averageRating': lesson.getAverageRating(),
+        'numberReviews': lesson.getNumberReviews(),
+      });
+    }
+  }
 
-    return lesson;
+  Future<bool> updateNumberViews(LessonDB lesson) async {
+    DocumentSnapshot snapshot = await databaseReference.collection('lessons').document(lesson.getDBReference()).get();
+    if (snapshot != null) {
+      snapshot.reference.updateData({
+        'numberViews': lesson.getNumberViews(),
+      });
+    }
+  }
+
+  Future<bool> editLessonInDB(LessonDB lesson) async {
+    if (currentUser == null) {
+      await initiateFirebaseUser();
+    }
+    List<String> subStrings = generateSubStrings(lesson.getLessonName());
+    DocumentSnapshot snapshot = await databaseReference.collection('lessons').document(lesson.getDBReference()).get();
+    if (snapshot != null) {
+      snapshot.reference.updateData({
+        'videoURL': lesson.getVideoURL(),
+        'lessonName': lesson.getLessonName(),
+        'videoStartPoint': lesson.getVideoStartPoint(),
+        'videoEndPoint': lesson.getVideoEndPoint(),
+        'labels': lesson.getLabelsList(),
+        'videoID': lesson.getVideoID(),
+        'numberViews': lesson.getNumberViews(),
+        'averageRating': lesson.getAverageRating(),
+        'numberReviews': lesson.getNumberReviews(),
+        'originalVideoLength': lesson.getOriginalVideoLength(),
+        'searchSubStringsArray': subStrings,
+        'searchSubStringsLength': subStrings.length,
+      });
+
+      QuerySnapshot existingQuestions = await databaseReference
+          .collection('lessons')
+          .document(lesson.getDBReference())
+          .collection('questions')
+          .getDocuments();
+
+      for (var currentRow in existingQuestions.documents) {
+        await currentRow.reference.delete();
+      }
+      for (QuestionDB question in lesson.getQuestionsList()) {
+        databaseReference.collection('lessons').document(lesson.getDBReference()).collection('questions').add({
+          'videoURL': question.getVideoURL(),
+          'question': question.getQuestion(),
+          'answer': question.getAnswer(),
+          'americanAnswers': question.getAmericanAnswers(),
+          'videoStartPoint': question.getVideoStartTime(),
+          'videoEndPoint': question.getVideoEndTime(),
+          'answerStartPoint': question.getAnswerStartTime(),
+          'answerEndPoint': question.getAnswerEndTime()
+        });
+      }
+
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<String> addLessonToDB(LessonDB lesson) async {
