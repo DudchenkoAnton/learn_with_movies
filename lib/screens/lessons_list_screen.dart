@@ -4,6 +4,7 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:temp_project/screens/video_creator_screen.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class LessonsListScreen extends StatefulWidget {
   static const String id = 'lessons_list_screen';
@@ -22,6 +23,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   ScrollController _scrollController;
   Lock lock = new Lock();
   List<String> categories = [];
+  bool showSpinner=false;
 
   @override
   void initState() {
@@ -41,31 +43,45 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     });
   }
 
-  void filterSearchResults(String query) {
+  void filterSearchResults(String query) async{
     if (query.isNotEmpty) {
       List<LessonDB> dummyListData = List<LessonDB>();
-      allLesson.forEach((item) {
-        if (item.getLessonName().contains(query)) {
-          dummyListData.add(item);
-        }
+      setState(() {
+        showSpinner=true;
+      });
+      //////change the search for only movies that the user create
+      dummyListData=await db.searchLessonsFirstChunk(query,[]);
+      setState(() {
+        showSpinner=false;
       });
       setState(() {
         allLesson.clear();
         allLesson.addAll(dummyListData);
       });
-      return;
+
     } else {
-      setState(() async {
+
+      setState(() async{
+        setState(() {
+          showSpinner=true;
+        });
         _getThingsOnStartup().then((value) {});
+        setState(() {
+          showSpinner=false;
+        });
+
       });
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: new Text("Create Lesson with movies"),
+        title: new Text("Create My Lessons"),
       ),
       body: Container(
           margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
@@ -99,10 +115,12 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   Widget _LessonView(context) {
-    return Expanded(
-      child: RefreshIndicator(
+    return  Expanded(
+      child:RefreshIndicator(
         onRefresh: refreshAllVideos,
-        child: ListView.separated(
+        child:  ModalProgressHUD(
+        inAsyncCall: showSpinner,
+        child:ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             controller: _scrollController,
             physics: BouncingScrollPhysics(),
@@ -160,6 +178,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                 ),
             itemCount: (!endOfList && allLesson.length > 4) ? allLesson.length + 1 : allLesson.length),
       ),
+      ),
     );
   }
 
@@ -207,7 +226,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
         },
         controller: _searchView,
         decoration: InputDecoration(
-            labelText: "Search",
+            labelText: "Search my lessons",
             hintText: "Search",
             prefixIcon: Icon(Icons.search),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(22.0)))),

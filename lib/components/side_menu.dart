@@ -39,15 +39,18 @@ class SideMenu extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.create),
             title: Text('Create Lesson'),
-            onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => LessonsListScreen()));
+            onTap: ()async{
+              await Navigator.push(context, MaterialPageRoute(builder: (context) => LessonsListScreen()));
+            Navigator.pop(context);
             },
           ),
           ListTile(
               leading: Icon(Icons.info_outline),
               title: Text('About Us'),
-              onTap : () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AboutUs()));
+              onTap : ()async {
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => AboutUs()));
+                Navigator.pop(context);
+
               }
           ),
           ListTile(

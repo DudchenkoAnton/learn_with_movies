@@ -6,6 +6,8 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 
 class BodyHistory extends StatefulWidget {
   @override
@@ -23,6 +25,7 @@ class _BodyHistoryState extends State<BodyHistory> {
   ScrollController _scrollController;
   bool endOfList = false;
   Lock lock = new Lock();
+  bool showSpinner=false;
 
   @override
   void initState() {
@@ -42,21 +45,34 @@ class _BodyHistoryState extends State<BodyHistory> {
     });
   }
 
-  void filterSearchResults(String query) {
+  void filterSearchResults(String query) async{
     if (query.isNotEmpty) {
       List<LessonDB> dummyListData = List<LessonDB>();
-      allLesson.forEach((item) {
-        if (item.getLessonName().contains(query)) {
-          dummyListData.add(item);
-        }
+      setState(() {
+        showSpinner=true;
+      });
+
+      ///change function to search only in the history movies
+      dummyListData=await db.searchLessonsFirstChunk(query,[]);
+      setState(() {
+        showSpinner=false;
       });
       setState(() {
         allLesson.clear();
         allLesson.addAll(dummyListData);
       });
+
     } else {
-      setState(() {
-        _getThingsOnStartup().then((value) {});
+
+      setState(() async{
+        setState(() {
+          showSpinner=true;
+        });
+        await refreshAllVideos();
+        setState(() {
+          showSpinner=false;
+        });
+
       });
     }
   }
@@ -111,6 +127,7 @@ class _BodyHistoryState extends State<BodyHistory> {
     } else {
       this.cusIcon = Icon(Icons.search);
       this.cusSearchBar = Text("Learn With Movies");
+      _searchView.clear();
       filterSearchResults("");
     }
   }
@@ -130,7 +147,9 @@ class _BodyHistoryState extends State<BodyHistory> {
 
       );
     }else {
-      return RefreshIndicator(
+      return ModalProgressHUD(
+          inAsyncCall: showSpinner,
+          child:  RefreshIndicator(
         onRefresh: refreshAllVideos,
         child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
@@ -194,6 +213,7 @@ class _BodyHistoryState extends State<BodyHistory> {
             itemCount: (!endOfList && allLesson.length > 4)
                 ? allLesson.length + 1
                 : allLesson.length),
+      ),
       );
     };
   }
