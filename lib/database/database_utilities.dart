@@ -293,7 +293,6 @@ class DatabaseUtilities {
     currentQuery = currentQuery.orderBy(orderBy, descending: true).limit(lessonsNumber);
 
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
-    print('Length of the query snapshot array ----- ${querySnapshot.documents.length}');
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
   }
 
@@ -302,7 +301,6 @@ class DatabaseUtilities {
       return [];
     }
 
-    print('A LAST DOCUMENT - ${lastOrderedDocument.data}');
     currentQuery = Firestore.instance.collection("lessons");
     if (categories.length != 0) currentQuery = currentQuery.where('labels', arrayContains: categories[0]);
     currentQuery =
@@ -327,7 +325,6 @@ class DatabaseUtilities {
         break;
       }
       if (count == arrivedLessonsList.length) {
-        print('got a new last lecture - ${currentRow.data}');
         lastOrderedDocument = currentRow;
       }
 
