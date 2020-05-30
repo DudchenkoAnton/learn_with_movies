@@ -8,7 +8,6 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
-
 import '../database/database_utilities.dart';
 import '../database/database_utilities.dart';
 import '../database/database_utilities.dart';
@@ -35,6 +34,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   List<String> categories = [];
   bool change_category = false;
   List<String> moviesSeen = [];
+  bool showSpinner=false;
+
 
   @override
   void initState() {
@@ -60,21 +61,32 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
     });
   }
 
-  void filterSearchResults(String query) {
+  void filterSearchResults(String query) async{
     if (query.isNotEmpty) {
       List<LessonDB> dummyListData = List<LessonDB>();
-      allLesson.forEach((item) {
-        if (item.getLessonName().contains(query)) {
-          dummyListData.add(item);
-        }
+      setState(() {
+        showSpinner=true;
+      });
+      dummyListData=await db.searchLessonsFirstChunk(query,[]);
+      setState(() {
+        showSpinner=false;
       });
       setState(() {
         allLesson.clear();
         allLesson.addAll(dummyListData);
       });
+
     } else {
-      setState(() {
-        _getThingsOnStartup().then((value) {});
+
+      setState(() async{
+        setState(() {
+          showSpinner=true;
+        });
+        await refreshAllVideos();
+        setState(() {
+          showSpinner=false;
+        });
+
       });
     }
   }
@@ -109,7 +121,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   void searchAction() {
     if (this.cusIcon.icon == Icons.search) {
       this.cusIcon = Icon(Icons.clear);
-      this.cusSearchBar = TextField(
+      this.cusSearchBar =TextField(
         onChanged: (value) {
           filterSearchResults(value);
         },
@@ -130,9 +142,13 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
     } else {
       this.cusIcon = Icon(Icons.search);
       this.cusSearchBar = Text("Learn With Movies");
+      _searchView.clear();
       filterSearchResults("");
     }
   }
+
+
+
 
   bool _visible(index) {
     if (allLesson[index].averageRating == null) {
@@ -154,7 +170,9 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   List<bool> isPress = [false, false, false, false, false, false];
 
   Widget _CardViewCheck(context) {
-    return SafeArea(
+    return ModalProgressHUD(
+        inAsyncCall: showSpinner,
+        child: SafeArea(
       child: SingleChildScrollView(
         child: Container(
           child: Column(
@@ -302,6 +320,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
           ),
         ),
       ),
+    ),
     );
   }
 
