@@ -54,6 +54,8 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
 
   String next_question_label = "";
 
+  bool dialog_showed = false;
+
 
   void defineOptionsForAnswers() {
 
@@ -386,6 +388,10 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
               spacing: 2.0,
               onRatingChanged: (value) {
                 setState(() {
+
+                  dialog_showed = true;
+
+
                   rating = value;
                   DatabaseUtilities db = new DatabaseUtilities();
                   lesson.setNumberViews(lesson.getNumberViews() + 1);
@@ -772,10 +778,13 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
     if (question.americanAnswers != ";;" && question.americanAnswers != "") {
       selectedWidget = Column(
         children: <Widget>[
-          circles,
           Padding (
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 50),
+            child: circles,
+          ),
+          Padding (
+            padding: const EdgeInsets.fromLTRB(70, 10, 70, 10),
+            child:Text(
               '$curQuestionText',
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
@@ -783,7 +792,11 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
             ),
           ),
 
-          FlatButton(
+
+
+    Padding (
+    padding: const EdgeInsets.all(10.0),
+    child:FlatButton(
             onPressed: handle_option_1,
             //onPressed: discloseAnswer,
             textColor: Colors.black,
@@ -794,10 +807,12 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
                 width: 2,
                 //style: BorderStyle.solid
             ), borderRadius: BorderRadius.circular(15)),
-          ),
+          ),),
 
 
-          FlatButton(
+    Padding (
+    padding: const EdgeInsets.all(10.0),
+    child:FlatButton(
             onPressed: handle_option_2,
             //onPressed: discloseAnswer,
             textColor: Colors.black,
@@ -808,10 +823,12 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
               width: 2,
               //style: BorderStyle.solid
             ), borderRadius: BorderRadius.circular(15)),
-          ),
+          ),),
 
 
-          FlatButton(
+          Padding (
+          padding: const EdgeInsets.all(10.0),
+    child:FlatButton(
             onPressed: handle_option_3,
             //onPressed: discloseAnswer,
             textColor: Colors.black,
@@ -822,10 +839,12 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
               width: 2,
               //style: BorderStyle.solid
             ), borderRadius: BorderRadius.circular(15)),
-          ),
+          ),),
 
 
-          FlatButton(
+    Padding (
+    padding: const EdgeInsets.all(10.0),
+    child:FlatButton(
             onPressed: handle_option_4,
             //onPressed: discloseAnswer,
             textColor: Colors.black,
@@ -836,7 +855,7 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
               width: 2,
               //style: BorderStyle.solid
             ), borderRadius: BorderRadius.circular(15)),
-          ),
+          ),),
           Padding (
             padding: const EdgeInsets.all(8.0),
             child: Text(
