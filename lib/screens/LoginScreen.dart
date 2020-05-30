@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
         text: TextSpan(
           children: [
             TextSpan(
-              text: 'Don\'t have an Account? ',
+              text: 'Don\'t have an Account?\n',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18.0,
@@ -180,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             TextSpan(
-              text: 'Sign Up',
+              text: 'Quick Sign Up, it is completely free!',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18.0,

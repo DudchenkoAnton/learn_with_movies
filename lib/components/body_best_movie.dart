@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -26,15 +27,20 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   var animationOn = true;
   Icon cusIcon = Icon(Icons.search);
   Widget cusSearchBar = Text("Learn With Movies");
-  List<String> labels=['Medicine', 'Law', 'Entertainment', 'Sport', 'History'];
+  List<String> labels=['Medicine', 'Law', 'Entertainment', 'Sport', 'History','Song'];
   bool prase=false;
   ScrollController _scrollController;
   bool endOfList = false;
   Lock lock = new Lock();
   List<String> categories = [];
   bool change_category=false;
+  List<String> moviesSeen=[];
+
+
+
   @override
   void initState() {
+    //pull the id movies of the movies seen to the list -moviesSeen
     _getThingsOnStartup().then((value) {});
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
@@ -136,8 +142,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
 
 
   List<int> generateNumbers() => List<int>.generate(labels.length, (i) => i + 1);
-  List<Color> colorButton=[Colors.pink,Colors.deepPurpleAccent,Colors.cyan,Colors.deepOrange,Colors.lightGreen];
-  List<Color> colorRangeButton=[Colors.white,Colors.white,Colors.white,Colors.white,Colors.white];
+  List<Color> colorButton=[Colors.pink,Colors.deepPurpleAccent,Colors.cyan,Colors.deepOrange,Colors.lightGreen,Colors.purpleAccent];
+  List<Color> colorRangeButton=[Colors.white,Colors.white,Colors.white,Colors.white,Colors.white,Colors.white];
   List<bool> isPress=[false,false,false,false,false];
 
   Widget _CardViewCheck(context) {
@@ -148,6 +154,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
             children: <Widget>[
               Container(
                 height: 110,
+                width: MediaQuery.of(context).size.width ,
                 child: GridView.builder(
                     shrinkWrap: true,
                     itemCount: labels.length,
@@ -165,24 +172,28 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                               .size
                               .width / 4,
                           height: 20.0,
-                          margin: const EdgeInsets.all(7.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(width: 3,
-                                color: colorRangeButton[index],
-                                style: BorderStyle.solid),
-
-                          ),
+                          margin: const EdgeInsets.all(5.0),
                           child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                                side: BorderSide(color:colorRangeButton[index]),
+                            ),
+
                             color: colorButton[index],
                             child: Center(child: Text(labels[index],
                               style: TextStyle(
                                   color: Colors.white, fontSize: 13.0),),),
                             onPressed: () async {
-                              if (!isPress[index] && !isPress.contains(true)) {
+                              if (!isPress[index]) {
                                 //the button is on
                                 setState(()  {
-                                  colorRangeButton[index] = Colors.black;
+                                  if (isPress.contains(true)){
+                                    int index_last_press=isPress.indexOf(true);
+                                    isPress[index_last_press]=false;
+                                    colorRangeButton[index_last_press] = Colors.white;
+
+                                  }
+                                  colorRangeButton[index] = Colors.grey[700];
                                   categories.add(labels[index]);
                                   isPress[index] = true;
                                   change_category = true;
@@ -218,6 +229,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                       .of(context)
                       .size
                       .height - 200.0,
+                  width:MediaQuery.of(context).size.width  ,
                   child: RefreshIndicator(
                     onRefresh: refreshAllVideos,
                     child: ModalProgressHUD(
@@ -235,42 +247,54 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                             }
 
                             return Column(
-                              children: <Widget>[
-                                SizedBox(height: 4),
-                                GestureDetector(
-                                  onTap: () {
-                                    move_screen(context, index);
-                                  },
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width - 10.0,
-                                    height: 200.0,
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: NetworkImage(
-                                                url_image(allLesson[index].videoURL)),
-                                            fit: BoxFit.cover)),
+                                children: <Widget>[
+                                  SizedBox(height: 4),
+                                  GestureDetector(
+                                    onTap: () {
+                                      move_screen(context, index);
+                                    },
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width - 10.0,
+                                      height: 200.0,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                  url_image(allLesson[index].videoURL)),
+                                              fit: BoxFit.cover)),
+                                    ),
                                   ),
-                                ),
-                                ListTile(
-                                  title: Text(allLesson[index].lessonName),
-                                  subtitle: Row(children: <Widget>[
-                                    Text("${allLesson[index].getVideoLenght()} min"),
-                                    Visibility(
-                                        child: Row(
-                                          children: <Widget>[
-                                            Text(
-                                                ",  Rating: ${allLesson[index].averageRating}  "),
-                                            Icon(
-                                              Icons.star,
-                                              size: 15.0,
+                                    ListTile(
+                                      title: Text(allLesson[index].lessonName),
+                                      subtitle:
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                      Row(children: <Widget>[
+                                        Text("${allLesson[index].getVideoLenght()} min"),
+                                        Visibility(
+                                            child: Row(
+                                              children: <Widget>[
+                                                Text(
+                                                    ",  Rating: ${allLesson[index].averageRating}  "),
+                                                Icon(
+                                                  Icons.star,
+                                                  size: 15.0,
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        visible: _visible(index))
-                                  ]),
-                                ),
-                              ],
-                            );
+                                            visible: _visible(index)),
+                                       ],),
+                                      userSeeMovie(allLesson[index].getVideoID())?
+                                        Icon(
+                                          Icons.check_circle_outline,
+                                          color: Colors.green,
+                                          size: 25.0,):Container()
+
+                                      ],
+                                      ),
+                                    ),
+                                  ],
+                                );
                           },
                           separatorBuilder: (context, index) => Divider(
                             height: 1.0,
@@ -326,7 +350,12 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
       ),
     );
   }
-
+  bool userSeeMovie(String id){
+    if (moviesSeen.contains(id)){
+      return true;
+    }
+    return false;
+  }
   void _scrollListener() async {
     if (_scrollController.offset >=
             _scrollController.position.maxScrollExtent &&

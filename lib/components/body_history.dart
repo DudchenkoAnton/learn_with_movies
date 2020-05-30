@@ -123,66 +123,79 @@ class _BodyHistoryState extends State<BodyHistory> {
   }
 
   Widget _CardView(context) {
-    return RefreshIndicator(
-      onRefresh: refreshAllVideos,
-      child: ListView.separated(
-          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-          controller: _scrollController,
-          physics: BouncingScrollPhysics(),
-          itemBuilder: (context, index) {
-            if (index == allLesson.length) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
 
-            return Column(
-              children: <Widget>[
-                SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () {
-                    move_screen(context, index);
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 10.0,
-                    height: 200.0,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: NetworkImage(
-                                url_image(allLesson[index].videoURL)),
-                            fit: BoxFit.cover)),
+    if (allLesson.length==0){
+      return Container(
+        child: Padding(padding:EdgeInsets.all(16.0),child:Center(child:Text("There are not lessons yet, let's start to learn!",style: TextStyle(fontSize: 25.0),textAlign: TextAlign.center))),
+
+      );
+    }else {
+      return RefreshIndicator(
+        onRefresh: refreshAllVideos,
+        child: ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+            controller: _scrollController,
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              if (index == allLesson.length) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              return Column(
+                children: <Widget>[
+                  SizedBox(height: 4),
+                  GestureDetector(
+                    onTap: () {
+                      move_screen(context, index);
+                    },
+                    child: Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width - 10.0,
+                      height: 200.0,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                  url_image(allLesson[index].videoURL)),
+                              fit: BoxFit.cover)),
+                    ),
                   ),
+                  ListTile(
+                    title: Text(allLesson[index].lessonName),
+                    subtitle: Row(children: <Widget>[
+                      Text("${allLesson[index].getVideoLenght()} min"),
+                      Visibility(
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                  ",  Rating: ${allLesson[index]
+                                      .averageRating}  "),
+                              Icon(
+                                Icons.star,
+                                size: 15.0,
+                              ),
+                            ],
+                          ),
+                          visible: _visible(index))
+                    ]),
+                  ),
+                ],
+              );
+            },
+            separatorBuilder: (context, index) =>
+                Divider(
+                  height: 1.0,
+                  color: Colors.grey,
                 ),
-                ListTile(
-                  title: Text(allLesson[index].lessonName),
-                  subtitle: Row(children: <Widget>[
-                    Text("${allLesson[index].getVideoLenght()} min"),
-                    Visibility(
-                        child: Row(
-                          children: <Widget>[
-                            Text(
-                                ",  Rating: ${allLesson[index].averageRating}  "),
-                            Icon(
-                              Icons.star,
-                              size: 15.0,
-                            ),
-                          ],
-                        ),
-                        visible: _visible(index))
-                  ]),
-                ),
-              ],
-            );
-          },
-          separatorBuilder: (context, index) => Divider(
-                height: 1.0,
-                color: Colors.grey,
-              ),
-          itemCount: (!endOfList && allLesson.length > 4)
-              ? allLesson.length + 1
-              : allLesson.length),
-    );
+            itemCount: (!endOfList && allLesson.length > 4)
+                ? allLesson.length + 1
+                : allLesson.length),
+      );
+    };
   }
 
   void move_screen(BuildContext context, int index) async {

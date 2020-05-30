@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:temp_project/database/lesson_db.dart';
+import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/screens/user_questions_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../database/database_utilities.dart';
@@ -69,12 +70,20 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                   title: Text("Are you ready for quezze?"),
                   actions: <Widget>[
                     FlatButton(
-                      child: Text("No"),
+                      child: Icon(Icons.home,color: Colors.blue,),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
+                      },
+                    ),
+                    FlatButton(
+                      child: Icon(Icons.replay,color: Colors.blue),
                       onPressed: () {
                         db.addLessonToUserHistory(widget.lessonData);
                         print('got rejected about video questions');
-                        Navigator.pop(context);
-                        returnButton();
+                       // _youtubePlayerController.reset();
+                        Navigator.pop(context, true);
                       },
                     ),
                     FlatButton(
