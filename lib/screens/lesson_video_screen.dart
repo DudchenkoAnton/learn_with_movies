@@ -63,6 +63,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
           },
           onEnded: (YoutubeMetaData metaData) {
             setState(() {
+              _youtubePlayerController.pause();
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
@@ -91,6 +92,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                         _youtubePlayerController.seekTo(Duration(seconds: widget.lessonData.getVideoStartPoint()));
+                        _youtubePlayerController.pause();
                         proceedToQuestionsButton();
                       },
                     ),

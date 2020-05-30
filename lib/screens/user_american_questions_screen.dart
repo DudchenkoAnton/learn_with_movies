@@ -11,18 +11,15 @@ class UserAmericanQuestionsScreen extends StatefulWidget {
 
   LessonDB lessonDB;
 
-  UserAmericanQuestionsScreen({Key key, this.title, @required this.lessonDB})
-      : super(key: key);
+  UserAmericanQuestionsScreen({Key key, this.title, @required this.lessonDB}) : super(key: key);
 
   final String title;
 
   @override
-  _UserAmericanQuestionsScreenState createState() =>
-      _UserAmericanQuestionsScreenState();
+  _UserAmericanQuestionsScreenState createState() => _UserAmericanQuestionsScreenState();
 }
 
-class _UserAmericanQuestionsScreenState
-    extends State<UserAmericanQuestionsScreen> {
+class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScreen> {
   int _counter = 0;
   int _cur_question = 0;
   TextEditingController _answerController = TextEditingController();
@@ -55,19 +52,18 @@ class _UserAmericanQuestionsScreenState
 
   String next_question_label = "";
 
+  bool dialog_showed = false;
+
   void defineOptionsForAnswers() {
     if (question.americanAnswers != ";;" && question.americanAnswers != "") {
-      List<String> incorrectOptionsList =
-          question.getAmericanAnswers().split(";");
+      List<String> incorrectOptionsList = question.getAmericanAnswers().split(";");
 
       Random random = new Random();
       correctAnswerNum = answer_options[random.nextInt(answer_options.length)];
       answer_options.remove(correctAnswerNum);
-      int incorrect_option_1 =
-          answer_options[random.nextInt(answer_options.length)];
+      int incorrect_option_1 = answer_options[random.nextInt(answer_options.length)];
       answer_options.remove(incorrect_option_1);
-      int incorrect_option_2 =
-          answer_options[random.nextInt(answer_options.length)];
+      int incorrect_option_2 = answer_options[random.nextInt(answer_options.length)];
       answer_options.remove(incorrect_option_2);
       int incorrect_option_3 = answer_options[0];
 
@@ -153,12 +149,10 @@ class _UserAmericanQuestionsScreenState
       ),
     );
     _controller.addListener(() {
-      if (_controller.value.position <
-          Duration(seconds: curQuestionStartPoint)) {
+      if (_controller.value.position < Duration(seconds: curQuestionStartPoint)) {
         _controller.seekTo(Duration(seconds: curQuestionStartPoint));
         _controller.pause();
-      } else if (_controller.value.position >
-          Duration(seconds: curQuestionEndPoint)) {
+      } else if (_controller.value.position > Duration(seconds: curQuestionEndPoint)) {
         _controller.seekTo(Duration(seconds: curQuestionEndPoint));
         _controller.pause();
       }
@@ -286,7 +280,7 @@ class _UserAmericanQuestionsScreenState
         curQuestionStartPoint = question.getVideoStartTime();
         curQuestionEndPoint = question.getVideoEndTime();
         _answerController.text = "";
-        _controller.play();
+        _controller.reset();
       });
     }
   }
@@ -377,16 +371,16 @@ class _UserAmericanQuestionsScreenState
               spacing: 2.0,
               onRatingChanged: (value) {
                 setState(() {
+                  dialog_showed = true;
+
                   rating = value;
                   DatabaseUtilities db = new DatabaseUtilities();
                   lesson.setNumberViews(lesson.getNumberViews() + 1);
-                  double lesson_rating =
-                      ((lesson.getNumberReviews() * lesson.getAverageRating()) +
-                              rating) /
-                          (lesson.getNumberReviews() + 1);
+                  double lesson_rating = ((lesson.getNumberReviews() * lesson.getAverageRating()) + rating) /
+                      (lesson.getNumberReviews() + 1);
                   lesson.setAverageRating(lesson_rating);
                   lesson.setNumberReviews(lesson.getNumberReviews() + 1);
-                  db.editLessonInDB(lesson);
+                  db.updateLessonRating(lesson);
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 });
               },
@@ -397,7 +391,7 @@ class _UserAmericanQuestionsScreenState
               onPressed: () {
                 DatabaseUtilities db = new DatabaseUtilities();
                 lesson.setNumberViews(lesson.getNumberViews() + 1);
-                db.editLessonInDB(lesson);
+                db.updateNumberViews(lesson);
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
             ),
@@ -430,6 +424,15 @@ class _UserAmericanQuestionsScreenState
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              question.answer,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0, color: Colors.green),
             ),
           ),
           YoutubePlayer(
@@ -770,9 +773,12 @@ class _UserAmericanQuestionsScreenState
     if (question.americanAnswers != ";;" && question.americanAnswers != "") {
       selectedWidget = Column(
         children: <Widget>[
-          circles,
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 50),
+            child: circles,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(70, 10, 70, 10),
             child: Text(
               '$curQuestionText',
               textAlign: TextAlign.center,
@@ -780,73 +786,85 @@ class _UserAmericanQuestionsScreenState
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
             ),
           ),
-          FlatButton(
-            onPressed: handle_option_1,
-            //onPressed: discloseAnswer,
-            textColor: Colors.black,
-            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-            child: Text(
-              answer_option_1,
-              style: TextStyle(color: Colors.black, fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: FlatButton(
+              onPressed: handle_option_1,
+              //onPressed: discloseAnswer,
+              textColor: Colors.black,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Text(
+                answer_option_1,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Colors.lightBlueAccent,
+                    width: 2,
+                    //style: BorderStyle.solid
+                  ),
+                  borderRadius: BorderRadius.circular(15)),
             ),
-            shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Colors.lightBlueAccent,
-                  width: 2,
-                  //style: BorderStyle.solid
-                ),
-                borderRadius: BorderRadius.circular(15)),
           ),
-          FlatButton(
-            onPressed: handle_option_2,
-            //onPressed: discloseAnswer,
-            textColor: Colors.black,
-            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-            child: Text(
-              answer_option_2,
-              style: TextStyle(color: Colors.black, fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: FlatButton(
+              onPressed: handle_option_2,
+              //onPressed: discloseAnswer,
+              textColor: Colors.black,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Text(
+                answer_option_2,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Colors.lightBlueAccent,
+                    width: 2,
+                    //style: BorderStyle.solid
+                  ),
+                  borderRadius: BorderRadius.circular(15)),
             ),
-            shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Colors.lightBlueAccent,
-                  width: 2,
-                  //style: BorderStyle.solid
-                ),
-                borderRadius: BorderRadius.circular(15)),
           ),
-          FlatButton(
-            onPressed: handle_option_3,
-            //onPressed: discloseAnswer,
-            textColor: Colors.black,
-            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-            child: Text(
-              answer_option_3,
-              style: TextStyle(color: Colors.black, fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: FlatButton(
+              onPressed: handle_option_3,
+              //onPressed: discloseAnswer,
+              textColor: Colors.black,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Text(
+                answer_option_3,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Colors.lightBlueAccent,
+                    width: 2,
+                    //style: BorderStyle.solid
+                  ),
+                  borderRadius: BorderRadius.circular(15)),
             ),
-            shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Colors.lightBlueAccent,
-                  width: 2,
-                  //style: BorderStyle.solid
-                ),
-                borderRadius: BorderRadius.circular(15)),
           ),
-          FlatButton(
-            onPressed: handle_option_4,
-            //onPressed: discloseAnswer,
-            textColor: Colors.black,
-            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-            child: Text(
-              answer_option_4,
-              style: TextStyle(color: Colors.black, fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: FlatButton(
+              onPressed: handle_option_4,
+              //onPressed: discloseAnswer,
+              textColor: Colors.black,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Text(
+                answer_option_4,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Colors.lightBlueAccent,
+                    width: 2,
+                    //style: BorderStyle.solid
+                  ),
+                  borderRadius: BorderRadius.circular(15)),
             ),
-            shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Colors.lightBlueAccent,
-                  width: 2,
-                  //style: BorderStyle.solid
-                ),
-                borderRadius: BorderRadius.circular(15)),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -860,7 +878,10 @@ class _UserAmericanQuestionsScreenState
     } else {
       selectedWidget = Column(
         children: <Widget>[
-          circles,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 50),
+            child: circles,
+          ),
           Text(
             '$curQuestionText',
             style: Theme.of(context).textTheme.display1,
@@ -883,11 +904,9 @@ class _UserAmericanQuestionsScreenState
                     borderRadius: const BorderRadius.all(
                       const Radius.circular(8.0),
                     ),
-                    borderSide:
-                        const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                   ),
-                  contentPadding: new EdgeInsets.symmetric(
-                      vertical: 40.0, horizontal: 10.0),
+                  contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: BorderSide(
@@ -943,15 +962,21 @@ class _UserAmericanQuestionsScreenState
 
     return Scaffold(
       appBar: AppBar(
+        /*
+        leading: new IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          }
+        ),
+         */
         title: Text(widget.title),
         actions: <Widget>[
           RawMaterialButton(
             child: Text(
               '$next_question_label',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
             ),
             onPressed: nextQuestion,
           )

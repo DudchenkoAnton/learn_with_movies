@@ -5,14 +5,12 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 
-
 class UserQuestionsScreen extends StatefulWidget {
   static const String id = 'lesson_video_screen';
 
   LessonDB lessonDB;
 
-  UserQuestionsScreen({Key key, this.title, @required this.lessonDB})
-      : super(key: key);
+  UserQuestionsScreen({Key key, this.title, @required this.lessonDB}) : super(key: key);
 
   final String title;
 
@@ -60,12 +58,10 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
       ),
     );
     _controller.addListener(() {
-      if (_controller.value.position <
-          Duration(seconds: curQuestionStartPoint)) {
+      if (_controller.value.position < Duration(seconds: curQuestionStartPoint)) {
         _controller.seekTo(Duration(seconds: curQuestionStartPoint));
         _controller.pause();
-      } else if (_controller.value.position >
-          Duration(seconds: curQuestionEndPoint)) {
+      } else if (_controller.value.position > Duration(seconds: curQuestionEndPoint)) {
         _controller.seekTo(Duration(seconds: curQuestionEndPoint));
         _controller.pause();
       }
@@ -88,7 +84,6 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
        */
 
       _showDialog();
-
     } else {
       question = lesson.getQuestionsList()[_cur_question];
       _cur_question += 1;
@@ -126,11 +121,9 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
 
   void _showAnswer() {
     // flutter defined function
-    if ( ! this.question.isAnswerVideoAdded()) {
+    if (!this.question.isAnswerVideoAdded()) {
       discloseAnswer();
-    }
-    else {
-
+    } else {
       _controller.pause();
 
       curQuestionStartPoint = question.getAnswerStartTime();
@@ -158,7 +151,7 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
             ],
           );
         },
-      ).then((val){
+      ).then((val) {
         _controller.pause();
 
         curQuestionStartPoint = question.getVideoStartTime();
@@ -194,14 +187,12 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
                   rating = value;
                   DatabaseUtilities db = new DatabaseUtilities();
                   lesson.setNumberViews(lesson.getNumberViews() + 1);
-                  double lesson_rating = ((lesson.getNumberReviews()
-                      * lesson.getAverageRating()) + rating)
-                      / (lesson.getNumberReviews() + 1);
+                  double lesson_rating = ((lesson.getNumberReviews() * lesson.getAverageRating()) + rating) /
+                      (lesson.getNumberReviews() + 1);
                   lesson.setAverageRating(lesson_rating);
                   lesson.setNumberReviews(lesson.getNumberReviews() + 1);
                   db.editLessonInDB(lesson);
                   Navigator.of(context).popUntil((route) => route.isFirst);
-
                 });
               },
             ),
@@ -240,10 +231,7 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           RawMaterialButton(
             child: Text(
               'Next Question    ',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
             ),
             onPressed: nextQuestion,
           )
@@ -269,7 +257,6 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-
             YoutubePlayer(
               controller: _controller,
               showVideoProgressIndicator: true,
@@ -286,8 +273,7 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 controller: _answerController,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter Answer'),
+                decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter Answer'),
               ),
             ),
             RaisedButton(
@@ -302,7 +288,6 @@ class _UserQuestionsScreenState extends State<UserQuestionsScreen> {
               '$result',
               style: Theme.of(context).textTheme.display1,
             ),
-
             RaisedButton(
               child: Text("Disclose the answer"),
               onPressed: isAnswerDisclosed ? null : _showAnswer,
