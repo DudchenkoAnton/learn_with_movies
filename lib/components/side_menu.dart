@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:temp_project/database/auth.dart';
 import 'package:temp_project/screens/LoginScreen.dart';
+import 'package:temp_project/screens/about_us_screen.dart';
 import 'package:temp_project/screens/lessons_list_screen.dart';
 
 class SideMenu extends StatelessWidget {
@@ -43,6 +44,13 @@ class SideMenu extends StatelessWidget {
             },
           ),
           ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text('About Us'),
+              onTap : () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AboutUs()));
+              }
+          ),
+          ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
             onTap : ()async {
@@ -50,6 +58,7 @@ class SideMenu extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(emailReset: "",)));
             }
           ),
+
       ],
       ),
     );
