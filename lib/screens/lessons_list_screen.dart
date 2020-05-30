@@ -32,8 +32,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   Future _getThingsOnStartup() async {
-    List<LessonDB> list =
-        await db.getFirstLessonsChunk("averageRating", categories);
+    List<LessonDB> list = await db.getFirstUserLessonsChunk("averageRating", categories);
     allLesson.clear();
     allLesson.addAll(list);
     animationOn = false;
@@ -124,9 +123,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                     height: 100.0,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: NetworkImage(
-                                url_image(allLesson[index].videoURL)),
-                            fit: BoxFit.cover)),
+                            image: NetworkImage(url_image(allLesson[index].videoURL)), fit: BoxFit.cover)),
                   ),
                   Column(children: <Widget>[
                     Container(
@@ -134,8 +131,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                       height: 70.0,
                       child: ListTile(
                         title: Text(allLesson[index].getLessonName()),
-                        subtitle:
-                            Text(allLesson[index].getVideoLenght() + ' min'),
+                        subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
                       ),
                     ),
                     Row(
@@ -162,9 +158,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                   height: 4.0,
                   color: Colors.grey,
                 ),
-            itemCount: (!endOfList && allLesson.length > 4)
-                ? allLesson.length + 1
-                : allLesson.length),
+            itemCount: (!endOfList && allLesson.length > 4) ? allLesson.length + 1 : allLesson.length),
       ),
     );
   }
@@ -216,15 +210,13 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
             labelText: "Search",
             hintText: "Search",
             prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(22.0)))),
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(22.0)))),
       ),
     );
   }
 
   void add_card(BuildContext context) async {
-    final lesson_new = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => VideoCreatorScreen()));
+    final lesson_new = await Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCreatorScreen()));
     if (lesson_new != null) {
       setState(() {
         //lesson_new need to by from the shape of LessonDB
@@ -235,14 +227,12 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   void _scrollListener() async {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       // TODO: add to here pagination function invocation
       await lock.synchronized(() async {
         print(' --------------REACHED THE END OF THE LIST ----------');
-        List<LessonDB> list =
-            await db.getNextLessonsChunk('averageRating', categories);
+        List<LessonDB> list = await db.getNextUserLessonsChunk('averageRating', categories);
         if (list.length > 0) {
           setState(() {
             allLesson.addAll(list);
@@ -257,8 +247,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   Future<void> refreshAllVideos() async {
-    List<LessonDB> list =
-        await db.getFirstLessonsChunk("averageRating", categories);
+    List<LessonDB> list = await db.getFirstUserLessonsChunk("averageRating", categories);
     setState(() {
       allLesson.clear();
       allLesson.addAll(list);

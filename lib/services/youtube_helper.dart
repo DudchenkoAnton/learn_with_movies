@@ -9,12 +9,10 @@ const youtubeURL = 'https://www.googleapis.com/youtube/v3/videos?';
 class YoutubeNetworkHelper {
   bool operationSuccessful = false;
   Future<bool> loadVideoData(LessonDB currentLesson) async {
-    if (currentLesson.getVideoID() == null ||
-        currentLesson.getVideoID() == '') {
+    if (currentLesson.getVideoID() == null || currentLesson.getVideoID() == '') {
       return false;
     }
-    var requestURL =
-        '${youtubeURL}part=$requestMode&id=${currentLesson.getVideoID()}&key=$apiKey';
+    var requestURL = '${youtubeURL}part=$requestMode&id=${currentLesson.getVideoID()}&key=$apiKey';
     NetworkHelper helper = NetworkHelper(requestURL);
 
     print('The request string:');
@@ -35,14 +33,16 @@ class YoutubeNetworkHelper {
   }
 
   void updateVideoData(dynamic response, LessonDB currentLesson) {
+    int durationInSeconds;
     if (response != null) {
       String youtubeName = response['items'][0]['snippet']['title'];
-      String youtubeDuration =
-          response['items'][0]['contentDetails']['duration'];
+      String youtubeDuration = response['items'][0]['contentDetails']['duration'];
 
       currentLesson.setYoutubeOriginalName(youtubeName);
       currentLesson.setVideoStartPoint(0);
-      currentLesson.setVideoEndPoint(convertDuration(youtubeDuration));
+      durationInSeconds = convertDuration(youtubeDuration);
+      currentLesson.setVideoEndPoint(durationInSeconds);
+      currentLesson.setOriginalVideoLength(durationInSeconds);
     }
   }
 

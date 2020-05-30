@@ -12,23 +12,52 @@ class LessonDB {
   String videoID;
   String dbDocumentID;
   int numberViews; // amount of views of lesson
-  double averageRating ;
-  int numberReviews; // amount of users that leaves a rating
+  double averageRating;
+  int numberReviews; //
+  int originalVideoLength;
+  String creatorUserID; // amount of users that leaves a rating
+  String creationDate;
 
-  LessonDB({
-    this.videoURL,
-    this.lessonName,
-    this.lessonDetails,
-    this.videoStartPoint,
-    this.videoEndPoint,
-    this.labelsList,
-    this.youtubeOriginalName,
-    this.videoID,
-    this.questionsList,
-    this.numberViews = 0,
-    this.averageRating = 0,
-    this.numberReviews = 0
-  });
+  LessonDB(
+      {this.originalVideoLength,
+      this.creationDate,
+      this.creatorUserID,
+      this.videoURL,
+      this.lessonName,
+      this.lessonDetails,
+      this.videoStartPoint,
+      this.videoEndPoint,
+      this.labelsList,
+      this.youtubeOriginalName,
+      this.videoID,
+      this.questionsList,
+      this.numberViews = 0,
+      this.averageRating = 0,
+      this.numberReviews = 0});
+
+  int getOriginalVideoLength() {
+    return this.originalVideoLength;
+  }
+
+  void setOriginalVideoLength(int secondsLength) {
+    originalVideoLength = secondsLength;
+  }
+
+  String getCreatorUserID() {
+    return this.creatorUserID;
+  }
+
+  void setCreatorUserID(String userID) {
+    creatorUserID = userID;
+  }
+
+  String getCreationDate() {
+    return this.creationDate;
+  }
+
+//  void setCreationDate(String date) {
+//    this.creationDate = date;
+//  }
 
   String getVideoID() {
     return this.videoID;
@@ -66,8 +95,8 @@ class LessonDB {
     return this.numberReviews;
   }
 
-  int getAverageRatingInt(){
-    if (this.averageRating==null){
+  int getAverageRatingInt() {
+    if (this.averageRating == null) {
       return 0;
     }
     print(((this.averageRating).roundToDouble()).toString());
@@ -78,21 +107,20 @@ class LessonDB {
     return this.averageRating;
   }
 
-  String getVideoLenght(){
-
-    var s=this.videoEndPoint-this.videoStartPoint;
+  String getVideoLenght() {
+    var s = this.videoEndPoint - this.videoStartPoint;
     var hrs = (s / 3600).floor();
 
     var mins = ((s % 3600) / 60).floor();
     var secs = (s % 60).floor();
-    var res='';
+    var res = '';
     if (hrs > 0) {
       res += "" + hrs.toString() + ":" + (mins < 10 ? "0" : "");
     }
     res += "" + mins.toString() + ":" + (secs < 10 ? "0" : secs.toString());
     return res;
-
   }
+
   List<String> getLabelsList() {
     return this.labelsList;
   }
