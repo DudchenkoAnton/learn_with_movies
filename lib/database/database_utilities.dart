@@ -49,12 +49,13 @@ class DatabaseUtilities {
     }
   }
 
-  Future<bool> updateLessonRating(LessonDB lesson) async {
+  Future<bool> updateLessonRatingAndViews(LessonDB lesson) async {
     DocumentSnapshot snapshot = await databaseReference.collection('lessons').document(lesson.getDBReference()).get();
     if (snapshot != null) {
       snapshot.reference.updateData({
         'averageRating': lesson.getAverageRating(),
         'numberReviews': lesson.getNumberReviews(),
+        'numberViews': lesson.getNumberViews(),
       });
     }
   }

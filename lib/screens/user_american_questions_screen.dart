@@ -380,7 +380,7 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
                       (lesson.getNumberReviews() + 1);
                   lesson.setAverageRating(lesson_rating);
                   lesson.setNumberReviews(lesson.getNumberReviews() + 1);
-                  db.updateLessonRating(lesson);
+                  db.updateLessonRatingAndViews(lesson);
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 });
               },

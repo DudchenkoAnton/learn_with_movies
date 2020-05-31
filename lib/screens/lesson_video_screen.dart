@@ -75,6 +75,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                         color: Colors.blue,
                       ),
                       onPressed: () {
+                        db.addLessonToUserHistory(widget.lessonData);
                         Navigator.pop(context);
                         returnButton();
                       },
@@ -90,6 +91,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                     FlatButton(
                       child: Text("Yes!"),
                       onPressed: () {
+                        db.addLessonToUserHistory(widget.lessonData);
                         Navigator.pop(context);
                         _youtubePlayerController.seekTo(Duration(seconds: widget.lessonData.getVideoStartPoint()));
                         _youtubePlayerController.pause();
