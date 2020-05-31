@@ -9,10 +9,10 @@ class VideoRangeText extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   Function(int start, int end) onChanged;
 
-  TextEditingController startMinutesController = TextEditingController();
-  TextEditingController startSecondsController = TextEditingController();
-  TextEditingController endMinutesController = TextEditingController();
-  TextEditingController endSecondsController = TextEditingController();
+//  TextEditingController startMinutesController = TextEditingController();
+//  TextEditingController startSecondsController = TextEditingController();
+//  TextEditingController endMinutesController = TextEditingController();
+//  TextEditingController endSecondsController = TextEditingController();
 
   VideoRangeText(
       {@required this.formKey,
@@ -20,10 +20,10 @@ class VideoRangeText extends StatefulWidget {
       @required this.secondsStartPoint,
       @required this.secondsEndPoint,
       @required this.secondsLength}) {
-    startMinutesController.text = (secondsStartPoint ~/ 60).toString();
-    startSecondsController.text = (secondsStartPoint % 60).toString();
-    endMinutesController.text = (secondsEndPoint ~/ 60).toString();
-    endSecondsController.text = (secondsEndPoint % 60).toString();
+//    startMinutesController.text = (secondsStartPoint ~/ 60).toString();
+//    startSecondsController.text = (secondsStartPoint % 60).toString();
+//    endMinutesController.text = (secondsEndPoint ~/ 60).toString();
+//    endSecondsController.text = (secondsEndPoint % 60).toString();
   }
 
   @override
@@ -31,20 +31,21 @@ class VideoRangeText extends StatefulWidget {
 }
 
 class _VideoRangeTextState extends State<VideoRangeText> {
-//  TextEditingController startMinutesController = TextEditingController();
-//  TextEditingController startSecondsController = TextEditingController();
-//  TextEditingController endMinutesController = TextEditingController();
-//  TextEditingController endSecondsController = TextEditingController();
+  TextEditingController startMinutesController = TextEditingController();
+  TextEditingController startSecondsController = TextEditingController();
+  TextEditingController endMinutesController = TextEditingController();
+  TextEditingController endSecondsController = TextEditingController();
+
   int secondsStartPoint;
   int secondsEndPoint;
 
   @override
   void initState() {
     super.initState();
-//    startMinutesController.text = (widget.secondsStartPoint ~/ 60).toString();
-//    endMinutesController.text = (widget.secondsEndPoint ~/ 60).toString();
-//    startSecondsController.text = (widget.secondsStartPoint % 60).toString();
-//    endSecondsController.text = (widget.secondsEndPoint % 60).toString();
+    startMinutesController.text = (widget.secondsStartPoint ~/ 60).toString();
+    endMinutesController.text = (widget.secondsEndPoint ~/ 60).toString();
+    startSecondsController.text = (widget.secondsStartPoint % 60).toString();
+    endSecondsController.text = (widget.secondsEndPoint % 60).toString();
   }
 
   int isNumeric(String s) {
@@ -61,14 +62,14 @@ class _VideoRangeTextState extends State<VideoRangeText> {
   }
 
   bool checkProvidedValues() {
-//    int startSec = isNumeric(startSecondsController.text);
-//    int endSec = isNumeric(endSecondsController.text);
-//    int startMin = isNumeric(startMinutesController.text);
-//    int endMin = isNumeric(endMinutesController.text);
-    int startSec = isNumeric(widget.startSecondsController.text);
-    int endSec = isNumeric(widget.endSecondsController.text);
-    int startMin = isNumeric(widget.startMinutesController.text);
-    int endMin = isNumeric(widget.endMinutesController.text);
+    int startSec = isNumeric(startSecondsController.text);
+    int endSec = isNumeric(endSecondsController.text);
+    int startMin = isNumeric(startMinutesController.text);
+    int endMin = isNumeric(endMinutesController.text);
+//    int startSec = isNumeric(widget.startSecondsController.text);
+//    int endSec = isNumeric(widget.endSecondsController.text);
+//    int startMin = isNumeric(widget.startMinutesController.text);
+//    int endMin = isNumeric(widget.endMinutesController.text);
 
     if (startSec < 0 || startSec > 59) return false;
     if (endSec < 0 || endSec > 59) return false;
@@ -93,6 +94,11 @@ class _VideoRangeTextState extends State<VideoRangeText> {
 
   @override
   Widget build(BuildContext context) {
+    startMinutesController.text = (widget.secondsStartPoint ~/ 60).toString();
+    endMinutesController.text = (widget.secondsEndPoint ~/ 60).toString();
+    startSecondsController.text = (widget.secondsStartPoint % 60).toString();
+    endSecondsController.text = (widget.secondsEndPoint % 60).toString();
+
     return Form(
       key: widget.formKey,
       child: FormField<int>(
@@ -105,8 +111,8 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
-                    onChanged: onChangedCallback,
-                    controller: widget.startMinutesController,
+                    onSubmitted: onChangedCallback,
+                    controller: startMinutesController,
                     decoration: kTimePickerDecoration,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.numberWithOptions(),
@@ -121,8 +127,8 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
-                    onChanged: onChangedCallback,
-                    controller: widget.startSecondsController,
+                    onSubmitted: onChangedCallback,
+                    controller: startSecondsController,
                     decoration: kTimePickerDecoration,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.numberWithOptions(),
@@ -136,8 +142,8 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
-                    onChanged: onChangedCallback,
-                    controller: widget.endMinutesController,
+                    onSubmitted: onChangedCallback,
+                    controller: endMinutesController,
                     decoration: kTimePickerDecoration,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.numberWithOptions(),
@@ -152,8 +158,8 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
-                    onChanged: onChangedCallback,
-                    controller: widget.endSecondsController,
+                    onSubmitted: onChangedCallback,
+                    controller: endSecondsController,
                     decoration: kTimePickerDecoration,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.numberWithOptions(),
