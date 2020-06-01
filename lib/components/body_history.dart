@@ -7,6 +7,7 @@ import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:temp_project/utilites/constants.dart';
 
 
 class BodyHistory extends StatefulWidget {
@@ -191,8 +192,7 @@ class _BodyHistoryState extends State<BodyHistory> {
                           child: Row(
                             children: <Widget>[
                               Text(
-                                  ",  Rating: ${allLesson[index]
-                                      .averageRating}  "),
+                                  ",  Rating: ${rating_print(allLesson[index].averageRating)}  "),
                               Icon(
                                 Icons.star,
                                 size: 15.0,

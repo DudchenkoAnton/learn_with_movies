@@ -8,6 +8,7 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
+import 'package:temp_project/utilites/constants.dart';
 import '../database/database_utilities.dart';
 import '../database/database_utilities.dart';
 import '../database/database_utilities.dart';
@@ -285,7 +286,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                                         Visibility(
                                             child: Row(
                                               children: <Widget>[
-                                                Text(",  Rating: ${allLesson[index].averageRating}  "),
+                                                Text(",  Rating: ${rating_print(allLesson[index].averageRating)}  "),
                                                 Icon(
                                                   Icons.star,
                                                   size: 15.0,
@@ -366,6 +367,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
     }
     return false;
   }
+
+
 
   void _scrollListener() async {
     if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
