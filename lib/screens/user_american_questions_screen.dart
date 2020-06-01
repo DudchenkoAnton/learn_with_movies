@@ -413,29 +413,47 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Icon(
-              Icons.not_interested,
+              Icons.cancel,
               color: Colors.red,
               size: 60.0,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              'Your answer: ' + answer + "\n\nCorrect answer:",
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              'Your answer:',
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
               textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
             ),
           ),
+          SizedBox(height: 20.0),
           Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              question.answer,
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              answer,
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
               textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0, color: Colors.green),
             ),
           ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              "Correct answer:",
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              question.answer,
+    style: Theme.of(context).textTheme.display1.apply(color: Colors.green),
+    textAlign: TextAlign.center,
+    ),
+          ),
+          SizedBox(height: 20.0),
           YoutubePlayer(
             controller: _controller,
             showVideoProgressIndicator: true,
@@ -467,6 +485,42 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
               size: 60.0,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              "Question:",
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              question.getQuestion(),
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              "Answer:",
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              question.answer,
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.green),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
           YoutubePlayer(
             controller: _controller,
             showVideoProgressIndicator: true,
