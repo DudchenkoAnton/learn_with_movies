@@ -27,7 +27,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   var animationOn = true;
   Icon cusIcon = Icon(Icons.search);
   Widget cusSearchBar = Text("Learn With Movies");
-  List<String> labels = ['Medicine', 'Law', 'Entertainment', 'Sport', 'History', 'Music'];
+  List<String> labels = ['All','Medicine', 'Law', 'Entertainment', 'Sport', 'History', 'Music'];
   bool prase = false;
   ScrollController _scrollController;
   bool endOfList = false;
@@ -160,6 +160,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
 
   List<int> generateNumbers() => List<int>.generate(labels.length, (i) => i + 1);
   List<Color> colorButton = [
+    Colors.yellow[700],
     Colors.pink,
     Colors.deepPurpleAccent,
     Colors.cyan,
@@ -167,8 +168,8 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
     Colors.lightGreen,
     Colors.purpleAccent
   ];
-  List<Color> colorRangeButton = [Colors.white, Colors.white, Colors.white, Colors.white, Colors.white, Colors.white];
-  List<bool> isPress = [false, false, false, false, false, false];
+  List<Color> colorRangeButton = [Colors.grey[700],Colors.white, Colors.white, Colors.white, Colors.white, Colors.white, Colors.white];
+  List<bool> isPress = [true,false, false, false, false, false, false];
 
   Widget _CardViewCheck(context) {
     return ModalProgressHUD(
@@ -179,18 +180,17 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
           child: Column(
             children: <Widget>[
               Container(
-                height: 110,
+                height: 90,
                 width: MediaQuery.of(context).size.width,
-                child: GridView.builder(
+                child: ListView.builder(
                     shrinkWrap: true,
+                    controller: _scrollController,
+                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 3),
                     itemCount: labels.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: MediaQuery.of(context).size.width / (600 / 4),
-                    ),
+                    scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
-                          width: MediaQuery.of(context).size.width / 4,
+                          width: MediaQuery.of(context).size.width / 3,
                           height: 20.0,
                           margin: const EdgeInsets.all(5.0),
                           child: RaisedButton(
@@ -215,26 +215,40 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                                     colorRangeButton[index_last_press] = Colors.white;
                                   }
                                   colorRangeButton[index] = Colors.grey[700];
-                                  categories.add(labels[index]);
+                                  categories.clear();
+                                  if (labels[index]!='All') {
+                                    categories.add(labels[index]);
+                                  }
                                   isPress[index] = true;
                                   change_category = true;
                                 });
                                 await refreshAllVideos();
                                 setState(() {
+                                  if (categories.isEmpty){
+                                    isPress[index]=false;
+                                    isPress[0]=true;
+                                    colorRangeButton[index] = Colors.white;
+                                    colorRangeButton[0] = Colors.grey[700];
+
+                                  }
                                   change_category = false;
                                 });
                               } else if (isPress[index]) {
-                                //the button is off!
-                                setState(() {
-                                  colorRangeButton[index] = Colors.white;
-                                  categories.remove(labels[index]);
-                                  isPress[index] = false;
-                                  change_category = true;
-                                });
-                                await refreshAllVideos();
-                                setState(() {
-                                  change_category = false;
-                                });
+                                if (labels[index]!='All') {
+                                  //the button is off!
+                                  setState(() {
+                                    colorRangeButton[index] = Colors.white;
+                                    colorRangeButton[0]=Colors.grey[700];
+                                    categories.remove(labels[index]);
+                                    isPress[index] = false;
+                                    isPress[0] = true;
+                                    change_category = true;
+                                  });
+                                  await refreshAllVideos();
+                                  setState(() {
+                                    change_category = false;
+                                  });
+                                }
                               }
                             },
                           ));
@@ -392,6 +406,10 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
 
   Future<void> refreshAllVideos() async {
     List<LessonDB> list = await db.getFirstLessonsChunk("averageRating", categories);
+    if (list.isEmpty &  categories.isNotEmpty){
+      categories.clear();
+      list = await db.getFirstLessonsChunk("averageRating", categories);
+    }
     setState(() {
       allLesson.clear();
       allLesson.addAll(list);
