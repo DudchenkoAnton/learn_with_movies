@@ -63,6 +63,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
   int format_of_question = 0;
 
+  String question_creation_text = "Choose one way to create your question";
+
   Widget selectedWidget = Container();
 
   void _incrementCounter() {
@@ -193,34 +195,6 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     super.initState();
 
     selectedWidget = Container(
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            YoutubePlayer(
-              controller: _controller,
-              showVideoProgressIndicator: true,
-              onReady: () {
-                _controller.seekTo(startAt[0]);
-                print('Player is ready.');
-              },
-            ),
-            Text(
-              'Range video for answer',
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            VideoRangeSlider(
-              startAt: startAt,
-              endAt: endAt,
-              length: videoLengthOriginal,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -232,6 +206,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       }
 
       setState(() {
+        question_creation_text = "";
         format_of_question = 1;
         selectedWidget = Container(
           child: SingleChildScrollView(
@@ -532,7 +507,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
         actions: <Widget>[
           RawMaterialButton(
             child: Text(
-              'Save',
+              'Continue',
               style: TextStyle(color: Colors.white),
             ),
             onPressed: saveQuestion,
@@ -541,6 +516,14 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       ),
       body: ListView(
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              question_creation_text,
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -561,6 +544,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
               FlatButton(
                 onPressed: () {
                   setState(() {
+                    question_creation_text = "";
                     format_of_question = 2;
                     selectedWidget = Container(
                       child: SingleChildScrollView(

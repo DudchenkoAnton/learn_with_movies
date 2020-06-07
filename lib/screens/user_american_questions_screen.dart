@@ -5,6 +5,7 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/question_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
+import 'package:temp_project/screens/score_representation_screen.dart';
 
 class UserAmericanQuestionsScreen extends StatefulWidget {
   static const String id = 'lesson_video_screen';
@@ -53,6 +54,10 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
   String next_question_label = "";
 
   bool dialog_showed = false;
+
+  bool check_answer_enabled = false;
+
+  int num_correct_answ = 0;
 
   void defineOptionsForAnswers() {
     if (question.americanAnswers != ";;" && question.americanAnswers != "") {
@@ -253,36 +258,58 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
   }
 
   void nextQuestion() {
-    result_mode = 0;
 
-    disclossedAnswer = "";
-    isAnswerDisclosed = true;
-    result = "";
-    if (_cur_question == lesson.getQuestionsList().length) {
-      /*
+    if (next_question_label.length == 0) {
+      return;
+    }
+
+    if (check_answer_enabled == false) {
+      result_mode = 0;
+
+      disclossedAnswer = "";
+      isAnswerDisclosed = true;
+      result = "";
+      if (_cur_question == lesson.getQuestionsList().length) {
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RateScreen(),
+          builder: (context) => ScoreScreen(lessonDB: this.lesson,
+            num_correct_answ: num_correct_answ,title: "Learn With Movies",),
         ),
       );
-       */
 
-      _showDialog();
-    } else {
-      question = lesson.getQuestionsList()[_cur_question];
-      _cur_question += 1;
 
-      //defineOptionsForAnswers();
+        //_showDialog();
+      } else {
+        question = lesson.getQuestionsList()[_cur_question];
+        _cur_question += 1;
 
-      setState(() {
-        curQuestionText = question.getQuestion();
-        curQuestionStartPoint = question.getVideoStartTime();
-        curQuestionEndPoint = question.getVideoEndTime();
-        _answerController.text = "";
-        _controller.reset();
-      });
+        //defineOptionsForAnswers();
+
+        setState(() {
+          curQuestionText = question.getQuestion();
+          curQuestionStartPoint = question.getVideoStartTime();
+          curQuestionEndPoint = question.getVideoEndTime();
+          _answerController.text = "";
+          _controller.reset();
+        });
+      }
     }
+
+    else {
+
+      result_mode = 1;
+      if (_answer_open_format.text == question.answer) {
+        create_result_widget(true, "");
+      } else {
+        create_result_widget(false, _answer_open_format.text);
+      }
+      _answer_open_format.text = "";
+
+      check_answer_enabled = false;
+    }
+
   }
 
   void checkAnswer() {
@@ -421,6 +448,24 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child:Text(
+              "Question:",
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
+              question.getQuestion(),
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child:Text(
               'Your answer:',
               style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
               textAlign: TextAlign.center,
@@ -431,11 +476,12 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child:Text(
               answer,
-              style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
+              style: Theme.of(context).textTheme.display1.apply(color: Colors.redAccent),
               textAlign: TextAlign.center,
             ),
           ),
           SizedBox(height: 20.0),
+
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child:Text(
@@ -465,6 +511,8 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
         ],
       ),);
     } else {
+      num_correct_answ += 1;
+
       selectedWidget = SingleChildScrollView(
           child: Column(
         children: <Widget>[
@@ -824,6 +872,7 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
 
     setState(() {
       next_question_label = "";
+      check_answer_enabled = false;
     });
 
     if (question.americanAnswers != ";;" && question.americanAnswers != "") {
@@ -942,6 +991,10 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
         ],
       ),);
     } else {
+      setState(() {
+        next_question_label = "Check the answer     ";
+        check_answer_enabled = true;
+      });
       selectedWidget = SingleChildScrollView(
           child: Column(
         children: <Widget>[
@@ -969,6 +1022,8 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
                   create_result_widget(false, _answer_open_format.text);
                 }
                 _answer_open_format.text = "";
+
+                check_answer_enabled = false;
               },
               controller: _answer_open_format,
               decoration: InputDecoration(
@@ -1034,15 +1089,15 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
 
     return Scaffold(
         appBar: AppBar(
-        /*
+
         leading: new IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
           }
         ),
-         */
+
         title: Text(widget.title),
         actions: <Widget>[
           RawMaterialButton(
