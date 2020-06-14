@@ -38,6 +38,7 @@ dependencies:
   smooth_star_rating: 1.0.4+2
   flutter_rating_bar: ^1.1.0
   synchronized: ^2.2.0
+  fluttertoast: ^4.0.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.7.5

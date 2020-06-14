@@ -14,6 +14,7 @@ import 'package:temp_project/database/question_db.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:temp_project/components/video_range_slider.dart';
 import 'package:temp_project/components/video_range_text_field.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class VideoCreatorScreen extends StatefulWidget {
   static const String id = 'video_creator_screen';
@@ -490,6 +491,18 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     loadingVideoFailed = false;
     videoSuccessfullyLoaded = true;
     getVideoTimeMarks();
+    if (widget.videoData == null) {
+      Fluttertoast.showToast(
+        msg: "Video Uploaded Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.grey,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+    }
+
     return;
   }
 
