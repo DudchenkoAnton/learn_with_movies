@@ -120,7 +120,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                 ),
               ),
               SizedBox(width: 5),
-              Text(':'),
+              Text(':', style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(width: 5),
               Flexible(
                 child: Container(
@@ -135,8 +135,16 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   ),
                 ),
               ),
-              SizedBox(width: 35),
-              SizedBox(width: 35),
+              SizedBox(width: 5),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Container(
+                  height: 1.0,
+                  width: 40.0,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(width: 5),
               Flexible(
                 child: Container(
                   height: 35,
@@ -151,7 +159,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                 ),
               ),
               SizedBox(width: 5),
-              Text(':'),
+              Text(':', style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(width: 5),
               Flexible(
                 child: Container(

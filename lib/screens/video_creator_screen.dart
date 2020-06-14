@@ -108,6 +108,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                       if (_videoLinkFormKey.currentState.validate() && videoLinkController.text != currentLoadedLink) {
                         await loadVideo(videoLinkController.text, true);
                         _videoLinkFormKey.currentState.validate();
+                        _firstStepFormKey.currentState.validate();
                       }
                     },
                   ),
@@ -129,6 +130,15 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                   }
                 },
               ),
+              videoSuccessfullyLoaded
+                  ? Container(
+                      margin: EdgeInsets.only(top: 15),
+                      child: Text(
+                        "Video uploaded successfully!",
+                        style: TextStyle(color: Colors.green[800]),
+                      ),
+                    )
+                  : Container(),
             ]),
           ),
           Container(
@@ -569,6 +579,18 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     if (widget.videoData == null) {
       saveLessonDataAndExit();
     } else {
+      if (currentStep == 0 && !_firstStepFormKey.currentState.validate()) {
+        return;
+      }
+      if (currentLesson.questionsList.length == 0 && currentStep == 2) {
+        _thirdStepFormKey.currentState.validate();
+        shouldValidateThird = false;
+        return;
+      } else if (currentLesson.questionsList.length == 0 && currentStep != 2) {
+        shouldValidateThird = true;
+        goTo(2);
+        return;
+      }
       await dbHelper.deleteDraftFromDB(currentLesson);
       saveLessonDataAndExit();
     }

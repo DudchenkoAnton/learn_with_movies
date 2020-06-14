@@ -2,7 +2,7 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:temp_project/services/networking.dart';
 import 'package:temp_project/database/lesson_db.dart';
 
-const String apiKey = 'AIzaSyAhAmKB8dpDbUAB8dqdu_U0p9Gw3x1HNdg';
+const String apiKey = 'AIzaSyC_VXT-0YR0J_EzlR19RaoKoaw0qXmVQ_o';
 const requestMode = 'snippet,contentDetails';
 const youtubeURL = 'https://www.googleapis.com/youtube/v3/videos?';
 
@@ -21,7 +21,7 @@ class YoutubeNetworkHelper {
 
     try {
       var response = await helper.getData();
-      if (response != null) {
+      if (response != null && isNotLiveStream(response)) {
         updateVideoData(response, currentLesson);
         operationSuccessful = true;
       }
@@ -31,6 +31,15 @@ class YoutubeNetworkHelper {
       print(e);
     }
     return operationSuccessful ? true : false;
+  }
+
+  bool isNotLiveStream(var response) {
+    String liveStreamValue = response['items'][0]['snippet']['liveBroadcastContent'];
+    if (liveStreamValue == 'none') {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   void updateVideoData(dynamic response, LessonDB currentLesson) {

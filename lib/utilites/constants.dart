@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-
-double rating_print(double rating_num){
-  if (rating_num%1!=0){
+double rating_print(double rating_num) {
+  if (rating_num % 1 != 0) {
     return num.parse(rating_num.toStringAsFixed(2));
   }
   return rating_num;
 }
-
 
 const kTextFieldDecoration = InputDecoration(
   hintText: '',

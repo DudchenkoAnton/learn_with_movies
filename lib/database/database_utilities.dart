@@ -279,23 +279,43 @@ class DatabaseUtilities {
     return formattedName;
   }
 
-  void generateSearchQuery(String lessonName, List<String> categories) {
+  void generateSearchQuery(String lessonName, List<String> categories, bool onlyUserCreatedLessons) {
     String formattedName = generateFormattedName(lessonName);
 
     currentQuery = Firestore.instance.collection("lessons");
+    if (onlyUserCreatedLessons) currentQuery = currentQuery.where('creatorUserID', isEqualTo: currentUser.uid);
     if (categories.length != 0) currentQuery = currentQuery.where('labels', arrayContains: categories[0]);
     currentQuery = currentQuery.where("searchSubStringsArray", arrayContains: formattedName);
     currentQuery = currentQuery.orderBy('averageRating', descending: true).limit(lessonsNumber);
   }
 
   Future<List<LessonDB>> searchLessonsFirstChunk(String lessonName, List<String> categories) async {
-    generateSearchQuery(lessonName, categories);
+    generateSearchQuery(lessonName, categories, false);
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
   }
 
   Future<List<LessonDB>> searchLessonsNextChunk(String lessonName, List<String> categories) async {
-    generateSearchQuery(lessonName, categories);
+    generateSearchQuery(lessonName, categories, false);
+    currentQuery = currentQuery.startAfterDocument(lastOrderedDocument);
+
+    QuerySnapshot querySnapshot = await currentQuery.getDocuments();
+    return (await createLessonsList(querySnapshot.documents, lessonsNumber));
+  }
+
+  Future<List<LessonDB>> searchUserLessonsFirstChunk(String lessonName, List<String> categories) async {
+    if (currentUser == null) {
+      bool gotCurrentUser = await initiateFirebaseUser();
+      if (!gotCurrentUser) return [];
+    }
+
+    generateSearchQuery(lessonName, categories, true);
+    QuerySnapshot querySnapshot = await currentQuery.getDocuments();
+    return (await createLessonsList(querySnapshot.documents, lessonsNumber));
+  }
+
+  Future<List<LessonDB>> searchUserLessonsNextChunk(String lessonName, List<String> categories) async {
+    generateSearchQuery(lessonName, categories, true);
     currentQuery = currentQuery.startAfterDocument(lastOrderedDocument);
 
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
@@ -580,7 +600,7 @@ class DatabaseUtilities {
     });
 
     for (QuestionDB question in lesson.getQuestionsList()) {
-      databaseReference.collection('lessons').document(ref.documentID).collection('questions').add({
+      userDocReference.collection('drafts').document(ref.documentID).collection('questions').add({
         'videoURL': question.getVideoURL(),
         'question': question.getQuestion(),
         'answer': question.getAnswer(),
@@ -666,7 +686,7 @@ class DatabaseUtilities {
     }
   }
 
-  Future<List<LessonDB>> getLessonsFromDB() async {
+  Future<List<LessonDB>> getDraftsFromDB() async {
     DocumentReference userDocReference = await getUserDocumentReference();
     if (userDocReference == null) return null;
 
@@ -696,6 +716,7 @@ class DatabaseUtilities {
         videoID: data['videoID'],
         originalVideoLength: data['originalVideoLength'],
         isDraft: true,
+        questionsList: [],
       );
 
       lesson.setDBReference(currentRow.documentID);

@@ -23,7 +23,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   ScrollController _scrollController;
   Lock lock = new Lock();
   List<String> categories = [];
-  bool showSpinner=false;
+  bool showSpinner = false;
 
   @override
   void initState() {
@@ -33,13 +33,9 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     super.initState();
   }
 
-
-
-
-
   Future _getThingsOnStartup() async {
     List<LessonDB> list = await db.getFirstUserLessonsChunk("averageRating", categories);
-    List<LessonDB> listDraft=await db.getLessonsFromDB();
+    List<LessonDB> listDraft = await db.getDraftsFromDB();
     allLesson.clear();
     allLesson.addAll(listDraft);
     allLesson.addAll(list);
@@ -49,39 +45,33 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     });
   }
 
-  void filterSearchResults(String query) async{
+  void filterSearchResults(String query) async {
     if (query.isNotEmpty) {
       List<LessonDB> dummyListData = List<LessonDB>();
       setState(() {
-        showSpinner=true;
+        showSpinner = true;
       });
       //////change the search for only movies that the user create
-      dummyListData=await db.searchLessonsFirstChunk(query,[]);
+      dummyListData = await db.searchUserLessonsFirstChunk(query, []);
       setState(() {
-        showSpinner=false;
+        showSpinner = false;
       });
       setState(() {
         allLesson.clear();
         allLesson.addAll(dummyListData);
       });
-
     } else {
-
-      setState(() async{
+      setState(() async {
         setState(() {
-          showSpinner=true;
+          showSpinner = true;
         });
         _getThingsOnStartup().then((value) {});
         setState(() {
-          showSpinner=false;
+          showSpinner = false;
         });
-
       });
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -121,74 +111,73 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
   }
 
   Widget _LessonView(context) {
-    return  Expanded(
-      child:RefreshIndicator(
+    return Expanded(
+      child: RefreshIndicator(
         onRefresh: refreshAllVideos,
-        child:  ModalProgressHUD(
-        inAsyncCall: showSpinner,
-        child:ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            controller: _scrollController,
-            physics: BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              if (index == allLesson.length) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-              return Row(
-                children: <Widget>[
-                  Container(
-                    width: 140.0,
-                    height: 100.0,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: NetworkImage(url_image(allLesson[index].videoURL)), fit: BoxFit.cover)),
-                  ),
-                  Column(children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width - 200.0,
-                      height: 70.0,
-                      child: ListTile(
-                        title: Text(allLesson[index].getLessonName()),
-                        subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
-                      ),
+        child: ModalProgressHUD(
+          inAsyncCall: showSpinner,
+          child: ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              controller: _scrollController,
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (context, index) {
+                if (index == allLesson.length) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                    Row(
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () => setState(() {
-                            edit_card(context, allLesson[index]);
-                          }),
-                          icon: Icon(Icons.edit),
+                  );
+                }
+                return Row(
+                  children: <Widget>[
+                    Container(
+                      width: 140.0,
+                      height: 100.0,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: NetworkImage(url_image(allLesson[index].videoURL)), fit: BoxFit.cover)),
+                    ),
+                    Column(children: <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width - 200.0,
+                        height: 70.0,
+                        child: ListTile(
+                          title: Text(allLesson[index].getLessonName()),
+                          subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
                         ),
-                        IconButton(
-                          onPressed: () => setState(() {
-                            if (allLesson[index].isDraft){
-                              delete_card_draft(context, allLesson[index]);
-
-                            }else {
-                              delete_card(context, allLesson[index]);
-                            }
-                          }),
-                          icon: Icon(Icons.delete),
-                        ),
-                          allLesson[index].isDraft?Icon(Icons.build,color: Colors.purpleAccent):Container(),
-                      ],
-                    )
-                  ]),
-                ],
-              );
-            },
-            separatorBuilder: (context, index) => Divider(
-                  height: 4.0,
-                  color: Colors.grey,
-                ),
-            itemCount: (!endOfList && allLesson.length > 4) ? allLesson.length + 1 : allLesson.length),
-      ),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () => setState(() {
+                              edit_card(context, allLesson[index]);
+                            }),
+                            icon: Icon(Icons.edit),
+                          ),
+                          IconButton(
+                            onPressed: () => setState(() {
+                              if (allLesson[index].isDraft) {
+                                delete_card_draft(context, allLesson[index]);
+                              } else {
+                                delete_card(context, allLesson[index]);
+                              }
+                            }),
+                            icon: Icon(Icons.delete),
+                          ),
+                          allLesson[index].isDraft ? Icon(Icons.build, color: Colors.purpleAccent) : Container(),
+                        ],
+                      )
+                    ]),
+                  ],
+                );
+              },
+              separatorBuilder: (context, index) => Divider(
+                    height: 4.0,
+                    color: Colors.grey,
+                  ),
+              itemCount: (!endOfList && allLesson.length > 4) ? allLesson.length + 1 : allLesson.length),
+        ),
       ),
     );
   }
@@ -198,12 +187,12 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       allLesson.remove(lesson_object);
     }
   }
+
   void delete_card_draft(BuildContext context, lesson_object) async {
     if (await db.deleteDraftFromDB(lesson_object)) {
       allLesson.remove(lesson_object);
     }
   }
-
 
   Widget create_animation() {
     return Container(
@@ -283,7 +272,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
 
   Future<void> refreshAllVideos() async {
     List<LessonDB> list = await db.getFirstUserLessonsChunk("averageRating", categories);
-    List<LessonDB> draftList=await db.getLessonsFromDB();
+    List<LessonDB> draftList = await db.getDraftsFromDB();
     setState(() {
       allLesson.clear();
       allLesson.addAll(draftList);
