@@ -33,9 +33,15 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     super.initState();
   }
 
+
+
+
+
   Future _getThingsOnStartup() async {
     List<LessonDB> list = await db.getFirstUserLessonsChunk("averageRating", categories);
+    List<LessonDB> listDraft=await db.getLessonsFromDB();
     allLesson.clear();
+    allLesson.addAll(listDraft);
     allLesson.addAll(list);
     animationOn = false;
     setState(() {
@@ -133,7 +139,6 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                   ),
                 );
               }
-
               return Row(
                 children: <Widget>[
                   Container(
@@ -162,10 +167,16 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                         ),
                         IconButton(
                           onPressed: () => setState(() {
-                            delete_card(context, allLesson[index]);
+                            if (allLesson[index].isDraft){
+                              delete_card_draft(context, allLesson[index]);
+
+                            }else {
+                              delete_card(context, allLesson[index]);
+                            }
                           }),
                           icon: Icon(Icons.delete),
                         ),
+                          allLesson[index].isDraft?Icon(Icons.build,color: Colors.purpleAccent):Container(),
                       ],
                     )
                   ]),
@@ -187,6 +198,12 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       allLesson.remove(lesson_object);
     }
   }
+  void delete_card_draft(BuildContext context, lesson_object) async {
+    if (await db.deleteDraftFromDB(lesson_object)) {
+      allLesson.remove(lesson_object);
+    }
+  }
+
 
   Widget create_animation() {
     return Container(
@@ -238,9 +255,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
     final lesson_new = await Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCreatorScreen()));
     if (lesson_new != null) {
       setState(() {
-        //lesson_new need to by from the shape of LessonDB
-        allLesson.insert(0, lesson_new);
-        // allLesson.add(lesson_new);
+        refreshAllVideos();
+        //allLesson.insert(0, lesson_new);
       });
     }
   }
@@ -267,8 +283,10 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
 
   Future<void> refreshAllVideos() async {
     List<LessonDB> list = await db.getFirstUserLessonsChunk("averageRating", categories);
+    List<LessonDB> draftList=await db.getLessonsFromDB();
     setState(() {
       allLesson.clear();
+      allLesson.addAll(draftList);
       allLesson.addAll(list);
       endOfList = false;
     });
