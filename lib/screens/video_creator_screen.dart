@@ -327,6 +327,18 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
       onStepContinue: nextStep,
       onStepCancel: cancelStep,
       onStepTapped: (step) => goTo(step),
+      controlsBuilder: (BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) =>
+          currentStep == 2
+              ? Container()
+              : Container(
+                  margin: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 100),
+                  child: RaisedButton(
+                    onPressed: onStepContinue,
+                    child: Text("Continue"),
+                    color: Colors.lightBlueAccent,
+                  ),
+                ),
     );
   }
 
@@ -355,22 +367,59 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     super.dispose();
   }
 
+  AppBar generateAppBar() {
+    return AppBar(
+      centerTitle: true,
+      title: Text('Create Lesson'),
+      leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => currentStep == 0 ? Navigator.of(context).pop() : cancelStep()),
+      actions: widget.videoData == null || widget.videoData.checkIfDraft()
+          ? (currentStep < 2
+              ? <Widget>[
+                  RawMaterialButton(
+                    child: Text(
+                      'Save draft',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: saveDraftDataAndExit,
+                  )
+                ]
+              : <Widget>[
+                  RawMaterialButton(
+                    child: Text(
+                      'Save draft',
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                    onPressed: saveDraftDataAndExit,
+                    constraints: BoxConstraints(maxWidth: 60),
+                  ),
+                  RawMaterialButton(
+                    child: Text(
+                      'Upload',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: saveDraftAsLesson,
+                    constraints: BoxConstraints(maxWidth: 150, minWidth: 60),
+                  )
+                ])
+          : <Widget>[
+              RawMaterialButton(
+                child: Text(
+                  'Save',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: saveLessonDataAndExit,
+              )
+            ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Create Lesson'),
-        actions: <Widget>[
-          RawMaterialButton(
-            child: Text(
-              'Save',
-              style: TextStyle(color: Colors.white),
-            ),
-            onPressed: saveLessonDataAndExit,
-          )
-        ],
-      ),
+      appBar: generateAppBar(),
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
         child: lessonDataStepper(),
@@ -386,11 +435,14 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     String videoID;
     bool metaDataLoaded;
 
+    if (!videoURL.startsWith('https://')) videoURL = 'https://' + videoURL;
     // first of all, we check whether provided url is legal youtube video url
     videoID = YoutubePlayer.convertUrlToId(videoURL);
     if (videoID == null) {
       loadingVideoFailed = true;
       return;
+    } else {
+      videoURL = 'https://m.youtube.com/watch?v=' + videoID;
     }
 
     // if so, we start 'loading' animation
@@ -405,6 +457,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
       if (!metaDataLoaded) {
         loadingProcessFailed = true;
         loadingVideoFailed = true;
+        setState(() => showSpinner = false);
         return;
       }
     }
@@ -427,6 +480,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
       youtubePlayer = null;
       loadingProcessFailed = true;
       loadingVideoFailed = true;
+      setState(() => showSpinner = false);
       return;
     }
 
@@ -467,6 +521,46 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     }
   }
 
+  void saveDraftDataAndExit() async {
+    bool isEdited = false;
+
+    if (currentStep != 0 || _firstStepFormKey.currentState.validate()) {
+      currentLesson.setLessonName(lessonNameController.text);
+      currentLesson.setVideoURL(currentLoadedLink);
+    } else {
+      return;
+    }
+
+    currentLesson.setVideoStartPoint(secondsStartPoint);
+    currentLesson.setVideoEndPoint(secondsEndPoint);
+    currentLesson.setIsDraft(true);
+
+    setState(() => showSpinner = true);
+    try {
+      if (widget.videoData == null) {
+        String documentID = await dbHelper.addDraftToDB(currentLesson);
+        currentLesson.setDBReference(documentID);
+      } else {
+        while (!isEdited) {
+          isEdited = await dbHelper.editDraftInDB(currentLesson);
+        }
+      }
+      Navigator.pop(context, currentLesson);
+    } catch (e) {
+      //TODO: add code in case that lesson saving failed
+    }
+    setState(() => showSpinner = false);
+  }
+
+  void saveDraftAsLesson() async {
+    if (widget.videoData == null) {
+      saveLessonDataAndExit();
+    } else {
+      await dbHelper.deleteDraftFromDB(currentLesson);
+      saveLessonDataAndExit();
+    }
+  }
+
   void saveLessonDataAndExit() async {
     bool isEdited = false;
 
@@ -492,7 +586,8 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
 
     setState(() => showSpinner = true);
     try {
-      if (widget.videoData == null) {
+      if (widget.videoData == null || currentLesson.checkIfDraft()) {
+        currentLesson.setIsDraft(false);
         String documentID = await dbHelper.addLessonToDB(currentLesson);
         currentLesson.setDBReference(documentID);
       } else {

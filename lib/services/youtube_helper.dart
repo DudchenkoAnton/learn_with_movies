@@ -2,12 +2,13 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:temp_project/services/networking.dart';
 import 'package:temp_project/database/lesson_db.dart';
 
-const String apiKey = 'AIzaSyC1A409ejzuIRRJgeSLdwrw7slhUR4xL-k';
+const String apiKey = 'AIzaSyAhAmKB8dpDbUAB8dqdu_U0p9Gw3x1HNdg';
 const requestMode = 'snippet,contentDetails';
 const youtubeURL = 'https://www.googleapis.com/youtube/v3/videos?';
 
 class YoutubeNetworkHelper {
   bool operationSuccessful = false;
+
   Future<bool> loadVideoData(LessonDB currentLesson) async {
     if (currentLesson.getVideoID() == null || currentLesson.getVideoID() == '') {
       return false;

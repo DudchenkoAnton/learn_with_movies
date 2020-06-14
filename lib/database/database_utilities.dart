@@ -544,5 +544,179 @@ class DatabaseUtilities {
     return lessonsIDsArray;
   }
 
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+
+  Future<DocumentReference> getUserDocumentReference() async {
+    if (currentUser == null) await initiateFirebaseUser();
+
+    QuerySnapshot querySnapshot =
+        await databaseReference.collection("users").where('userID', isEqualTo: currentUser.uid).getDocuments();
+    if (querySnapshot.documents.length == 0) return null;
+
+    DocumentReference userDocumentRef = querySnapshot.documents[0].reference;
+
+    return userDocumentRef;
+  }
+
+  Future<String> addDraftToDB(LessonDB lesson) async {
+    if (currentUser == null) {
+      bool gotCurrentUser = await initiateFirebaseUser();
+      if (!gotCurrentUser) return '';
+    }
+
+    DocumentReference userDocReference = await getUserDocumentReference();
+    if (userDocReference == null) return null;
+
+    DocumentReference ref = await userDocReference.collection('drafts').add({
+      'videoURL': lesson.getVideoURL(),
+      'lessonName': lesson.getLessonName(),
+      'videoStartPoint': lesson.getVideoStartPoint(),
+      'videoEndPoint': lesson.getVideoEndPoint(),
+      'labels': lesson.getLabelsList(),
+      'videoID': lesson.getVideoID(),
+      'originalVideoLength': lesson.getOriginalVideoLength(),
+    });
+
+    for (QuestionDB question in lesson.getQuestionsList()) {
+      databaseReference.collection('lessons').document(ref.documentID).collection('questions').add({
+        'videoURL': question.getVideoURL(),
+        'question': question.getQuestion(),
+        'answer': question.getAnswer(),
+        'americanAnswers': question.getAmericanAnswers(),
+        'videoStartPoint': question.getVideoStartTime(),
+        'videoEndPoint': question.getVideoEndTime(),
+        'answerStartPoint': question.getAnswerStartTime(),
+        'answerEndPoint': question.getAnswerEndTime()
+      });
+    }
+
+    return ref.documentID;
+  }
+
+  Future<bool> deleteDraftFromDB(LessonDB lesson) async {
+    print(lesson.getDBReference());
+    var lessonReference = lesson.getDBReference();
+    DocumentReference userDocReference = await getUserDocumentReference();
+
+    if (lessonReference == null) return false;
+    if (userDocReference == null) return null;
+
+    try {
+      userDocReference
+          .collection('drafts')
+          .document(lessonReference)
+          .collection('questions')
+          .getDocuments()
+          .then((snapshot) {
+        for (DocumentSnapshot ds in snapshot.documents) {
+          ds.reference.delete();
+        }
+      });
+      userDocReference.collection('drafts').document(lessonReference).delete();
+      return true;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> editDraftInDB(LessonDB lesson) async {
+    DocumentReference userDocReference = await getUserDocumentReference();
+    if (userDocReference == null) return null;
+
+    DocumentSnapshot snapshot = await userDocReference.collection('drafts').document(lesson.getDBReference()).get();
+    if (snapshot != null) {
+      snapshot.reference.updateData({
+        'videoURL': lesson.getVideoURL(),
+        'lessonName': lesson.getLessonName(),
+        'videoStartPoint': lesson.getVideoStartPoint(),
+        'videoEndPoint': lesson.getVideoEndPoint(),
+        'labels': lesson.getLabelsList(),
+        'videoID': lesson.getVideoID(),
+        'originalVideoLength': lesson.getOriginalVideoLength(),
+      });
+
+      QuerySnapshot existingQuestions = await userDocReference
+          .collection('drafts')
+          .document(lesson.getDBReference())
+          .collection('questions')
+          .getDocuments();
+
+      for (var currentRow in existingQuestions.documents) {
+        await currentRow.reference.delete();
+      }
+      for (QuestionDB question in lesson.getQuestionsList()) {
+        userDocReference.collection('drafts').document(lesson.getDBReference()).collection('questions').add({
+          'videoURL': question.getVideoURL(),
+          'question': question.getQuestion(),
+          'answer': question.getAnswer(),
+          'americanAnswers': question.getAmericanAnswers(),
+          'videoStartPoint': question.getVideoStartTime(),
+          'videoEndPoint': question.getVideoEndTime(),
+          'answerStartPoint': question.getAnswerStartTime(),
+          'answerEndPoint': question.getAnswerEndTime()
+        });
+      }
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<List<LessonDB>> getLessonsFromDB() async {
+    DocumentReference userDocReference = await getUserDocumentReference();
+    if (userDocReference == null) return null;
+
+    QuerySnapshot querySnapshot = await userDocReference.collection('drafts').getDocuments();
+    var arrivedLessonsList = querySnapshot.documents;
+
+    this.lessonsList = new List();
+    for (var currentRow in arrivedLessonsList) {
+      var data = Map<String, dynamic>.from(currentRow.data);
+
+      QuerySnapshot querySnapshot = await userDocReference
+          .collection('drafts')
+          .document(currentRow.documentID)
+          .collection("questions")
+          .getDocuments();
+
+      var arrivedQuestionsList = querySnapshot.documents;
+
+      List<String> labels = (data["labels"] as List).map((s) => (s as String)).toList();
+
+      LessonDB lesson = LessonDB(
+        videoURL: data['videoURL'],
+        lessonName: data['lessonName'],
+        videoStartPoint: data['videoStartPoint'],
+        videoEndPoint: data['videoEndPoint'],
+        labelsList: labels,
+        videoID: data['videoID'],
+        originalVideoLength: data['originalVideoLength'],
+        isDraft: true,
+      );
+
+      lesson.setDBReference(currentRow.documentID);
+
+      for (var elm in arrivedQuestionsList) {
+        var data = Map<String, dynamic>.from(elm.data);
+        lesson.addQuestion(QuestionDB(
+            videoURL: data['videoURL'],
+            question: data['question'],
+            answer: data['answer'],
+            americanAnswers: data["americanAnswers"],
+            videoStartPoint: data['videoStartPoint'],
+            videoEndPoint: data['videoEndPoint'],
+            answerStartPoint: data['answerStartPoint'],
+            answerEndPoint: data['answerEndPoint']));
+      }
+
+      this.lessonsList.add(lesson);
+    }
+    return this.lessonsList;
+  }
+
 // Anton Current Code - end
 }

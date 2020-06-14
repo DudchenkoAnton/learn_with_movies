@@ -17,23 +17,34 @@ class LessonDB {
   int originalVideoLength;
   String creatorUserID; // amount of users that leaves a rating
   String creationDate;
+  bool isDraft;
 
-  LessonDB(
-      {this.originalVideoLength,
-      this.creationDate,
-      this.creatorUserID,
-      this.videoURL,
-      this.lessonName,
-      this.lessonDetails,
-      this.videoStartPoint,
-      this.videoEndPoint,
-      this.labelsList,
-      this.youtubeOriginalName,
-      this.videoID,
-      this.questionsList,
-      this.numberViews = 0,
-      this.averageRating = 0,
-      this.numberReviews = 0});
+  LessonDB({
+    this.originalVideoLength,
+    this.creationDate,
+    this.creatorUserID,
+    this.videoURL,
+    this.lessonName,
+    this.lessonDetails,
+    this.videoStartPoint,
+    this.videoEndPoint,
+    this.labelsList,
+    this.youtubeOriginalName,
+    this.videoID,
+    this.questionsList,
+    this.numberViews = 0,
+    this.averageRating = 0,
+    this.numberReviews = 0,
+    this.isDraft = false,
+  });
+
+  bool checkIfDraft() {
+    return this.isDraft;
+  }
+
+  void setIsDraft(bool draft) {
+    this.isDraft = draft;
+  }
 
   int getOriginalVideoLength() {
     return this.originalVideoLength;
