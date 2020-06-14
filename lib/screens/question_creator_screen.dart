@@ -4,6 +4,8 @@ import 'package:temp_project/database/question_db.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:temp_project/components/video_range_slider.dart';
 import 'create_answer_segment.dart';
+import 'package:temp_project/components/video_range_text_field.dart';
+import 'package:temp_project/components/video_range_slider_new.dart';
 
 class QuestionCreatorScreen extends StatefulWidget {
   static const String id = 'question_creator_screen';
@@ -17,6 +19,9 @@ class QuestionCreatorScreen extends StatefulWidget {
 }
 
 class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
+
+  final _secondStepFormKey = GlobalKey<FormState>();
+
 //  TextEditingController _startAtController = TextEditingController();
 //  TextEditingController _endAtController = TextEditingController();
   TextEditingController _questionController = TextEditingController();
@@ -66,6 +71,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   String question_creation_text = "Choose one way to create your question";
 
   Widget selectedWidget = Container();
+
+  int cur_start_time_secconds = 0;
+  int cur_end_time_secconds = 0;
+
+  int last_range_indication = 0; // 0 - slider, 1 - text
 
   void _incrementCounter() {
     setState(() {
@@ -158,6 +168,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     if (widget.question == null) {
       startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
       endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
+      cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+      cur_end_time_secconds = widget.videoData.getVideoEndPoint();
     } else {
       _answerController.text = widget.question.answer;
       _answer_open_format.text = widget.question.answer;
@@ -172,6 +184,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       _questionController.text = widget.question.question;
       startAt[0] = Duration(seconds: widget.question.getVideoStartTime());
       endAt[0] = Duration(seconds: widget.question.getVideoEndTime());
+      cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+      cur_end_time_secconds = widget.videoData.getVideoEndPoint();
     }
 
     //TODO: update videoLengthOriginal, startAt, endAt, depending on received video data
@@ -206,6 +220,12 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       }
 
       setState(() {
+
+        startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
+        endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
+        cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+        cur_end_time_secconds = widget.videoData.getVideoEndPoint();
+
         question_creation_text = "";
         format_of_question = 1;
         selectedWidget = Container(
@@ -486,11 +506,53 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 SizedBox(
                   height: 10.0,
                 ),
+                /*
                 VideoRangeSlider(
                   startAt: startAt,
                   endAt: endAt,
                   length: videoLengthOriginal,
                 ),
+
+                 */
+
+                SizedBox(height: 16.0),
+                VideoRangeSliderNew(
+                  secondsStartPoint: cur_start_time_secconds,
+                  secondsEndPoint: cur_end_time_secconds,
+                  secondsLength: cur_end_time_secconds - cur_start_time_secconds,
+                  onChanged: (int start, int end) {
+                    setState(() {
+                      last_range_indication = 1;
+                      startAt[0] = Duration(seconds: start);
+                      endAt[0] = Duration(seconds: end);
+                      cur_start_time_secconds = start;
+                      cur_end_time_secconds = end;
+                      temp.setVideoStartTime(start);
+                      temp.setVideoEndTime(end);
+                      _controller.pause();
+                    });
+                  },
+                ),
+                SizedBox(height: 16.0),
+                VideoRangeText(
+                  formKey: _secondStepFormKey,
+                  secondsStartPoint: cur_start_time_secconds,
+                  secondsEndPoint: cur_end_time_secconds,
+                  secondsLength: cur_end_time_secconds - cur_start_time_secconds,
+                  onChanged: (int start, int end) {
+                    setState(() {
+                      last_range_indication = 2;
+                      startAt[0] = Duration(seconds: start);
+                      endAt[0] = Duration(seconds: end);
+                      cur_start_time_secconds = start;
+                      cur_end_time_secconds = end;
+                      temp.setVideoStartTime(start);
+                      temp.setVideoEndTime(end);
+                      _controller.pause();
+                    });
+                  },
+                ),
+                SizedBox(height: 16.0),
               ],
             ),
           ),
@@ -544,6 +606,12 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
               FlatButton(
                 onPressed: () {
                   setState(() {
+
+                    startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
+                    endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
+                    cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+                    cur_end_time_secconds = widget.videoData.getVideoEndPoint();
+
                     question_creation_text = "";
                     format_of_question = 2;
                     selectedWidget = Container(
@@ -609,11 +677,51 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                             SizedBox(
                               height: 10.0,
                             ),
+                            /*
                             VideoRangeSlider(
                               startAt: startAt,
                               endAt: endAt,
                               length: videoLengthOriginal,
                             ),
+                             */
+                            SizedBox(height: 16.0),
+                            VideoRangeSliderNew(
+                              secondsStartPoint: cur_start_time_secconds,
+                              secondsEndPoint: cur_end_time_secconds,
+                              secondsLength: cur_end_time_secconds - cur_start_time_secconds,
+                              onChanged: (int start, int end) {
+                                setState(() {
+                                  last_range_indication = 1;
+                                  startAt[0] = Duration(seconds: start);
+                                  endAt[0] = Duration(seconds: end);
+                                  cur_start_time_secconds = start;
+                                  cur_end_time_secconds = end;
+                                  temp.setVideoStartTime(start);
+                                  temp.setVideoEndTime(end);
+                                  _controller.pause();
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16.0),
+                            VideoRangeText(
+                              formKey: _secondStepFormKey,
+                              secondsStartPoint: cur_start_time_secconds,
+                              secondsEndPoint: cur_end_time_secconds,
+                              secondsLength: cur_end_time_secconds - cur_start_time_secconds,
+                              onChanged: (int start, int end) {
+                                setState(() {
+                                  last_range_indication = 2;
+                                  startAt[0] = Duration(seconds: start);
+                                  endAt[0] = Duration(seconds: end);
+                                  cur_start_time_secconds = start;
+                                  cur_end_time_secconds = end;
+                                  temp.setVideoStartTime(start);
+                                  temp.setVideoEndTime(end);
+                                  _controller.pause();
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16.0),
                           ],
                         ),
                       ),
