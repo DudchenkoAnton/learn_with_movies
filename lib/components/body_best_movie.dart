@@ -30,6 +30,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   List<String> labels = ['All','Medicine', 'Law', 'Entertainment', 'Sport', 'History', 'Music'];
   bool prase = false;
   ScrollController _scrollController;
+  ScrollController _scrollController_2;
   bool endOfList = false;
   Lock lock = new Lock();
   List<String> categories = [];
@@ -43,6 +44,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
     _getLessonsHistory();
     _getThingsOnStartup().then((value) {});
     _scrollController = ScrollController();
+    _scrollController_2=ScrollController();
     _scrollController.addListener(_scrollListener);
     super.initState();
   }
@@ -184,7 +186,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                 width: MediaQuery.of(context).size.width,
                 child: ListView.builder(
                     shrinkWrap: true,
-                    controller: _scrollController,
+                    controller: _scrollController_2,
                     padding: EdgeInsets.symmetric(horizontal: 2, vertical: 3),
                     itemCount: labels.length,
                     scrollDirection: Axis.horizontal,
