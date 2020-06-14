@@ -77,8 +77,12 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                 child: TextFormField(
                   controller: videoLinkController,
                   decoration: kTextFieldDecoration.copyWith(
-                    hintText: 'Enter video link',
-                  ),
+                      hintText: 'Enter video link',
+                      suffixIcon: IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            videoLinkController.clear();
+                          })),
                   validator: (input) {
                     if (input.length == 0) {
                       return 'Enter a youtube video link';

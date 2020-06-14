@@ -2,7 +2,7 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:temp_project/services/networking.dart';
 import 'package:temp_project/database/lesson_db.dart';
 
-const String apiKey = 'AIzaSyC_VXT-0YR0J_EzlR19RaoKoaw0qXmVQ_o';
+const String apiKey = 'AIzaSyDGWvXxvhjPe02S7CbN2xmoB8eHu85Q0sA';
 const requestMode = 'snippet,contentDetails';
 const youtubeURL = 'https://www.googleapis.com/youtube/v3/videos?';
 
