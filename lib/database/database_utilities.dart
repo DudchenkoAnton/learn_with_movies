@@ -16,8 +16,9 @@ class DatabaseUtilities {
   List<LessonDB> lessonsList = new List<LessonDB>();
   FirebaseUser currentUser;
   final lessonsNumber = 5;
-  DocumentSnapshot lastOrderedDocument;
-  DocumentSnapshot lastRecentDocument;
+  DocumentSnapshot lastOrderedLessonDocument;
+  DocumentSnapshot lastOrderedDraftDocument;
+  DocumentSnapshot lastRecentLessonDocument;
   String currentUserCollectionID;
   Query currentQuery;
   int lastChunkLength = -1;
@@ -279,28 +280,44 @@ class DatabaseUtilities {
     return formattedName;
   }
 
-  void generateSearchQuery(String lessonName, List<String> categories, bool onlyUserCreatedLessons) {
+  void generateLessonsSearchQuery(String lessonName, List<String> categories, bool onlyUserCreatedLessons) {
     String formattedName = generateFormattedName(lessonName);
 
     currentQuery = Firestore.instance.collection("lessons");
     if (onlyUserCreatedLessons) currentQuery = currentQuery.where('creatorUserID', isEqualTo: currentUser.uid);
     if (categories.length != 0) currentQuery = currentQuery.where('labels', arrayContains: categories[0]);
     currentQuery = currentQuery.where("searchSubStringsArray", arrayContains: formattedName);
-    currentQuery = currentQuery.orderBy('averageRating', descending: true).limit(lessonsNumber);
+    if (onlyUserCreatedLessons) {
+      currentQuery = currentQuery.orderBy('searchSubStringsLength', descending: false).limit(lessonsNumber);
+    } else {
+      currentQuery = currentQuery.orderBy('averageRating', descending: true).limit(lessonsNumber);
+    }
   }
 
   Future<List<LessonDB>> searchLessonsFirstChunk(String lessonName, List<String> categories) async {
-    generateSearchQuery(lessonName, categories, false);
+    generateLessonsSearchQuery(lessonName, categories, false);
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
   }
 
   Future<List<LessonDB>> searchLessonsNextChunk(String lessonName, List<String> categories) async {
-    generateSearchQuery(lessonName, categories, false);
-    currentQuery = currentQuery.startAfterDocument(lastOrderedDocument);
+    generateLessonsSearchQuery(lessonName, categories, false);
+    currentQuery = currentQuery.startAfterDocument(lastOrderedLessonDocument);
 
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
+  }
+
+  Future<void> generateDraftsSearchQuery(String lessonName, List<String> categories) async {
+    String formattedName = generateFormattedName(lessonName);
+
+    DocumentReference userDocReference = await getUserDocumentReference();
+    if (userDocReference == null) return;
+
+    currentQuery = userDocReference.collection("drafts");
+    if (categories.length != 0) currentQuery = currentQuery.where('labels', arrayContains: categories[0]);
+    currentQuery = currentQuery.where("searchSubStringsArray", arrayContains: formattedName);
+    currentQuery = currentQuery.orderBy('searchSubStringsLength', descending: false).limit(lessonsNumber);
   }
 
   Future<List<LessonDB>> searchUserLessonsFirstChunk(String lessonName, List<String> categories) async {
@@ -309,17 +326,69 @@ class DatabaseUtilities {
       if (!gotCurrentUser) return [];
     }
 
-    generateSearchQuery(lessonName, categories, true);
-    QuerySnapshot querySnapshot = await currentQuery.getDocuments();
-    return (await createLessonsList(querySnapshot.documents, lessonsNumber));
+    generateLessonsSearchQuery(lessonName, categories, true);
+    QuerySnapshot lessonsQuerySnapshot = await currentQuery.getDocuments();
+//    return (await createLessonsList(lessonsQuerySnapshot.documents, lessonsNumber));
+
+    await generateDraftsSearchQuery(lessonName, categories);
+    QuerySnapshot draftsQuerySnapshot = await currentQuery.getDocuments();
+
+    return (await generateUserLessonsList(lessonsQuerySnapshot.documents, draftsQuerySnapshot.documents));
   }
 
   Future<List<LessonDB>> searchUserLessonsNextChunk(String lessonName, List<String> categories) async {
-    generateSearchQuery(lessonName, categories, true);
-    currentQuery = currentQuery.startAfterDocument(lastOrderedDocument);
-
+    generateLessonsSearchQuery(lessonName, categories, true);
+    if (lastOrderedLessonDocument != null) currentQuery = currentQuery.startAfterDocument(lastOrderedLessonDocument);
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
+
+    await generateDraftsSearchQuery(lessonName, categories);
+    if (lastOrderedDraftDocument != null) currentQuery = currentQuery.startAfterDocument(lastOrderedDraftDocument);
+    QuerySnapshot draftsQuerySnapshot = await currentQuery.getDocuments();
+
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
+  }
+
+  Future<List<LessonDB>> generateUserLessonsList(List<DocumentSnapshot> lessons, List<DocumentSnapshot> drafts) async {
+    int length = 0, i = 0, j = 0;
+    List<LessonDB> lessonsList = await createLessonsList(lessons, lessonsNumber);
+    List<LessonDB> draftsList = await createLessonsList(drafts, lessonsNumber);
+    List<LessonDB> resultingList = new List();
+
+    while (length < lessonsNumber) {
+      if (i < lessonsList.length && j < draftsList.length) {
+        if (lessonsList[i].searchArrayLength > draftsList[j].searchArrayLength) {
+          resultingList.add(lessonsList[i]);
+          i++;
+        } else {
+          draftsList[j].isDraft = true;
+          resultingList.add(draftsList[j]);
+          j++;
+        }
+      } else if (i >= lessonsList.length && j < draftsList.length) {
+        draftsList[j].isDraft = true;
+        resultingList.add(draftsList[j]);
+        j++;
+      } else if (i < lessonsList.length && j >= draftsList.length) {
+        resultingList.add(lessonsList[i]);
+        i++;
+      }
+      length++;
+    }
+
+    if (lessons.length > 0) {
+      i < lessons.length
+          ? lastOrderedLessonDocument = lessons[i]
+          : lastOrderedLessonDocument = lessons[lessons.length - 1];
+    } else {
+      lastOrderedLessonDocument = null;
+    }
+    if (drafts.length > 0) {
+      j < drafts.length ? lastOrderedDraftDocument = drafts[j] : lastOrderedDraftDocument = drafts[drafts.length - 1];
+    } else {
+      lastOrderedDraftDocument = null;
+    }
+
+    return resultingList;
   }
 
 ////////////////////////////////////////////////////////////////
@@ -344,12 +413,12 @@ class DatabaseUtilities {
   }
 
   Future<List<LessonDB>> getNextUserLessonsChunk(String orderBy, List<String> categories) async {
-    if (lastOrderedDocument == null) {
+    if (lastOrderedLessonDocument == null) {
       return [];
     }
 
     generateUserCreatorQuery(orderBy, categories);
-    currentQuery = currentQuery.startAfterDocument(lastOrderedDocument);
+    currentQuery = currentQuery.startAfterDocument(lastOrderedLessonDocument);
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
   }
@@ -380,14 +449,16 @@ class DatabaseUtilities {
   }
 
   Future<List<LessonDB>> getNextLessonsChunk(String orderBy, List<String> categories) async {
-    if (lastOrderedDocument == null) {
+    if (lastOrderedLessonDocument == null) {
       return [];
     }
 
     currentQuery = Firestore.instance.collection("lessons");
     if (categories.length != 0) currentQuery = currentQuery.where('labels', arrayContains: categories[0]);
-    currentQuery =
-        currentQuery.orderBy(orderBy, descending: true).limit(lessonsNumber).startAfterDocument(lastOrderedDocument);
+    currentQuery = currentQuery
+        .orderBy(orderBy, descending: true)
+        .limit(lessonsNumber)
+        .startAfterDocument(lastOrderedLessonDocument);
     QuerySnapshot querySnapshot = await currentQuery.getDocuments();
     return (await createLessonsList(querySnapshot.documents, lessonsNumber));
   }
@@ -398,7 +469,7 @@ class DatabaseUtilities {
 
   Future<List<LessonDB>> createLessonsList(List<DocumentSnapshot> arrivedLessonsList, int lessonsNum) async {
 //    var arrivedLessonsList = querySnapshot.documents;
-    this.lessonsList = new List();
+    List<LessonDB> lessonsList = new List();
 
     int count = 0;
 
@@ -408,7 +479,7 @@ class DatabaseUtilities {
         break;
       }
       if (count == arrivedLessonsList.length) {
-        lastOrderedDocument = currentRow;
+        lastOrderedLessonDocument = currentRow;
       }
 
       var data = Map<String, dynamic>.from(currentRow.data);
@@ -451,12 +522,12 @@ class DatabaseUtilities {
             answerEndPoint: data['answerEndPoint']));
       }
 
-      this.lessonsList.add(lesson);
+      lessonsList.add(lesson);
     }
-    if (this.lessonsList.length == 0) {
-      lastOrderedDocument = null;
+    if (lessonsList.length == 0) {
+      lastOrderedLessonDocument = null;
     }
-    return this.lessonsList;
+    return lessonsList;
   }
 
 //////////////////////////////////////////////////////////////
@@ -469,8 +540,8 @@ class DatabaseUtilities {
     }
 
     Query tempQuery = await generateFinishedLessonsQuery();
-    if (lastRecentDocument != null && !refresh) {
-      tempQuery = tempQuery.startAfterDocument(lastRecentDocument);
+    if (lastRecentLessonDocument != null && !refresh) {
+      tempQuery = tempQuery.startAfterDocument(lastRecentLessonDocument);
     }
     QuerySnapshot finishedLessonsQuerySnapshot = await tempQuery.limit(lessonsNumber).getDocuments();
     int finishedLength = finishedLessonsQuerySnapshot.documents.length;
@@ -504,8 +575,8 @@ class DatabaseUtilities {
 
   Future<List<DocumentSnapshot>> getMissedLessons(int numberOfLessons) async {
     Query tempQuery = await generateFinishedLessonsQuery();
-    if (lastRecentDocument != null) {
-      tempQuery = tempQuery.startAfterDocument(lastRecentDocument);
+    if (lastRecentLessonDocument != null) {
+      tempQuery = tempQuery.startAfterDocument(lastRecentLessonDocument);
     }
     QuerySnapshot tempSnapshot = await tempQuery.limit(lessonsNumber * 2).getDocuments();
     List<DocumentSnapshot> listOfLessons = await getHistoryLessonsData(tempSnapshot);
@@ -527,7 +598,7 @@ class DatabaseUtilities {
           .where('lessonName', isEqualTo: currentRow.data['lessonName'])
           .getDocuments();
       if (temp.documents.length > 0) {
-        lastRecentDocument = currentRow;
+        lastRecentLessonDocument = currentRow;
         listOfLessons.add(temp.documents[0]);
       } else {
         historyToDelete.add(currentRow.documentID);
@@ -586,6 +657,11 @@ class DatabaseUtilities {
       if (!gotCurrentUser) return '';
     }
 
+    String userID = currentUser.uid;
+    List<String> subStrings = generateSubStrings(lesson.getLessonName());
+    DateTime now = DateTime.now();
+    String currentDate = now.toIso8601String();
+
     DocumentReference userDocReference = await getUserDocumentReference();
     if (userDocReference == null) return null;
 
@@ -597,6 +673,9 @@ class DatabaseUtilities {
       'labels': lesson.getLabelsList(),
       'videoID': lesson.getVideoID(),
       'originalVideoLength': lesson.getOriginalVideoLength(),
+      'creationDate': currentDate,
+      'searchSubStringsArray': subStrings,
+      'searchSubStringsLength': subStrings.length,
     });
 
     for (QuestionDB question in lesson.getQuestionsList()) {
@@ -646,6 +725,8 @@ class DatabaseUtilities {
     DocumentReference userDocReference = await getUserDocumentReference();
     if (userDocReference == null) return null;
 
+    List<String> subStrings = generateSubStrings(lesson.getLessonName());
+
     DocumentSnapshot snapshot = await userDocReference.collection('drafts').document(lesson.getDBReference()).get();
     if (snapshot != null) {
       snapshot.reference.updateData({
@@ -656,6 +737,8 @@ class DatabaseUtilities {
         'labels': lesson.getLabelsList(),
         'videoID': lesson.getVideoID(),
         'originalVideoLength': lesson.getOriginalVideoLength(),
+        'searchSubStringsArray': subStrings,
+        'searchSubStringsLength': subStrings.length,
       });
 
       QuerySnapshot existingQuestions = await userDocReference
@@ -693,7 +776,7 @@ class DatabaseUtilities {
     QuerySnapshot querySnapshot = await userDocReference.collection('drafts').getDocuments();
     var arrivedLessonsList = querySnapshot.documents;
 
-    this.lessonsList = new List();
+    List<LessonDB> lessonsList = new List();
     for (var currentRow in arrivedLessonsList) {
       var data = Map<String, dynamic>.from(currentRow.data);
 
@@ -734,9 +817,9 @@ class DatabaseUtilities {
             answerEndPoint: data['answerEndPoint']));
       }
 
-      this.lessonsList.add(lesson);
+      lessonsList.add(lesson);
     }
-    return this.lessonsList;
+    return lessonsList;
   }
 
 // Anton Current Code - end

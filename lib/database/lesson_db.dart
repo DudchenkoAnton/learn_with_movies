@@ -18,6 +18,7 @@ class LessonDB {
   String creatorUserID; // amount of users that leaves a rating
   String creationDate;
   bool isDraft;
+  int searchArrayLength;
 
   LessonDB({
     this.originalVideoLength,
@@ -36,6 +37,7 @@ class LessonDB {
     this.averageRating = 0,
     this.numberReviews = 0,
     this.isDraft = false,
+    this.searchArrayLength = 0,
   });
 
   bool checkIfDraft() {

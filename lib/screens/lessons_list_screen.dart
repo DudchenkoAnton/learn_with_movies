@@ -53,6 +53,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       });
       //////change the search for only movies that the user create
       dummyListData = await db.searchUserLessonsFirstChunk(query, []);
+      // PRINT OF QUERY, AND LIST OF RETURNED OBJECTS
+      print(query);
       print(dummyListData);
       setState(() {
         showSpinner = false;
@@ -61,6 +63,8 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
         allLesson.clear();
         allLesson.addAll(dummyListData);
       });
+      // ADDED PRINT OF LESSONS LIST, TO KNOW NUMBER OF LESSONS
+      print(allLesson);
     } else {
       setState(() async {
         setState(() {
