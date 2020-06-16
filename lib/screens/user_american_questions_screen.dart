@@ -299,15 +299,7 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
 
     else {
 
-      result_mode = 1;
-      if (_answer_open_format.text == question.answer) {
-        create_result_widget(true, "");
-      } else {
-        create_result_widget(false, _answer_open_format.text);
-      }
-      _answer_open_format.text = "";
 
-      check_answer_enabled = false;
     }
 
   }
@@ -431,6 +423,9 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
   void create_result_widget(bool result, String answer) {
     setState(() {
       next_question_label = 'Next Question    ';
+      if (_cur_question == lesson.getQuestionsList().length) {
+        next_question_label = 'Done    ';
+      }
     });
 
     if (result == false) {
@@ -992,7 +987,7 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
       ),);
     } else {
       setState(() {
-        next_question_label = "Check the answer     ";
+        next_question_label = "";
         check_answer_enabled = true;
       });
       selectedWidget = SingleChildScrollView(
@@ -1042,6 +1037,34 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
                   ),
                   hintText: 'Enter the Answer'),
             ),
+          ),
+
+          FlatButton(
+            onPressed: (){
+              result_mode = 1;
+              if (_answer_open_format.text == question.answer) {
+                create_result_widget(true, "");
+              } else {
+                create_result_widget(false, _answer_open_format.text);
+              }
+              _answer_open_format.text = "";
+
+              check_answer_enabled = false;
+            },
+            //onPressed: discloseAnswer,
+            textColor: Colors.black,
+            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+            child: Text(
+              "Check the answer",
+              style: TextStyle(color: Colors.black, fontSize: 20),
+            ),
+            shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: Colors.lightBlueAccent,
+                  width: 2,
+                  //style: BorderStyle.solid
+                ),
+                borderRadius: BorderRadius.circular(15)),
           ),
 /*
           FlatButton(

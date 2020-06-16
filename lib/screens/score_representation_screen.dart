@@ -204,11 +204,6 @@ class _ScoreScreenState extends State<ScoreScreen> {
 
   void _showDialog() {
 
-    times_dialog_called += 1;
-    if (times_dialog_called >= 2) {
-      return;
-    }
-
     build_rating_widget();
 
     // flutter defined function
@@ -246,7 +241,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
 
     Future.delayed(const Duration(seconds: 5), () {
 
-      _showDialog();
+      //_showDialog();
 
     });
 
@@ -262,6 +257,15 @@ class _ScoreScreenState extends State<ScoreScreen> {
           ),
 
           title: Text(widget.title),
+          actions: <Widget>[
+            RawMaterialButton(
+              child: Text(
+                'Next     ',
+                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+              onPressed: _showDialog,
+            )
+          ],
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -286,7 +290,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
               children: <Widget>[
                 SizedBox(height: 20.0),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   child:Text(
                     "Well done!\nYou've finished the lesson:\n",
                     style: Theme.of(context).textTheme.display1.apply(color: Colors.black),
@@ -295,7 +299,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                 ),
                 //SizedBox(height: 20.0),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                   child:Text(
                     widget.lessonDB.lessonName,
                     style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
@@ -309,7 +313,7 @@ class _ScoreScreenState extends State<ScoreScreen> {
                     "You answered correctly on " + widget.num_correct_answ.toString()
                     + "/" + widget.lessonDB.getQuestionsList().length.toString()
                     + " questions!",
-                    style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
+                    style: Theme.of(context).textTheme.display1.apply(color: Colors.green),
                     textAlign: TextAlign.center,
                   ),
                 ),
