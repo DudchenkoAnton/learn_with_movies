@@ -15,6 +15,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:temp_project/components/video_range_slider.dart';
 import 'package:temp_project/components/video_range_text_field.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' as youtubeMeta;
 
 class VideoCreatorScreen extends StatefulWidget {
   static const String id = 'video_creator_screen';
@@ -468,13 +469,32 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     if (loadMetaData) {
       currentLesson.setVideoURL(videoURL);
       currentLesson.setVideoID(videoID);
-      metaDataLoaded = await youtubeHelper.loadVideoData(currentLesson);
-      if (!metaDataLoaded) {
+      // #########################################################
+      var yt = youtubeMeta.YoutubeExplode();
+      var video = await yt.videos.get(videoID);
+      yt.close();
+      if (video == null || video.duration.inSeconds == 0) {
         loadingProcessFailed = true;
         loadingVideoFailed = true;
         setState(() => showSpinner = false);
         return;
+      } else {
+        currentLesson.setVideoStartPoint(0);
+        currentLesson.setVideoEndPoint(video.duration.inSeconds);
+        currentLesson.setOriginalVideoLength(currentLesson.getVideoEndPoint());
+        currentLesson.setYoutubeOriginalName(video.title);
+
+        print(currentLesson.getVideoEndPoint());
+        print(currentLesson.youtubeOriginalName);
       }
+      // #########################################################
+//      metaDataLoaded = await youtubeHelper.loadVideoData(currentLesson);
+//      if (!metaDataLoaded) {
+//        loadingProcessFailed = true;
+//        loadingVideoFailed = true;
+//        setState(() => showSpinner = false);
+//        return;
+//      }
     }
 
     // then, we update video controller, whether there already was loaded video, or not
