@@ -182,18 +182,16 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
           child: Column(
             children: <Widget>[
               Container(
-                height: 90,
+                height: 60,
                 width: MediaQuery.of(context).size.width,
                 child: ListView.builder(
                     shrinkWrap: true,
                     controller: _scrollController_2,
-                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 3),
                     itemCount: labels.length,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
                           width: MediaQuery.of(context).size.width / 3,
-                          height: 20.0,
                           margin: const EdgeInsets.all(5.0),
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
@@ -204,7 +202,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                             child: Center(
                               child: Text(
                                 labels[index],
-                                style: TextStyle(color: Colors.white, fontSize: 13.0),
+                                style: TextStyle(color: Colors.white, fontSize: 16.0),
                               ),
                             ),
                             onPressed: () async {

@@ -53,6 +53,7 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       });
       //////change the search for only movies that the user create
       dummyListData = await db.searchUserLessonsFirstChunk(query, []);
+      print(dummyListData);
       setState(() {
         showSpinner = false;
       });
