@@ -191,7 +191,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
-                          width: MediaQuery.of(context).size.width / 3,
+                          width: MediaQuery.of(context).size.width / 3 +20,
                           margin: const EdgeInsets.all(5.0),
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
@@ -202,7 +202,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                             child: Center(
                               child: Text(
                                 labels[index],
-                                style: TextStyle(color: Colors.white, fontSize: 16.0),
+                                style: TextStyle(color: Colors.white, fontSize: 14.0),
                               ),
                             ),
                             onPressed: () async {
