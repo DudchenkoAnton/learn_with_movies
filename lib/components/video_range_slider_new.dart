@@ -48,14 +48,17 @@ class _VideoRangeSliderNewState extends State<VideoRangeSliderNew> {
         return cur_minutes.toString() + ":" + cur_seconds.toString();
       },
       onChanged: (double newLowerValue, double newUpperValue) {
-        _lowerValue = newLowerValue;
-        _upperValue = newUpperValue;
+        print('Received seconds end point -- ${widget.secondsEndPoint}');
+        print('newValue -- ${newUpperValue};  oldValue --- ${(widget.secondsEndPoint * 100) / widget.secondsLength}');
+//        _lowerValue = newLowerValue;
+//        _upperValue = newUpperValue;
 
         int seconds = widget.secondsLength;
-        int startSeconds = (seconds * newLowerValue / 100).toInt();
-        int endSeconds = (seconds * newUpperValue / 100).toInt();
-        widget.secondsStartPoint = startSeconds;
-        widget.secondsEndPoint = endSeconds;
+        int startSeconds = (seconds * newLowerValue / 100).round();
+        int endSeconds = (seconds * newUpperValue / 100).round();
+        print('The end seconds -- $endSeconds');
+//        widget.secondsStartPoint = startSeconds;
+//        widget.secondsEndPoint = endSeconds;
         widget.onChanged(startSeconds, endSeconds);
       },
     );

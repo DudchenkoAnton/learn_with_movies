@@ -36,6 +36,11 @@ class _VideoRangeTextState extends State<VideoRangeText> {
   TextEditingController endMinutesController = TextEditingController();
   TextEditingController endSecondsController = TextEditingController();
 
+  FocusNode startMinFocusNode;
+  FocusNode startSecFocusNode;
+  FocusNode endMinFocusNode;
+  FocusNode endSecFocusNode;
+
   int secondsStartPoint;
   int secondsEndPoint;
 
@@ -46,6 +51,22 @@ class _VideoRangeTextState extends State<VideoRangeText> {
     endMinutesController.text = (widget.secondsEndPoint ~/ 60).toString();
     startSecondsController.text = (widget.secondsStartPoint % 60).toString();
     endSecondsController.text = (widget.secondsEndPoint % 60).toString();
+
+    startMinFocusNode = FocusNode();
+    startSecFocusNode = FocusNode();
+    endMinFocusNode = FocusNode();
+    endSecFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    startMinFocusNode.dispose();
+    startSecFocusNode.dispose();
+    endMinFocusNode.dispose();
+    endSecFocusNode.dispose();
+
+    super.dispose();
   }
 
   int isNumeric(String s) {
@@ -92,6 +113,14 @@ class _VideoRangeTextState extends State<VideoRangeText> {
     }
   }
 
+  void onRefreshCallback() {
+    onChangedCallback('');
+    if (startMinFocusNode.hasFocus) startMinFocusNode.unfocus();
+    if (startSecFocusNode.hasFocus) startSecFocusNode.unfocus();
+    if (endMinFocusNode.hasFocus) endMinFocusNode.unfocus();
+    if (endSecFocusNode.hasFocus) endSecFocusNode.unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     startMinutesController.text = (widget.secondsStartPoint ~/ 60).toString();
@@ -111,6 +140,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
+                    focusNode: startMinFocusNode,
                     onSubmitted: onChangedCallback,
                     controller: startMinutesController,
                     decoration: kTimePickerDecoration,
@@ -127,6 +157,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
+                    focusNode: startSecFocusNode,
                     onSubmitted: onChangedCallback,
                     controller: startSecondsController,
                     decoration: kTimePickerDecoration,
@@ -140,7 +171,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
                 child: Container(
                   height: 1.0,
-                  width: 40.0,
+                  width: 20.0,
                   color: Colors.black,
                 ),
               ),
@@ -150,6 +181,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
+                    focusNode: endMinFocusNode,
                     onSubmitted: onChangedCallback,
                     controller: endMinutesController,
                     decoration: kTimePickerDecoration,
@@ -166,6 +198,7 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                   height: 35,
                   decoration: kContainerDecorationDefaultLessonEditor.copyWith(color: Colors.white),
                   child: TextField(
+                    focusNode: endSecFocusNode,
                     onSubmitted: onChangedCallback,
                     controller: endSecondsController,
                     decoration: kTimePickerDecoration,
@@ -175,6 +208,15 @@ class _VideoRangeTextState extends State<VideoRangeText> {
                 ),
               ),
               SizedBox(width: 25),
+              Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.lightBlueAccent),
+                child: IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: onRefreshCallback,
+                ),
+              ),
             ],
           ),
           state.hasError
