@@ -19,7 +19,6 @@ class QuestionCreatorScreen extends StatefulWidget {
 }
 
 class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
-
   final _secondStepFormKey = GlobalKey<FormState>();
 
 //  TextEditingController _startAtController = TextEditingController();
@@ -208,8 +207,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     });
     super.initState();
 
-    selectedWidget = Container(
-    );
+    selectedWidget = Container();
   }
 
   @override
@@ -220,7 +218,6 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       }
 
       setState(() {
-
         startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
         endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
         cur_start_time_secconds = widget.videoData.getVideoStartPoint();
@@ -517,16 +514,16 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
                 SizedBox(height: 16.0),
                 VideoRangeSliderNew(
-                  secondsStartPoint: cur_start_time_secconds,
-                  secondsEndPoint: cur_end_time_secconds,
-                  secondsLength: cur_end_time_secconds - cur_start_time_secconds,
+                  secondsStartPoint: cur_start_time_secconds - widget.videoData.getVideoStartPoint(),
+                  secondsEndPoint: cur_end_time_secconds - widget.videoData.getVideoStartPoint(),
+                  secondsLength: widget.videoData.getVideoEndPoint() - widget.videoData.getVideoStartPoint(),
                   onChanged: (int start, int end) {
                     setState(() {
                       last_range_indication = 1;
                       startAt[0] = Duration(seconds: start);
                       endAt[0] = Duration(seconds: end);
-                      cur_start_time_secconds = start;
-                      cur_end_time_secconds = end;
+                      cur_start_time_secconds = start + widget.videoData.getVideoStartPoint();
+                      cur_end_time_secconds = end + widget.videoData.getVideoStartPoint();
                       temp.setVideoStartTime(start);
                       temp.setVideoEndTime(end);
                       _controller.pause();
@@ -580,7 +577,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child:Text(
+            child: Text(
               question_creation_text,
               style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
               textAlign: TextAlign.center,
@@ -606,7 +603,6 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
               FlatButton(
                 onPressed: () {
                   setState(() {
-
                     startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
                     endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
                     cur_start_time_secconds = widget.videoData.getVideoStartPoint();
