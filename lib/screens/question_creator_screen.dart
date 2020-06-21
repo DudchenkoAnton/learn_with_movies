@@ -496,7 +496,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                   controller: _controller,
                   showVideoProgressIndicator: true,
                   onReady: () {
-                    _controller.seekTo(Duration(seconds: cur_start_time_secconds));
+                    //_controller.seekTo(Duration(seconds: cur_start_time_secconds));
                     print('Player is ready.');
                   },
                 ),
@@ -634,7 +634,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                   controller: _controller,
                   showVideoProgressIndicator: true,
                   onReady: () {
-                    _controller.seekTo(Duration(seconds: cur_start_time_secconds));
+                    //_controller.seekTo(Duration(seconds: cur_start_time_secconds));
                     print('Player is ready.');
                   },
                 ),
