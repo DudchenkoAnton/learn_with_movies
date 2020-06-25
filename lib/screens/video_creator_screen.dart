@@ -425,7 +425,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (currentStep == 0) {
-              Navigator.of(context).pop();
+              if (isAlreadySavedAsDraft) {
+                Navigator.pop(context, currentLesson);
+              } else {
+                Navigator.of(context).pop();
+              }
             } else {
               cancelStep();
             }
