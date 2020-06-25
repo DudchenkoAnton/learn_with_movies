@@ -83,6 +83,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
   int open_visited_func = 0;
 
+  int num_of_screen_updates = 0;
+
   void _incrementCounter() {
     setState(() {
       print("Add question:" + _questionController.text);
@@ -176,6 +178,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       cur_start_time_secconds = widget.videoData.getVideoStartPoint();
       cur_end_time_secconds = widget.videoData.getVideoEndPoint();
     } else {
+      question_creation_text = "";
       _answerController.text = widget.question.answer;
       _answer_open_format.text = widget.question.answer;
       List<String> options = widget.question.americanAnswers.split(";");
@@ -214,6 +217,9 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     selectedWidget = Container();
 
     lenght_cur = cur_end_time_secconds - cur_start_time_secconds;
+
+    temp.setVideoStartTime(widget.videoData.getVideoStartPoint());
+    temp.setVideoEndTime(widget.videoData.getVideoEndPoint());
   }
 
   @override
@@ -701,6 +707,23 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       open_function_counter = 0;
     }
 
+    if (widget.question == null) {
+
+    } else {
+      List<String> options = widget.question.americanAnswers.split(";");
+
+      num_of_screen_updates++;
+
+      if (options.length >= 3 && options[0].length > 0 &&
+          options[1].length > 0 && options[2].length > 0 && num_of_screen_updates <= 1) {
+        american_button_action();
+      }
+      if (widget.question.americanAnswers.length == 0 && num_of_screen_updates <= 1) {
+        open_button_action();
+      }
+    }
+
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -733,8 +756,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 child: FlatButton(
                   onPressed: american_button_action,
                   child: Text(
-                    "\nmultiple\n choice\nquestion\n",
-                    style: TextStyle(color: Colors.black, fontSize: 20),
+                    "\nMultiple Choice\n     Question\n",
+                    style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
                   shape: RoundedRectangleBorder(
                       side: BorderSide(color: Colors.blue, width: 4, style: BorderStyle.solid),
@@ -745,8 +768,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
               FlatButton(
                 onPressed: open_button_action,
                 child: Text(
-                  "\n  open\nquestion\n\n",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
+                  "\n         Open\n      Question       \n",
+                  style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 shape: RoundedRectangleBorder(
                     side: BorderSide(color: Colors.blue, width: 4, style: BorderStyle.solid),
