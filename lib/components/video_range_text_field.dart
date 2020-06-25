@@ -36,6 +36,8 @@ class _VideoRangeTextState extends State<VideoRangeText> {
   TextEditingController endMinutesController = TextEditingController();
   TextEditingController endSecondsController = TextEditingController();
 
+  String initialStartSec, initialStartMin, initialEndSec, initialEndMin;
+
   FocusNode startMinFocusNode;
   FocusNode startSecFocusNode;
   FocusNode endMinFocusNode;
@@ -51,6 +53,11 @@ class _VideoRangeTextState extends State<VideoRangeText> {
     endMinutesController.text = (widget.secondsEndPoint ~/ 60).toString();
     startSecondsController.text = (widget.secondsStartPoint % 60).toString();
     endSecondsController.text = (widget.secondsEndPoint % 60).toString();
+
+    initialStartSec = startSecondsController.text;
+    initialStartMin = startMinutesController.text;
+    initialEndSec = endSecondsController.text;
+    initialEndMin = endMinutesController.text;
 
     startMinFocusNode = FocusNode();
     startSecFocusNode = FocusNode();
@@ -83,10 +90,16 @@ class _VideoRangeTextState extends State<VideoRangeText> {
   }
 
   bool checkProvidedValues() {
-    int startSec = isNumeric(startSecondsController.text);
-    int endSec = isNumeric(endSecondsController.text);
-    int startMin = isNumeric(startMinutesController.text);
-    int endMin = isNumeric(endMinutesController.text);
+    int startSec = 0, endSec = 0, startMin = 0, endMin = 0;
+    if (startSecondsController.text == '') startSecondsController.text = initialStartSec;
+    if (endSecondsController.text == '') endSecondsController.text = initialEndSec;
+    if (startMinutesController.text == '') startMinutesController.text = initialStartMin;
+    if (endMinutesController.text == '') endMinutesController.text = initialEndMin;
+
+    startSec = isNumeric(startSecondsController.text);
+    endSec = isNumeric(endSecondsController.text);
+    startMin = isNumeric(startMinutesController.text);
+    endMin = isNumeric(endMinutesController.text);
 //    int startSec = isNumeric(widget.startSecondsController.text);
 //    int endSec = isNumeric(widget.endSecondsController.text);
 //    int startMin = isNumeric(widget.startMinutesController.text);

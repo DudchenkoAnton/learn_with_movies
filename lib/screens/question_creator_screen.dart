@@ -9,7 +9,7 @@ import 'package:temp_project/components/video_range_slider_new.dart';
 
 class QuestionCreatorScreen extends StatefulWidget {
   static const String id = 'question_creator_screen';
-  final QuestionDB question;
+   QuestionDB question;
   final LessonDB videoData;
 
   QuestionCreatorScreen({Key key, this.question, @required this.videoData}) : super(key: key);
@@ -62,6 +62,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   bool activate_button_4 = true;
 
   int american_function_counter = 0;
+  int open_function_counter = 0;
 
   int correct_answer = 1;
 
@@ -75,6 +76,14 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   int cur_end_time_secconds = 0;
 
   int last_range_indication = 0; // 0 - slider, 1 - text
+
+  int widgetless_fix = 0;
+
+  int lenght_cur = 0;
+
+  int open_visited_func = 0;
+
+  int num_of_screen_updates = 0;
 
   void _incrementCounter() {
     setState(() {
@@ -139,8 +148,6 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       temp.setAnswer(_answer_open_format.text);
     }
 
-    temp.setVideoStartTime(startAt[0].inSeconds);
-    temp.setVideoEndTime(endAt[0].inSeconds);
     temp.setVideoURL(widget.videoData.videoURL);
     Navigator.pop(context, temp);
 
@@ -161,15 +168,17 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
   @override
   void initState() {
+
+    widgetless_fix = widget.videoData.getVideoStartPoint();
+
     videoLengthOriginal =
         Duration(seconds: widget.videoData.getVideoEndPoint() - widget.videoData.getVideoStartPoint());
 
     if (widget.question == null) {
-      startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
-      endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
       cur_start_time_secconds = widget.videoData.getVideoStartPoint();
       cur_end_time_secconds = widget.videoData.getVideoEndPoint();
     } else {
+      question_creation_text = "";
       _answerController.text = widget.question.answer;
       _answer_open_format.text = widget.question.answer;
       List<String> options = widget.question.americanAnswers.split(";");
@@ -181,10 +190,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       }
 
       _questionController.text = widget.question.question;
-      startAt[0] = Duration(seconds: widget.question.getVideoStartTime());
-      endAt[0] = Duration(seconds: widget.question.getVideoEndTime());
-      cur_start_time_secconds = widget.videoData.getVideoStartPoint();
-      cur_end_time_secconds = widget.videoData.getVideoEndPoint();
+      cur_start_time_secconds = widget.question.getVideoStartTime();
+      cur_end_time_secconds = widget.question.getVideoEndTime();
     }
 
     //TODO: update videoLengthOriginal, startAt, endAt, depending on received video data
@@ -192,22 +199,27 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       initialVideoId: widget.videoData.getVideoID(),
       flags: YoutubePlayerFlags(
         mute: false,
-        autoPlay: true,
+        autoPlay: false,
         //forceHideAnnotation: true,
       ),
     );
     _controller.addListener(() {
-      if (_controller.value.position < startAt[0]) {
-        _controller.seekTo(startAt[0]);
-        _controller.pause();
-      } else if (_controller.value.position > endAt[0]) {
-        _controller.seekTo(endAt[0]);
-        _controller.pause();
+      if (_controller.value.position < Duration(seconds: cur_start_time_secconds)) {
+        _controller.seekTo(Duration(seconds: cur_start_time_secconds));
+        //_controller.pause();
+      } else if (_controller.value.position > Duration(seconds: cur_end_time_secconds)) {
+        _controller.seekTo(Duration(seconds: cur_end_time_secconds));
+        //_controller.pause();
       }
     });
     super.initState();
 
     selectedWidget = Container();
+
+    lenght_cur = cur_end_time_secconds - cur_start_time_secconds;
+
+    temp.setVideoStartTime(widget.videoData.getVideoStartPoint());
+    temp.setVideoEndTime(widget.videoData.getVideoEndPoint());
   }
 
   @override
@@ -220,8 +232,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       setState(() {
         startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
         endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
-        cur_start_time_secconds = widget.videoData.getVideoStartPoint();
-        cur_end_time_secconds = widget.videoData.getVideoEndPoint();
+        //cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+        //cur_end_time_secconds = widget.videoData.getVideoEndPoint();
 
         question_creation_text = "";
         format_of_question = 1;
@@ -490,7 +502,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                   controller: _controller,
                   showVideoProgressIndicator: true,
                   onReady: () {
-                    _controller.seekTo(startAt[0]);
+                    //_controller.seekTo(Duration(seconds: cur_start_time_secconds));
                     print('Player is ready.');
                   },
                 ),
@@ -511,22 +523,22 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 ),
 
                  */
-
+                // AMERICAN
                 SizedBox(height: 16.0),
                 VideoRangeSliderNew(
-                  secondsStartPoint: cur_start_time_secconds - widget.videoData.getVideoStartPoint(),
-                  secondsEndPoint: cur_end_time_secconds - widget.videoData.getVideoStartPoint(),
-                  secondsLength: widget.videoData.getVideoEndPoint() - widget.videoData.getVideoStartPoint(),
+                  secondsStartPoint: cur_start_time_secconds,
+                  secondsEndPoint: cur_end_time_secconds,
+                  secondsLength: widget.videoData.originalVideoLength,
                   onChanged: (int start, int end) {
                     setState(() {
                       last_range_indication = 1;
-                      startAt[0] = Duration(seconds: start);
-                      endAt[0] = Duration(seconds: end);
-                      cur_start_time_secconds = start + widget.videoData.getVideoStartPoint();
-                      cur_end_time_secconds = end + widget.videoData.getVideoStartPoint();
+                      cur_start_time_secconds = start;
+                      cur_end_time_secconds =  end;
                       temp.setVideoStartTime(start);
                       temp.setVideoEndTime(end);
                       _controller.pause();
+                      american_button_action();
+                      american_function_counter += 1;
                     });
                   },
                 ),
@@ -535,17 +547,17 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                   formKey: _secondStepFormKey,
                   secondsStartPoint: cur_start_time_secconds,
                   secondsEndPoint: cur_end_time_secconds,
-                  secondsLength: cur_end_time_secconds - cur_start_time_secconds,
+                  secondsLength: widget.videoData.originalVideoLength,
                   onChanged: (int start, int end) {
                     setState(() {
                       last_range_indication = 2;
-                      startAt[0] = Duration(seconds: start);
-                      endAt[0] = Duration(seconds: end);
                       cur_start_time_secconds = start;
                       cur_end_time_secconds = end;
                       temp.setVideoStartTime(start);
                       temp.setVideoEndTime(end);
                       _controller.pause();
+                      american_button_action();
+                      american_function_counter += 1;
                     });
                   },
                 ),
@@ -558,6 +570,159 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
       american_function_counter = 0;
     }
+
+    void open_button_action() {
+      if (open_function_counter > 1) {
+        return;
+      }
+
+      setState(() {
+        startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
+        endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
+        //if (widget.question == null) {
+          //cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+          //cur_end_time_secconds = widget.videoData.getVideoEndPoint();
+        //}
+        //else {
+         // cur_start_time_secconds = widget.question.getVideoStartTime();
+         // cur_end_time_secconds = widget.question.getVideoEndTime();
+       // }
+
+        question_creation_text = "";
+        format_of_question = 2;
+        selectedWidget = Container(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: _questionController,
+                    decoration: InputDecoration(
+                        enabledBorder: const OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(8.0),
+                          ),
+                          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                        ),
+                        contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(
+                            color: Colors.blue,
+                          ),
+                        ),
+                        hintText: 'Enter the Question'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: _answer_open_format,
+                    decoration: InputDecoration(
+                        enabledBorder: const OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(8.0),
+                          ),
+                          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                        ),
+                        contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(
+                            color: Colors.blue,
+                          ),
+                        ),
+                        hintText: 'Enter the Answer'),
+                  ),
+                ),
+                YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: true,
+                  onReady: () {
+                    //_controller.seekTo(Duration(seconds: cur_start_time_secconds));
+                    print('Player is ready.');
+                  },
+                ),
+                Text(
+                  'Range video for answer',
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                /*
+                            VideoRangeSlider(
+                              startAt: startAt,
+                              endAt: endAt,
+                              length: videoLengthOriginal,
+                            ),
+                             */
+                SizedBox(height: 16.0),
+                VideoRangeSliderNew(
+                  secondsStartPoint: cur_start_time_secconds,
+                  secondsEndPoint: cur_end_time_secconds,
+                  secondsLength: widget.videoData.originalVideoLength,
+                  onChanged: (int start, int end) {
+                    setState(() {
+                      last_range_indication = 1;
+                      cur_start_time_secconds = start;
+                      cur_end_time_secconds =  end;
+                      temp.setVideoStartTime(start);
+                      temp.setVideoEndTime(end);
+                      _controller.pause();
+                      open_button_action();
+                      open_function_counter += 1;
+                    });
+                  },
+                ),
+                SizedBox(height: 16.0),
+                VideoRangeText(
+                  formKey: _secondStepFormKey,
+                  secondsStartPoint: cur_start_time_secconds,
+                  secondsEndPoint: cur_end_time_secconds,
+                  secondsLength: widget.videoData.originalVideoLength,
+                  onChanged: (int start, int end) {
+                    setState(() {
+                      last_range_indication = 2;
+                      cur_start_time_secconds = start;
+                      cur_end_time_secconds = end;
+                      temp.setVideoStartTime(start);
+                      temp.setVideoEndTime(end);
+                      _controller.pause();
+                      open_button_action();
+                      open_function_counter += 1;
+                    });
+                  },
+                ),
+                SizedBox(height: 16.0),
+              ],
+            ),
+          ),
+        );
+      });
+
+      open_function_counter = 0;
+    }
+
+    if (widget.question == null) {
+
+    } else {
+      List<String> options = widget.question.americanAnswers.split(";");
+
+      num_of_screen_updates++;
+
+      if (options.length >= 3 && options[0].length > 0 &&
+          options[1].length > 0 && options[2].length > 0 && num_of_screen_updates <= 1) {
+        american_button_action();
+      }
+      if (widget.question.americanAnswers.length == 0 && num_of_screen_updates <= 1) {
+        open_button_action();
+      }
+    }
+
 
     return Scaffold(
       appBar: AppBar(
@@ -591,8 +756,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 child: FlatButton(
                   onPressed: american_button_action,
                   child: Text(
-                    "\nmultiple\n choice\nquestion\n",
-                    style: TextStyle(color: Colors.black, fontSize: 20),
+                    "\nMultiple Choice\n     Question\n",
+                    style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
                   shape: RoundedRectangleBorder(
                       side: BorderSide(color: Colors.blue, width: 4, style: BorderStyle.solid),
@@ -601,132 +766,10 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () {
-                  setState(() {
-                    startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
-                    endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
-                    cur_start_time_secconds = widget.videoData.getVideoStartPoint();
-                    cur_end_time_secconds = widget.videoData.getVideoEndPoint();
-
-                    question_creation_text = "";
-                    format_of_question = 2;
-                    selectedWidget = Container(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _questionController,
-                                decoration: InputDecoration(
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderRadius: const BorderRadius.all(
-                                        const Radius.circular(8.0),
-                                      ),
-                                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                    ),
-                                    contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide(
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                    hintText: 'Enter the Question'),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _answer_open_format,
-                                decoration: InputDecoration(
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderRadius: const BorderRadius.all(
-                                        const Radius.circular(8.0),
-                                      ),
-                                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                                    ),
-                                    contentPadding: new EdgeInsets.symmetric(vertical: 40.0, horizontal: 10.0),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide(
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                    hintText: 'Enter the Answer'),
-                              ),
-                            ),
-                            YoutubePlayer(
-                              controller: _controller,
-                              showVideoProgressIndicator: true,
-                              onReady: () {
-                                _controller.seekTo(startAt[0]);
-                                print('Player is ready.');
-                              },
-                            ),
-                            Text(
-                              'Range video for answer',
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            /*
-                            VideoRangeSlider(
-                              startAt: startAt,
-                              endAt: endAt,
-                              length: videoLengthOriginal,
-                            ),
-                             */
-                            SizedBox(height: 16.0),
-                            VideoRangeSliderNew(
-                              secondsStartPoint: cur_start_time_secconds,
-                              secondsEndPoint: cur_end_time_secconds,
-                              secondsLength: cur_end_time_secconds - cur_start_time_secconds,
-                              onChanged: (int start, int end) {
-                                setState(() {
-                                  last_range_indication = 1;
-                                  startAt[0] = Duration(seconds: start);
-                                  endAt[0] = Duration(seconds: end);
-                                  cur_start_time_secconds = start;
-                                  cur_end_time_secconds = end;
-                                  temp.setVideoStartTime(start);
-                                  temp.setVideoEndTime(end);
-                                  _controller.pause();
-                                });
-                              },
-                            ),
-                            SizedBox(height: 16.0),
-                            VideoRangeText(
-                              formKey: _secondStepFormKey,
-                              secondsStartPoint: cur_start_time_secconds,
-                              secondsEndPoint: cur_end_time_secconds,
-                              secondsLength: cur_end_time_secconds - cur_start_time_secconds,
-                              onChanged: (int start, int end) {
-                                setState(() {
-                                  last_range_indication = 2;
-                                  startAt[0] = Duration(seconds: start);
-                                  endAt[0] = Duration(seconds: end);
-                                  cur_start_time_secconds = start;
-                                  cur_end_time_secconds = end;
-                                  temp.setVideoStartTime(start);
-                                  temp.setVideoEndTime(end);
-                                  _controller.pause();
-                                });
-                              },
-                            ),
-                            SizedBox(height: 16.0),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
-                },
+                onPressed: open_button_action,
                 child: Text(
-                  "\n  open\nquestion\n\n",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
+                  "\n         Open\n      Question       \n",
+                  style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 shape: RoundedRectangleBorder(
                     side: BorderSide(color: Colors.blue, width: 4, style: BorderStyle.solid),
