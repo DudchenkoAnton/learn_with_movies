@@ -28,9 +28,12 @@ class VideoCreatorScreen extends StatefulWidget {
 
 class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProviderStateMixin {
   //////////////////////////////////////////////////////////////////////
+  bool isSaveDraftMode = false;
+  bool isEditedStep = false;
   int currentStep = 0;
   int stepLength = 3;
   bool stepsCompleted = false;
+  bool isAlreadySavedAsDraft = false;
   //////////////////////////////////////////////////////////////////////
   TextEditingController videoLinkController = TextEditingController();
   TextEditingController lessonNameController = TextEditingController();
@@ -114,6 +117,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                         await loadVideo(videoLinkController.text, true);
                         _videoLinkFormKey.currentState.validate();
                         _firstStepFormKey.currentState.validate();
+                        setEditedStep();
                       }
                     },
                   ),
@@ -157,6 +161,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                 ),
                 SizedBox(height: 8.0),
                 TextFormField(
+                  onChanged: (string) => setEditedStep(),
                   controller: lessonNameController,
                   decoration: kTextFieldDecoration.copyWith(
                     hintText: 'Enter name of lesson',
@@ -179,6 +184,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                             } else {
                               currentLesson.removeLabel(checkBoxLabels[index]);
                             }
+                            setEditedStep();
                           },
                         );
                       }),
@@ -260,6 +266,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                     currentLesson.setVideoEndPoint(end);
                     youtubePlayerController.pause();
                   });
+                  setEditedStep();
                 },
               ),
               SizedBox(height: 16.0),
@@ -276,6 +283,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                     currentLesson.setVideoEndPoint(end);
                     youtubePlayerController.pause();
                   });
+                  setEditedStep();
                 },
               ),
               SizedBox(height: 16.0),
@@ -324,6 +332,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                           _thirdStepFormKey.currentState.validate();
                           updateQuestionListOnScreen();
                         });
+                        saveDraftData();
                       }
                     },
                   ),
@@ -387,11 +396,19 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
       youtubePlayer = YoutubePlayer(
         controller: youtubePlayerController,
       );
+      // If user creates new lesson, set save draft mode
+      isSaveDraftMode = true;
     } else {
       initializeLessonData();
       loadVideo(currentLesson.getVideoURL(), false);
       updateQuestionListOnScreen();
+      // If user is editing existing draft, set save draft mode
+      if (widget.videoData.isDraft) isSaveDraftMode = true;
     }
+  }
+
+  void setEditedStep() {
+    isEditedStep = true;
   }
 
   @override
@@ -406,7 +423,13 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
       title: Text('Create Lesson'),
       leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => currentStep == 0 ? Navigator.of(context).pop() : cancelStep()),
+          onPressed: () {
+            if (currentStep == 0) {
+              Navigator.of(context).pop();
+            } else {
+              cancelStep();
+            }
+          }),
       actions: widget.videoData == null || widget.videoData.checkIfDraft()
           ? (currentStep < 2
               ? <Widget>[
@@ -601,7 +624,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
 
     setState(() => showSpinner = true);
     try {
-      if (widget.videoData == null) {
+      if (widget.videoData == null && !isAlreadySavedAsDraft) {
         String documentID = await dbHelper.addDraftToDB(currentLesson);
         currentLesson.setDBReference(documentID);
       } else {
@@ -616,8 +639,39 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     setState(() => showSpinner = false);
   }
 
+  void saveDraftData() async {
+    bool isEdited = false;
+
+    if (currentStep != 0 || _firstStepFormKey.currentState.validate()) {
+      currentLesson.setLessonName(lessonNameController.text);
+      currentLesson.setVideoURL(currentLoadedLink);
+    } else {
+      return;
+    }
+
+    currentLesson.setVideoStartPoint(secondsStartPoint);
+    currentLesson.setVideoEndPoint(secondsEndPoint);
+    currentLesson.setIsDraft(true);
+
+    setState(() => showSpinner = true);
+    try {
+      if (widget.videoData == null && !isAlreadySavedAsDraft) {
+        String documentID = await dbHelper.addDraftToDB(currentLesson);
+        currentLesson.setDBReference(documentID);
+        isAlreadySavedAsDraft = true;
+      } else {
+        while (!isEdited) {
+          isEdited = await dbHelper.editDraftInDB(currentLesson);
+        }
+      }
+    } catch (e) {
+      //TODO: add code in case that lesson saving failed
+    }
+    setState(() => showSpinner = false);
+  }
+
   void saveDraftAsLesson() async {
-    if (widget.videoData == null) {
+    if (widget.videoData == null && !isAlreadySavedAsDraft) {
       saveLessonDataAndExit();
     } else {
       if (currentStep == 0 && !_firstStepFormKey.currentState.validate()) {
@@ -722,6 +776,12 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     } else if (currentStep != 1 && step == 1) {
       youtubePlayerController.pause();
     }
+
+    if (step != currentStep && (currentStep == 0 || currentStep == 1) && isSaveDraftMode && isEditedStep) {
+      isEditedStep = false;
+      saveDraftData();
+    }
+
     setState(() => currentStep = step);
   }
 
@@ -756,6 +816,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
           setState(() {
             updateQuestionListOnScreen();
           });
+          saveDraftData();
         },
         onEdit: () async {
           QuestionDB editedQuestion = await Navigator.push(
@@ -769,6 +830,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
             currentLesson.questionsList.removeAt(i);
             currentLesson.questionsList.add(editedQuestion);
             currentLesson.questionsList.sort(questionSortFunc);
+            saveDraftData();
           }
           setState(() {
             updateQuestionListOnScreen();

@@ -17,74 +17,77 @@ class QuestionDataContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: Colors.blueGrey[200],
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          SizedBox(width: 5),
-          Text(
-            numberOfQuestion,
-            style: TextStyle(
-              fontSize: 40,
+    return GestureDetector(
+      onTap: onEdit,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+        decoration: BoxDecoration(
+          color: Colors.blueGrey[200],
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            SizedBox(width: 5),
+            Text(
+              numberOfQuestion,
+              style: TextStyle(
+                fontSize: 40,
+                color: Colors.grey[800],
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                children: <Widget>[
+                  RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      text: questionText,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      text: answerText,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 10),
+            Container(
+              height: 65.0,
+              width: 2.0,
               color: Colors.grey[800],
+              margin: const EdgeInsets.only(left: 5.0, right: 5.0),
             ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              children: <Widget>[
-                RichText(
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                    text: questionText,
-                    style: TextStyle(fontSize: 16),
+            Container(
+              width: 38,
+              child: Column(
+                children: <Widget>[
+                  RoundedIconButton(
+                    width: 30,
+                    height: 30,
+                    icon: Icons.edit,
+                    color: Colors.blueGrey[200],
+                    onPressed: onEdit,
                   ),
-                ),
-                SizedBox(height: 10),
-                RichText(
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                    text: answerText,
-                    style: TextStyle(fontSize: 16),
+                  RoundedIconButton(
+                    width: 30,
+                    height: 30,
+                    icon: Icons.delete_forever,
+                    color: Colors.blueGrey[200],
+                    onPressed: onRemove,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          SizedBox(width: 10),
-          Container(
-            height: 65.0,
-            width: 2.0,
-            color: Colors.grey[800],
-            margin: const EdgeInsets.only(left: 5.0, right: 5.0),
-          ),
-          Container(
-            width: 38,
-            child: Column(
-              children: <Widget>[
-                RoundedIconButton(
-                  width: 30,
-                  height: 30,
-                  icon: Icons.edit,
-                  color: Colors.blueGrey[200],
-                  onPressed: onEdit,
-                ),
-                RoundedIconButton(
-                  width: 30,
-                  height: 30,
-                  icon: Icons.delete_forever,
-                  color: Colors.blueGrey[200],
-                  onPressed: onRemove,
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
