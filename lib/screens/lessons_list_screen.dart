@@ -136,12 +136,17 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                 }
                 return Row(
                   children: <Widget>[
-                    Container(
-                      width: 140.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: NetworkImage(url_image(allLesson[index].videoURL)), fit: BoxFit.cover)),
+                    InkWell(
+                      onTap: ()=>setState(() {
+                            edit_card(context, allLesson[index]);
+                        }),
+                      child: Container(
+                        width: 140.0,
+                        height: 100.0,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: NetworkImage(url_image(allLesson[index].videoURL)), fit: BoxFit.cover)),
+                      ),
                     ),
                     Column(children: <Widget>[
                       Container(
@@ -154,6 +159,10 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                       ),
                       Row(
                         children: <Widget>[
+                          allLesson[index].isDraft ?
+                          IconButton(icon:Icon(Icons.build), onPressed: () => setState(() {
+                            edit_card(context, allLesson[index]);
+                          }),color: Colors.purpleAccent):
                           IconButton(
                             onPressed: () => setState(() {
                               edit_card(context, allLesson[index]);
@@ -161,16 +170,11 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                             icon: Icon(Icons.edit),
                           ),
                           IconButton(
-                            onPressed: () => setState(() {
-                              if (allLesson[index].isDraft) {
-                                delete_card_draft(context, allLesson[index]);
-                              } else {
-                                delete_card(context, allLesson[index]);
-                              }
-                            }),
+                            onPressed: (){setState(() {
+                              showAlretDialog(allLesson[index]);
+                            });},
                             icon: Icon(Icons.delete),
                           ),
-                          allLesson[index].isDraft ? Icon(Icons.build, color: Colors.purpleAccent) : Container(),
                         ],
                       )
                     ]),
@@ -284,5 +288,37 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
       allLesson.addAll(list);
       endOfList = false;
     });
+  }
+
+
+  void showAlretDialog(LessonDB lesson) async{
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Are you sure you want to delete the lesson?"),
+        actions: [
+          FlatButton(
+            child: Text("Cancel"),
+            onPressed: () {Navigator.pop(context);},
+          ),
+          FlatButton(
+              child: Text("Delete"),
+              onPressed: () {
+                setState(() {
+                  if (lesson.isDraft) {
+                    delete_card_draft(context, lesson);
+                  } else {
+                    delete_card(context, lesson);
+                  }
+                  Navigator.pop(context);
+                  refreshAllVideos();
+                });
+          }
+          ),
+        ],
+      );
+      },
+    );
   }
 }
