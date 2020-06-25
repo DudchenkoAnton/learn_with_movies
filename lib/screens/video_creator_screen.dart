@@ -167,7 +167,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                 FormField<bool>(
                   builder: (state) => Column(children: [
                     ExpandedCheckboxList(
-                      mainText: 'Select Labels',
+                      mainText: generateMainText(),
                       expanded: List.generate(checkBoxLabels.length, (int index) {
                         return CheckboxListTile(
                           title: Text(checkBoxLabels[index]),
@@ -211,6 +211,23 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
         ],
       ),
     );
+  }
+
+  String generateMainText() {
+    String res = 'Selected Labels:';
+    bool labelPicked = false;
+    for (int i = 0; i < checkBoxValues.length; i++) {
+      if (checkBoxValues[i]) {
+        labelPicked = true;
+        res = res + ' ${checkBoxLabels[i]},';
+      }
+    }
+
+    if (labelPicked) {
+      return res.substring(0, res.length - 1);
+    } else {
+      return 'Select Labels';
+    }
   }
 
   Widget getSecondForm() {
