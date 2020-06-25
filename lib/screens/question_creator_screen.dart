@@ -68,7 +68,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
   int format_of_question = 0;
 
-  String question_creation_text = "Choose one way to create your question";
+  String question_creation_text = "";
 
   Widget selectedWidget = Container();
 
@@ -84,6 +84,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
   int open_visited_func = 0;
 
   int num_of_screen_updates = 0;
+  int american_num_of_screen_updates = 0;
 
   void _incrementCounter() {
     setState(() {
@@ -183,7 +184,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       _answer_open_format.text = widget.question.answer;
       List<String> options = widget.question.americanAnswers.split(";");
 
-      if (options.length >= 3 && options[0].length > 0 && options[1].length > 0 && options[2].length > 0) {
+      if (options.length >= 3 && (options[0].length > 0 || options[1].length > 0 || options[2].length > 0)) {
         _answerController2.text = options[0];
         _answerController3.text = options[1];
         _answerController4.text = options[2];
@@ -262,11 +263,17 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                         hintText: 'Enter the Question'),
                   ),
                 ),
+                SizedBox(
+                  height: 10.0,
+                ),
                 Text(
                   'Marker one correct answer:',
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+                SizedBox(
+                  height: 10.0,
                 ),
                 Row(
                   children: <Widget>[
@@ -506,11 +513,17 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                     print('Player is ready.');
                   },
                 ),
-                Text(
-                  'Range video for answer',
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    'Range video for answer',
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  ),
                 ),
                 SizedBox(
                   height: 10.0,
@@ -524,7 +537,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
                  */
                 // AMERICAN
-                SizedBox(height: 16.0),
+
                 VideoRangeSliderNew(
                   secondsStartPoint: cur_start_time_secconds,
                   secondsEndPoint: cur_end_time_secconds,
@@ -644,12 +657,17 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                     print('Player is ready.');
                   },
                 ),
-                Text(
+                SizedBox(
+                  height: 10.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
                   'Range video for answer',
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-                ),
+                ),),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -660,7 +678,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                               length: videoLengthOriginal,
                             ),
                              */
-                SizedBox(height: 16.0),
+   
                 VideoRangeSliderNew(
                   secondsStartPoint: cur_start_time_secconds,
                   secondsEndPoint: cur_end_time_secconds,
@@ -709,13 +727,21 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
     if (widget.question == null) {
 
+      american_num_of_screen_updates++;
+
+      if (american_num_of_screen_updates <= 1) {
+
+
+        american_button_action();
+      }
+
     } else {
       List<String> options = widget.question.americanAnswers.split(";");
 
       num_of_screen_updates++;
 
-      if (options.length >= 3 && options[0].length > 0 &&
-          options[1].length > 0 && options[2].length > 0 && num_of_screen_updates <= 1) {
+      if (options.length >= 3 && (options[0].length > 0 ||
+          options[1].length > 0 || options[2].length > 0) && num_of_screen_updates <= 1) {
         american_button_action();
       }
       if (widget.question.americanAnswers.length == 0 && num_of_screen_updates <= 1) {
@@ -740,14 +766,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       ),
       body: ListView(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: Text(
-              question_creation_text,
-              style: Theme.of(context).textTheme.display1.apply(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -757,7 +776,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                   onPressed: american_button_action,
                   child: Text(
                     "\nMultiple Choice\n     Question\n",
-                    style: TextStyle(color: Colors.black, fontSize: 18),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                   shape: RoundedRectangleBorder(
                       side: BorderSide(color: Colors.blue, width: 4, style: BorderStyle.solid),
@@ -769,7 +788,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 onPressed: open_button_action,
                 child: Text(
                   "\n         Open\n      Question       \n",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+                  style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
                 shape: RoundedRectangleBorder(
                     side: BorderSide(color: Colors.blue, width: 4, style: BorderStyle.solid),
