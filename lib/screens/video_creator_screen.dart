@@ -332,7 +332,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                           _thirdStepFormKey.currentState.validate();
                           updateQuestionListOnScreen();
                         });
-                        saveDraftData();
+                        if (isSaveDraftMode) saveDraftData();
                       }
                     },
                   ),
@@ -425,7 +425,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (currentStep == 0) {
-              if (isAlreadySavedAsDraft) {
+              if (!isSaveDraftMode || (isSaveDraftMode && isEditedStep)) {
+                showAlertDialog();
+              } else if (isAlreadySavedAsDraft) {
                 Navigator.pop(context, currentLesson);
               } else {
                 Navigator.of(context).pop();
@@ -820,7 +822,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
           setState(() {
             updateQuestionListOnScreen();
           });
-          saveDraftData();
+          if (isSaveDraftMode) saveDraftData();
         },
         onEdit: () async {
           QuestionDB editedQuestion = await Navigator.push(
@@ -834,7 +836,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
             currentLesson.questionsList.removeAt(i);
             currentLesson.questionsList.add(editedQuestion);
             currentLesson.questionsList.sort(questionSortFunc);
-            saveDraftData();
+            if (isSaveDraftMode) saveDraftData();
           }
           setState(() {
             updateQuestionListOnScreen();
@@ -842,5 +844,30 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
         },
       ));
     }
+  }
+
+  void showAlertDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you sure you want to exit? All changes will not be saved."),
+          actions: [
+            FlatButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+                child: Text("Exit"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }),
+          ],
+        );
+      },
+    );
   }
 }
