@@ -149,12 +149,17 @@ class _LessonsListScreenState extends State<LessonsListScreen> {
                       ),
                     ),
                     Column(children: <Widget>[
-                      Container(
-                        width: MediaQuery.of(context).size.width - 200.0,
-                        height: 70.0,
-                        child: ListTile(
-                          title: Text(allLesson[index].getLessonName()),
-                          subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
+                      InkWell(
+                        onTap: ()=>setState(() {
+                          edit_card(context, allLesson[index]);
+                        }),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width - 200.0,
+                          height: 70.0,
+                          child: ListTile(
+                            title: Text(allLesson[index].getLessonName()),
+                            subtitle: Text(allLesson[index].getVideoLenght() + ' min'),
+                          ),
                         ),
                       ),
                       Row(
