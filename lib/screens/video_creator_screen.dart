@@ -615,6 +615,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
   }
 
   void saveDraftDataAndExit() async {
+    if (showSpinner) return;
     bool isEdited = false;
 
     if (currentStep != 0 || _firstStepFormKey.currentState.validate()) {
@@ -677,6 +678,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
   }
 
   void saveDraftAsLesson() async {
+    if (showSpinner) return;
     if (widget.videoData == null && !isAlreadySavedAsDraft) {
       saveLessonDataAndExit();
     } else {
