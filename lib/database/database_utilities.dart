@@ -110,7 +110,8 @@ class DatabaseUtilities {
           'videoStartPoint': question.getVideoStartTime(),
           'videoEndPoint': question.getVideoEndTime(),
           'answerStartPoint': question.getAnswerStartTime(),
-          'answerEndPoint': question.getAnswerEndTime()
+          'answerEndPoint': question.getAnswerEndTime(),
+          'questionIndex': question.questionIndex,
         });
       }
 
@@ -157,7 +158,8 @@ class DatabaseUtilities {
         'videoStartPoint': question.getVideoStartTime(),
         'videoEndPoint': question.getVideoEndTime(),
         'answerStartPoint': question.getAnswerStartTime(),
-        'answerEndPoint': question.getAnswerEndTime()
+        'answerEndPoint': question.getAnswerEndTime(),
+        'questionIndex': question.questionIndex,
       });
     }
 
@@ -519,15 +521,27 @@ class DatabaseUtilities {
             videoStartPoint: data['videoStartPoint'],
             videoEndPoint: data['videoEndPoint'],
             answerStartPoint: data['answerStartPoint'],
+            questionIndex: data['questionIndex'],
             answerEndPoint: data['answerEndPoint']));
       }
 
+      lesson.questionsList.sort(questionSortFunc);
       lessonsList.add(lesson);
     }
     if (lessonsList.length == 0) {
       lastOrderedLessonDocument = null;
     }
     return lessonsList;
+  }
+
+  int questionSortFunc(QuestionDB question2, QuestionDB question1) {
+    if (question1.questionIndex < question2.questionIndex) {
+      return 1;
+    } else if (question1.questionIndex > question2.questionIndex) {
+      return -1;
+    } else {
+      return 0;
+    }
   }
 
 //////////////////////////////////////////////////////////////
@@ -687,7 +701,8 @@ class DatabaseUtilities {
         'videoStartPoint': question.getVideoStartTime(),
         'videoEndPoint': question.getVideoEndTime(),
         'answerStartPoint': question.getAnswerStartTime(),
-        'answerEndPoint': question.getAnswerEndTime()
+        'answerEndPoint': question.getAnswerEndTime(),
+        'questionIndex': question.questionIndex,
       });
     }
 
@@ -759,7 +774,8 @@ class DatabaseUtilities {
           'videoStartPoint': question.getVideoStartTime(),
           'videoEndPoint': question.getVideoEndTime(),
           'answerStartPoint': question.getAnswerStartTime(),
-          'answerEndPoint': question.getAnswerEndTime()
+          'answerEndPoint': question.getAnswerEndTime(),
+          'questionIndex': question.questionIndex,
         });
       }
 
@@ -814,9 +830,11 @@ class DatabaseUtilities {
             videoStartPoint: data['videoStartPoint'],
             videoEndPoint: data['videoEndPoint'],
             answerStartPoint: data['answerStartPoint'],
+            questionIndex: data['questionIndex'],
             answerEndPoint: data['answerEndPoint']));
       }
 
+      lesson.questionsList.sort(questionSortFunc);
       lessonsList.add(lesson);
     }
     return lessonsList;

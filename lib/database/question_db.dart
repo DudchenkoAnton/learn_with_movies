@@ -7,6 +7,7 @@ class QuestionDB {
   int videoEndPoint;
   int answerStartPoint;
   int answerEndPoint;
+  int questionIndex;
 
   QuestionDB(
       {this.videoURL,
@@ -16,6 +17,7 @@ class QuestionDB {
       this.videoEndPoint,
       this.videoStartPoint,
       this.answerStartPoint = 0,
+      this.questionIndex = 0,
       this.answerEndPoint = 0});
 
   bool isAnswerVideoAdded() {

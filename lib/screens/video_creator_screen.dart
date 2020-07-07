@@ -325,7 +325,9 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                                     videoData: currentLesson,
                                   )));
                       if (newQuestion != null && newQuestion is QuestionDB) {
+                        newQuestion.questionIndex = currentLesson.questionsList.length;
                         currentLesson.addQuestion(newQuestion);
+                        //TODO: here I eliminated sorting code
                         currentLesson.questionsList.sort(questionSortFunc);
                         setState(() {
                           shouldValidateThird = false;
@@ -803,12 +805,18 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   int questionSortFunc(QuestionDB question2, QuestionDB question1) {
-    if (question1.getVideoStartTime() < question2.getVideoStartTime()) {
+    if (question1.questionIndex < question2.questionIndex) {
       return 1;
-    } else if (question1.getVideoStartTime() > question2.getVideoStartTime()) {
+    } else if (question1.questionIndex > question2.questionIndex) {
       return -1;
     } else {
       return 0;
+    }
+  }
+
+  void updateQuestionIndexes() {
+    for (int i = 0; i < currentLesson.questionsList.length; i++) {
+      currentLesson.questionsList[i].questionIndex = i;
     }
   }
 
@@ -821,6 +829,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
         answerText: currentLesson.questionsList[i].answer,
         onRemove: () {
           currentLesson.questionsList.removeAt(i);
+          updateQuestionIndexes();
           setState(() {
             updateQuestionListOnScreen();
           });
@@ -835,6 +844,8 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                         question: currentLesson.questionsList[i],
                       )));
           if (editedQuestion != null && editedQuestion is QuestionDB) {
+            //TODO: here is change of questions sorting code
+            editedQuestion.questionIndex = i;
             currentLesson.questionsList.removeAt(i);
             currentLesson.questionsList.add(editedQuestion);
             currentLesson.questionsList.sort(questionSortFunc);
