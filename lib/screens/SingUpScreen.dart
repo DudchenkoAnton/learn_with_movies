@@ -79,8 +79,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             onChanged: (input) {
               setState(() => _password = input);
             },
-            validator: (input) =>
-                input.length < 6 ? 'Enter a password with 6 chars long' : null,
+            validator: (input) => input.length < 6 ? 'Enter a password with 6 chars long' : null,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -116,7 +115,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         },
         padding: EdgeInsets.only(right: 0.0),
         child: Text(
-          'Do you have alraedy account?',
+          'Do you have already account?',
           style: kLabelStyle,
         ),
       ),
@@ -131,23 +130,21 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         elevation: 5.0,
         onPressed: () async {
           if (_formKey.currentState.validate()) {
-            final newUser =
-                await _auth.signUpwithEmailAndPassword(_email, _password);
+            final newUser = await _auth.signUpwithEmailAndPassword(_email, _password);
 //            print(_email);
 //            print(newUser.toString());
             if (newUser == null) {
               setState(() {
-                error = 'please supply a valid email';
+                error = 'Please supply a valid email';
               });
               return;
             }
 
             if (await db.createUserDocument()) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => UserChooseLesson()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
             } else {
               setState(() {
-                error = 'there is problems with internet connection';
+                error = 'There is problems with internet connection';
               });
               return;
             }
