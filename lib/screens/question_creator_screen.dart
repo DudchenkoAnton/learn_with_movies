@@ -207,9 +207,9 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     _controller.addListener(() {
       if (_controller.value.position < Duration(seconds: cur_start_time_secconds)) {
         _controller.seekTo(Duration(seconds: cur_start_time_secconds));
-        _controller.pause();
+        //_controller.pause();
       } else if (_controller.value.position > Duration(seconds: cur_end_time_secconds)) {
-        _controller.seekTo(Duration(seconds: cur_end_time_secconds));
+        _controller.seekTo(Duration(seconds: cur_start_time_secconds));
         _controller.pause();
       }
     });
@@ -221,6 +221,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
     temp.setVideoStartTime(widget.videoData.getVideoStartPoint());
     temp.setVideoEndTime(widget.videoData.getVideoEndPoint());
+
   }
 
   @override
