@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:temp_project/database/auth.dart';
 import 'package:temp_project/screens/LoginScreen.dart';
+import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/screens/about_us_screen.dart';
 import 'package:temp_project/screens/lessons_list_screen.dart';
 
@@ -38,19 +39,21 @@ class SideMenu extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.create),
-            title: Text('Create Lesson'),
+            title: Text('Quizz Creator Studio'),
             onTap: ()async{
               await Navigator.push(context, MaterialPageRoute(builder: (context) => LessonsListScreen()));
-            Navigator.pop(context);
+            Navigator.of(context).pop();
+            Navigator.of(context).push(new MaterialPageRoute(builder: (_)=>new UserChooseLesson()));
             },
+
           ),
           ListTile(
               leading: Icon(Icons.info_outline),
               title: Text('About Us'),
               onTap : ()async {
                 await Navigator.push(context, MaterialPageRoute(builder: (context) => AboutUs()));
-                Navigator.pop(context);
-
+                Navigator.of(context).pop();
+                Navigator.of(context).push(new MaterialPageRoute(builder: (_)=>new UserChooseLesson()));
               }
           ),
           ListTile(

@@ -118,6 +118,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
       drawer: SideMenu(),
       body: animationOn ? create_animation() : _CardViewCheck(context),
       //_CardView(context),
+
     );
   }
 
