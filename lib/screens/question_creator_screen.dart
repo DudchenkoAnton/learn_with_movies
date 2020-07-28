@@ -246,6 +246,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
                     controller: _questionController,
                     decoration: InputDecoration(
                         enabledBorder: const OutlineInputBorder(
@@ -313,6 +315,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
                           controller: _answerController,
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
@@ -611,6 +615,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
                     controller: _questionController,
                     decoration: InputDecoration(
                         enabledBorder: const OutlineInputBorder(
@@ -632,6 +638,8 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
                     controller: _answer_open_format,
                     decoration: InputDecoration(
                         enabledBorder: const OutlineInputBorder(

@@ -158,7 +158,7 @@ class _UserAmericanQuestionsScreenState extends State<UserAmericanQuestionsScree
         _controller.seekTo(Duration(seconds: curQuestionStartPoint));
         _controller.pause();
       } else if (_controller.value.position > Duration(seconds: curQuestionEndPoint)) {
-        _controller.seekTo(Duration(seconds: curQuestionEndPoint));
+        _controller.seekTo(Duration(seconds: curQuestionStartPoint));
         _controller.pause();
       }
     });
