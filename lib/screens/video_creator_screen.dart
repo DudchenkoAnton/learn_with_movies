@@ -313,7 +313,16 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
                     style: TextStyle(fontSize: 20.0),
                   ),
                   SizedBox(height: 20.0),
-                  Column(children: _questionsList),
+//                  Column(children: _questionsList),
+                  Container(
+                    height: 380,
+                    child: ReorderableListView(
+                      onReorder: _onReorder,
+                      scrollDirection: Axis.vertical,
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      children: updateQuestionListOnScreen(),
+                    ),
+                  ),
                   SizedBox(height: 15),
                   RoundedIconButton(
                     icon: Icons.add,
@@ -361,6 +370,18 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
         ),
       ],
     );
+  }
+
+  void _onReorder(int oldIndex, int newIndex) {
+    setEditedStep();
+    setState(() {
+      if (newIndex > oldIndex) newIndex -= 1;
+      final QuestionDB container = currentLesson.questionsList.removeAt(oldIndex);
+      currentLesson.questionsList.insert(newIndex, container);
+      for (int i = 0; i < currentLesson.questionsList.length; i++) {
+        currentLesson.questionsList[i].questionIndex = i;
+      }
+    });
   }
 
   Widget lessonDataStepper() {
@@ -787,7 +808,7 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
       youtubePlayerController.pause();
     }
 
-    if (step != currentStep && (currentStep == 0 || currentStep == 1) && isSaveDraftMode && isEditedStep) {
+    if (step != currentStep && isSaveDraftMode && isEditedStep) {
       isEditedStep = false;
       saveDraftData();
     }
@@ -820,10 +841,11 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
     }
   }
 
-  void updateQuestionListOnScreen() {
+  List<Widget> updateQuestionListOnScreen() {
     _questionsList.clear();
     for (int i = 0; i < currentLesson.questionsList.length; i++) {
       _questionsList.add(QuestionDataContainer(
+        key: Key('$i'),
         numberOfQuestion: (i + 1).toString(),
         questionText: currentLesson.questionsList[i].question,
         answerText: currentLesson.questionsList[i].answer,
@@ -857,6 +879,8 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
         },
       ));
     }
+
+    return _questionsList;
   }
 
   void showAlertDialog() async {

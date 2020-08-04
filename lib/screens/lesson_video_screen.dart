@@ -5,6 +5,7 @@ import 'package:temp_project/screens/user_questions_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../database/database_utilities.dart';
 import 'user_american_questions_screen.dart';
+import 'package:temp_project/utilites/texts.dart';
 
 class LessonVideoScreen extends StatefulWidget {
   static const String id = 'lesson_video_screen';
@@ -25,6 +26,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
   YoutubePlayerController _youtubePlayerController;
   YoutubePlayer _youtubePlayer;
   DatabaseUtilities db = new DatabaseUtilities();
+  bool passedInitialDialog = false;
 
   @override
   void initState() {
@@ -53,14 +55,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
   }
 
   @override
-  void deactivate() {
-    // TODO: implement deactivate
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
-    // TODO: implement dispose
     if (_youtubePlayerController != null) _youtubePlayerController.dispose();
     super.dispose();
   }
@@ -130,7 +125,6 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
   }
 
   void proceedToQuestionsButton() {
-    // TODO: Write code for going to questions screen
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -145,10 +139,45 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
     return Scaffold(
         backgroundColor: Colors.black,
         body: Container(
-          child: Center(
-            child: _youtubePlayer,
-          ),
+          child: passedInitialDialog ? buildVideoPlayer() : buildInitialDialog(),
         ));
+  }
+
+  Widget buildVideoPlayer() {
+    return Center(
+      child: _youtubePlayer,
+    );
+  }
+
+  Widget buildInitialDialog() {
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+            child: Text(
+              tInitialLessonText,
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+          FlatButton(
+            color: Colors.lightBlue,
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            child: Text(
+              "I am ready!",
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+            onPressed: () {
+              setState(() {
+                passedInitialDialog = true;
+              });
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget generateLessonScreen(Orientation orientation) {

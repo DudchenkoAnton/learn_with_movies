@@ -7,19 +7,23 @@ class QuestionDataContainer extends StatelessWidget {
   String answerText;
   Function onEdit;
   Function onRemove;
+  final Key key;
 
   QuestionDataContainer(
       {@required this.questionText,
       @required this.answerText,
       @required this.onEdit,
       @required this.onRemove,
-      @required this.numberOfQuestion});
+      @required this.numberOfQuestion,
+      @required this.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onEdit,
       child: Container(
+        height: 100,
+        width: 300,
         margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
         decoration: BoxDecoration(
           color: Colors.blueGrey[200],
@@ -27,6 +31,7 @@ class QuestionDataContainer extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SizedBox(width: 5),
             Text(
@@ -39,6 +44,7 @@ class QuestionDataContainer extends StatelessWidget {
             SizedBox(width: 10),
             Expanded(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   RichText(
                     overflow: TextOverflow.ellipsis,
