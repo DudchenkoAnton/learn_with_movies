@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/screens/UserChooseLesson.dart';
@@ -28,6 +30,9 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
   DatabaseUtilities db = new DatabaseUtilities();
   bool passedInitialDialog = false;
 
+  Timer _timer;
+  int _start = 10;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -52,14 +57,44 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
       },
       onEnded: onEndedCallback,
     );
+    startTimer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: Colors.black,
+        body: Container(
+          child: passedInitialDialog ? buildVideoPlayer() : buildInitialDialog(),
+        ));
   }
 
   @override
   void dispose() {
+    _timer.cancel();
     if (_youtubePlayerController != null) _youtubePlayerController.dispose();
     super.dispose();
   }
 
+  // This function starts counting down from 10 seconds, once user enters screen
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) => setState(
+        () {
+          if (_start < 1) {
+            timer.cancel();
+            passedInitialDialog = true;
+          } else {
+            _start = _start - 1;
+          }
+        },
+      ),
+    );
+  }
+
+  // This callback enables playing video only on chosen borders (by creator of lesson)
   void playSelectedSegmentListener() {
     if (_youtubePlayerController.value.position.inSeconds < secondsStartPoint) {
       _youtubePlayerController.seekTo(Duration(seconds: secondsStartPoint));
@@ -73,6 +108,7 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
     }
   }
 
+  // This callback shows dialog screen once lesson video is ended
   void onEndedCallback(YoutubeMetaData metaData) {
     setState(() {
       _youtubePlayerController.pause();
@@ -134,78 +170,39 @@ class _LessonVideoScreenState extends State<LessonVideoScreen> {
                 )));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.black,
-        body: Container(
-          child: passedInitialDialog ? buildVideoPlayer() : buildInitialDialog(),
-        ));
-  }
-
+  // This function builds widget of video player screen
   Widget buildVideoPlayer() {
     return Center(
       child: _youtubePlayer,
     );
   }
 
+  // This is a layout that shows initial screen with only button
   Widget buildInitialDialog() {
     return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-            child: Text(
-              tInitialLessonText,
-              style: TextStyle(color: Colors.white, fontSize: 25),
+      child: Container(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            FlatButton(
+              color: Colors.lightBlue,
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+              child: Text(
+                "Let's start! (${_start})",
+                style: TextStyle(color: Colors.white, fontSize: 25),
+              ),
+              onPressed: () {
+                setState(() {
+                  passedInitialDialog = true;
+                });
+              },
             ),
-          ),
-          FlatButton(
-            color: Colors.lightBlue,
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            child: Text(
-              "I am ready!",
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
-            onPressed: () {
-              setState(() {
-                passedInitialDialog = true;
-              });
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
-  }
-
-  Widget generateLessonScreen(Orientation orientation) {
-//    OrientationBuilder(
-//      builder: (context, orientation) {
-//        if (orientation == Orientation.landscape) {
-//          return generateLessonScreen(orientation);
-//        } else {
-//          return generateLessonScreen(orientation);
-//        }
-//      },
-//    )
-
-//    if (firstBuild) {
-//      firstBuild = false;
-//      currentOrientation = orientation;
-//    } else if (orientation != currentOrientation) {
-//      print('INSIDE THE CHANGE OF ORIENTATION MODE!!!!!+++++++++--------');
-//      currentOrientation = orientation;
-//      Duration currentDuration = _youtubePlayerController.value.position;
-//      _youtubePlayerController = YoutubePlayerController(initialVideoId: widget.lessonData.videoID);
-//      _youtubePlayerController.seekTo(currentDuration);
-//      _youtubePlayerController.addListener(playSelectedSegmentListener);
-//    }
-
-    return Container(
-        child: Center(
-      child: _youtubePlayer,
-    ));
   }
 }
