@@ -30,16 +30,13 @@ class QuestionDataContainer extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            SizedBox(width: 5),
-            Text(
-              numberOfQuestion,
-              style: TextStyle(
-                fontSize: 40,
-                color: Colors.grey[800],
-              ),
+            SizedBox(width: 10),
+            Icon(
+              Icons.dehaze,
+              size: 30,
             ),
             SizedBox(width: 10),
             Expanded(
@@ -67,12 +64,15 @@ class QuestionDataContainer extends StatelessWidget {
             SizedBox(width: 10),
             Container(
               height: 65.0,
-              width: 2.0,
-              color: Colors.grey[800],
+              width: 1.5,
               margin: const EdgeInsets.only(left: 5.0, right: 5.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: Colors.grey[800],
+              ),
             ),
             Container(
-              width: 38,
+              width: 35,
               child: Column(
                 children: <Widget>[
                   RoundedIconButton(
@@ -98,29 +98,3 @@ class QuestionDataContainer extends StatelessWidget {
     );
   }
 }
-
-//Expanded(
-//child: Container(
-//child: Text(
-//questionText,
-//style: TextStyle(fontSize: 15),
-//),
-//padding: EdgeInsets.only(left: 15)),
-//flex: 2,
-//),
-//Expanded(
-//child: Text(answerText, style: TextStyle(fontSize: 15)),
-//flex: 2,
-//),
-//Row(children: <Widget>[
-//RoundedIconButton(
-//icon: Icons.edit,
-//color: Colors.blueGrey[200],
-//onPressed: onEdit,
-//),
-//RoundedIconButton(
-//icon: Icons.delete_forever,
-//color: Colors.blueGrey[200],
-//onPressed: onRemove,
-//),
-//])
