@@ -8,6 +8,7 @@ import 'package:temp_project/database/lesson_db.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/lesson_video_screen.dart';
 import 'package:temp_project/database/auth.dart';
+import 'package:temp_project/utilites/category_object.dart';
 import 'package:temp_project/utilites/constants.dart';
 import '../database/database_utilities.dart';
 import '../database/database_utilities.dart';
@@ -37,6 +38,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   bool change_category = false;
   List<String> moviesSeen = [];
   bool showSpinner=false;
+  Category categoryObject=new Category();
 
 
   @override
@@ -162,17 +164,6 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
   }
 
   List<int> generateNumbers() => List<int>.generate(labels.length, (i) => i + 1);
-  List<Color> colorButton = [
-    Colors.yellow[700],
-    Colors.pink,
-    Colors.deepPurpleAccent,
-    Colors.cyan,
-    Colors.deepOrange,
-    Colors.lightGreen,
-    Colors.purpleAccent
-  ];
-  List<Color> colorRangeButton = [Colors.grey[700],Colors.white, Colors.white, Colors.white, Colors.white, Colors.white, Colors.white];
-  List<bool> isPress = [true,false, false, false, false, false, false];
 
   Widget _CardViewCheck(context) {
     return ModalProgressHUD(
@@ -188,7 +179,7 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                 child: ListView.builder(
                     shrinkWrap: true,
                     controller: _scrollController_2,
-                    itemCount: labels.length,
+                    itemCount: categoryObject.sizeCategory(),
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
@@ -197,52 +188,45 @@ class _BodyBestMovieState extends State<BodyBestMovie> {
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(color: colorRangeButton[index]),
+                              side: BorderSide(color: categoryObject.colorR(index)),
                             ),
-                            color: colorButton[index],
+                            color: categoryObject.colorB(index),
                             child: Center(
                               child: Text(
-                                labels[index],
+                                categoryObject.nameCategoryForUser(index),
                                 style: TextStyle(color: Colors.white, fontSize: 14.0),
                               ),
                             ),
                             onPressed: () async {
-                              if (!isPress[index]) {
-                                //the button is on
+                              if (!categoryObject.isPressIndex(index)) {
+                                //the button is off
                                 setState(() {
-                                  if (isPress.contains(true)) {
-                                    int index_last_press = isPress.indexOf(true);
-                                    isPress[index_last_press] = false;
-                                    colorRangeButton[index_last_press] = Colors.white;
-                                  }
-                                  colorRangeButton[index] = Colors.grey[700];
+                                  int index_last_press = categoryObject.indexTrue();
+                                  categoryObject.changePress(index_last_press,false);
+                                  categoryObject.changeColor(index_last_press, Colors.white);
+                                  categoryObject.changeColor(index,  Colors.grey[700]);
                                   categories.clear();
-                                  if (labels[index]!='All') {
-                                    categories.add(labels[index]);
+                                  if (index!=0) {
+                                    categories.add(categoryObject.nameCategoryForUser(index));
                                   }
-                                  isPress[index] = true;
+                                  categoryObject.changePress(index,true);
                                   change_category = true;
                                 });
                                 await refreshAllVideos();
                                 setState(() {
                                   if (categories.isEmpty){
-                                    isPress[index]=false;
-                                    isPress[0]=true;
-                                    colorRangeButton[index] = Colors.white;
-                                    colorRangeButton[0] = Colors.grey[700];
+                                    categoryObject.turn_to_start(index);
 
                                   }
                                   change_category = false;
                                 });
-                              } else if (isPress[index]) {
-                                if (labels[index]!='All') {
-                                  //the button is off!
+                              } else if (categoryObject.isPressIndex(index)) {
+                                //the button is on!
+                                if (index!=0) {
+                                  //turn the button to off!
                                   setState(() {
-                                    colorRangeButton[index] = Colors.white;
-                                    colorRangeButton[0]=Colors.grey[700];
-                                    categories.remove(labels[index]);
-                                    isPress[index] = false;
-                                    isPress[0] = true;
+                                    categoryObject.turn_to_start(index);
+                                    categories.remove(categoryObject.nameCategoryForUser(index));
                                     change_category = true;
                                   });
                                   await refreshAllVideos();
