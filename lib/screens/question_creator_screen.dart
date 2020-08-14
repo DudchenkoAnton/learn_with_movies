@@ -9,7 +9,7 @@ import 'package:temp_project/components/video_range_slider_new.dart';
 
 class QuestionCreatorScreen extends StatefulWidget {
   static const String id = 'question_creator_screen';
-   QuestionDB question;
+  QuestionDB question;
   final LessonDB videoData;
 
   QuestionCreatorScreen({Key key, this.question, @required this.videoData}) : super(key: key);
@@ -108,9 +108,9 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => AnswerSegmentScreen(
-                  videoData: widget.videoData,
-                  question: question_cur,
-                )));
+              videoData: widget.videoData,
+              question: question_cur,
+            )));
     temp.setAnswerEndTime(question_cur.getAnswerEndTime());
     temp.setAnsewerStartTime(question_cur.getAnswerStartTime());
   }
@@ -150,13 +150,58 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
     }
 
     temp.setVideoURL(widget.videoData.videoURL);
-    Navigator.pop(context, temp);
+
+    bool is_data_full = false;
+
+    if (temp.americanAnswers.length == 0) {
+      if (_questionController.text.length > 0 && _answer_open_format.text.length > 0) {
+        is_data_full = true;
+      }
+    }
+    else {
+      if (_questionController.text.length > 0 && _answerController.text.length > 0 &&
+          _answerController2.text.length > 0 && _answerController3.text.length > 0 &&
+          _answerController4.text.length > 0) {
+        is_data_full = true;
+      }
+    }
+
+    if (is_data_full == true) {
+      Navigator.pop(context, temp);
+    }
+    else {
+      _showDialog();
+    }
 
     print("Add question:" + _questionController.text);
     print("Add answer:" + _answerController.text);
 
     print(startAt[0].inSeconds.toString());
     print(endAt[0].inSeconds.toString());
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Please fill the missing data to create a question"),
+          content: new Text(""),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+
+            FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -169,12 +214,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
   @override
   void initState() {
-
     widgetless_fix = widget.videoData.getVideoStartPoint();
 
     videoLengthOriginal =
         Duration(seconds: widget.videoData.getVideoEndPoint() - widget.videoData.getVideoStartPoint());
-
+    ///// *****************************
     if (widget.question == null) {
       cur_start_time_secconds = widget.videoData.getVideoStartPoint();
       cur_end_time_secconds = widget.videoData.getVideoEndPoint();
@@ -191,8 +235,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
       }
 
       _questionController.text = widget.question.question;
+      ///// *****************************
       cur_start_time_secconds = widget.question.getVideoStartTime();
       cur_end_time_secconds = widget.question.getVideoEndTime();
+      print("Answer start time - ${cur_start_time_secconds}");
+      print("Answer start time - ${cur_end_time_secconds}");
     }
 
     //TODO: update videoLengthOriginal, startAt, endAt, depending on received video data
@@ -217,11 +264,17 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
 
     selectedWidget = Container();
 
+    ///// *****************************
     lenght_cur = cur_end_time_secconds - cur_start_time_secconds;
 
-    temp.setVideoStartTime(widget.videoData.getVideoStartPoint());
-    temp.setVideoEndTime(widget.videoData.getVideoEndPoint());
-
+    ///// *****************************
+    if (widget.question == null) {
+      temp.setVideoStartTime(widget.videoData.getVideoStartPoint());
+      temp.setVideoEndTime(widget.videoData.getVideoEndPoint());
+    } else {
+      temp.setVideoStartTime(widget.question.getVideoStartTime());
+      temp.setVideoEndTime(widget.question.getVideoEndTime());
+    }
   }
 
   @override
@@ -311,12 +364,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Expanded(
+                    Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
-                          keyboardType: TextInputType.multiline,
-                          maxLines: null,
+
                           controller: _answerController,
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
@@ -371,7 +423,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Expanded(
+                    Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
@@ -429,7 +481,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Expanded(
+                    Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
@@ -485,7 +537,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Expanded(
+                    Flexible (
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
@@ -598,13 +650,13 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
         startAt[0] = Duration(seconds: widget.videoData.getVideoStartPoint());
         endAt[0] = Duration(seconds: widget.videoData.getVideoEndPoint());
         //if (widget.question == null) {
-          //cur_start_time_secconds = widget.videoData.getVideoStartPoint();
-          //cur_end_time_secconds = widget.videoData.getVideoEndPoint();
+        //cur_start_time_secconds = widget.videoData.getVideoStartPoint();
+        //cur_end_time_secconds = widget.videoData.getVideoEndPoint();
         //}
         //else {
-         // cur_start_time_secconds = widget.question.getVideoStartTime();
-         // cur_end_time_secconds = widget.question.getVideoEndTime();
-       // }
+        // cur_start_time_secconds = widget.question.getVideoStartTime();
+        // cur_end_time_secconds = widget.question.getVideoEndTime();
+        // }
 
         question_creation_text = "";
         format_of_question = 2;
@@ -672,11 +724,11 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Text(
-                  'Range video for answer',
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-                ),),
+                    'Range video for answer',
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  ),),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -687,7 +739,7 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                               length: videoLengthOriginal,
                             ),
                              */
-   
+
                 VideoRangeSliderNew(
                   secondsStartPoint: cur_start_time_secconds,
                   secondsEndPoint: cur_end_time_secconds,
