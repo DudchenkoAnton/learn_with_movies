@@ -5,6 +5,7 @@ import 'package:temp_project/components/rounded_icon_button.dart';
 import 'package:temp_project/components/video_range_slider_new.dart';
 import 'package:temp_project/database/database_utilities.dart';
 import 'package:temp_project/screens/question_creator_screen.dart';
+import 'package:temp_project/utilites/category_object.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:temp_project/utilites/constants.dart';
 import 'package:temp_project/components/expanded_chekbox_list.dart';
@@ -410,6 +411,10 @@ class _VideoCreatorScreenState extends State<VideoCreatorScreen> with TickerProv
   @override
   void initState() {
     super.initState();
+
+    Category tempCatObj = Category();
+    checkBoxLabels = tempCatObj.getCategoriesListLessonCreator();
+    checkBoxValues = tempCatObj.getIsPressListLessonCreator();
 
     youtubeHelper = YoutubeNetworkHelper();
     if (widget.videoData == null) {

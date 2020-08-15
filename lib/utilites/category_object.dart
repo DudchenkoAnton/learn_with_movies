@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-class Category{
-  List<String> name_category=[];
-  List<Color> colorRangeButton=[Colors.grey[700]];
-  List<bool> isPress=[true];
+
+class Category {
+  List<String> name_category = [];
+  List<Color> colorRangeButton = [Colors.grey[700]];
+  List<bool> isPress = [true];
   List<Color> colorButton = [
     Colors.yellow[700],
     Colors.pink,
@@ -14,58 +15,69 @@ class Category{
     Colors.cyanAccent,
     Colors.pink[100],
   ];
-  Category(){
-       name_category=['Medicine', 'Law', 'Entertainment', 'Sport', 'History', 'Music','Business','Technology'];
+  Category() {
+    name_category = ['Medicine', 'Law', 'Entertainment', 'Sport', 'History', 'Music', 'Business', 'Technology'];
 
-       for (int i=0;i<name_category.length;i++){
-         colorRangeButton.add(Colors.white);
-       }
-       for (int i=0;i<name_category.length;i++){
-         isPress.add(false);
-       }
+    for (int i = 0; i < name_category.length; i++) {
+      colorRangeButton.add(Colors.white);
+    }
+    for (int i = 0; i < name_category.length; i++) {
+      isPress.add(false);
+    }
   }
-  void changeColor(int i,Color c){
-      colorRangeButton[i]=c;
+  void changeColor(int i, Color c) {
+    colorRangeButton[i] = c;
   }
-  void changePress(int i ,bool b){
-    isPress[i]=b;
+
+  void changePress(int i, bool b) {
+    isPress[i] = b;
   }
-  int indexTrue(){
+
+  int indexTrue() {
     return isPress.indexOf(true);
   }
-  Color colorB(int i){
+
+  Color colorB(int i) {
     return colorButton[i];
   }
-  Color colorR(int i){
+
+  Color colorR(int i) {
     return colorRangeButton[i];
   }
-  bool isPressIndex(int i){
+
+  bool isPressIndex(int i) {
     return isPress[i];
   }
 
-
-  String nameCategoryForUser(int i){
-    if (i==0){
+  String nameCategoryForUser(int i) {
+    if (i == 0) {
       return 'All';
+    } else {
+      return name_category[i - 1];
     }
-    else{
-      return name_category[i-1];
+  }
+
+  void turn_to_start(int i) {
+    colorRangeButton[i] = Colors.white;
+    colorRangeButton[0] = Colors.grey[700];
+    isPress[i] = false;
+    isPress[0] = true;
+  }
+
+  int sizeCategory() {
+    return name_category.length + 1;
+  }
+
+  List<String> getCategoriesListLessonCreator() {
+    return name_category;
+  }
+
+  List<bool> getIsPressListLessonCreator() {
+    List<bool> isPressedList = [];
+    for (int i = 0; i < name_category.length; i++) {
+      isPressedList.add(false);
     }
+
+    return isPressedList;
   }
-
-  void turn_to_start(int i){
-
-    colorRangeButton[i]=Colors.white;
-    colorRangeButton[0]=Colors.grey[700];
-    isPress[i]=false;
-    isPress[0]=true;
-
-  }
-  int sizeCategory(){
-    return name_category.length+1;
-  }
-
-
-
-
 }
