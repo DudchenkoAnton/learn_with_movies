@@ -364,10 +364,10 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Flexible(
+                    Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        child: TextFormField(minLines: 2, maxLines: 2,
 
                           controller: _answerController,
                           decoration: InputDecoration(
@@ -423,10 +423,10 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Flexible(
+                    Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        child: TextFormField(minLines: 2, maxLines: 2,
                           controller: _answerController2,
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
@@ -481,10 +481,10 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Flexible(
+                    Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        child: TextFormField(minLines: 2, maxLines: 2,
                           controller: _answerController3,
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
@@ -537,10 +537,10 @@ class _QuestionCreatorScreenState extends State<QuestionCreatorScreen> {
                       padding: EdgeInsets.all(15.0),
                       shape: CircleBorder(),
                     ),
-                    Flexible (
+                    Expanded (
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
+                        child: TextFormField(minLines: 2, maxLines: 2,
                           controller: _answerController4,
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
