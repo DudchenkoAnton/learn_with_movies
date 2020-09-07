@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "373264932203-3ebbkfudem7q285qccg6uuvlhoc50fq7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.universityproject.learnwithmovies",
+            "certificate_hash": "45c300a2707277aeb9b1975a0ea20468aac4d5de"
+          }
+        },
+        {
+          "client_id": "373264932203-4n5io2gdlvt6t3q7bjakjg3njp229800.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.universityproject.learnwithmovies",
+            "certificate_hash": "5c019eeeb7d74b4e3377de71b18969e5afb1cf00"
+          }
+        },
+        {
+          "client_id": "373264932203-os41msibqab18jgmd4acm7h5f5kov1sl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.universityproject.learnwithmovies",
+            "certificate_hash": "7da5e83856217f84e431c673e639767a26c395b8"
+          }
+        },
+        {
           "client_id": "373264932203-uec2asaf3l7e3t1aun7e8v7g7d02ov85.apps.googleusercontent.com",
           "client_type": 3
         }

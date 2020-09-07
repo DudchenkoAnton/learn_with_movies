@@ -5,6 +5,7 @@ import 'package:temp_project/screens/Forget_Password_Screen.dart';
 import 'package:temp_project/screens/SingUpScreen.dart';
 import 'package:temp_project/screens/UserChooseLesson.dart';
 import 'package:temp_project/utilites/constants.dart';
+import 'package:temp_project/utilites/sign_in_google.dart';
 
 class LoginScreen extends StatefulWidget {
   String emailReset;
@@ -129,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginBtn() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 25.0),
+      padding: EdgeInsets.symmetric(vertical: 20.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
@@ -175,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
               text: 'Don\'t have an Account?\n',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18.0,
+                fontSize: 14.0,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -183,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
               text: 'Quick Sign Up, it is completely free!',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18.0,
+                fontSize: 14.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -237,6 +238,68 @@ class _LoginScreenState extends State<LoginScreen> {
     await Navigator.push(context, MaterialPageRoute(builder: (context) => CreateUserScreen()));
   }
 
+  Widget _buildGoogleSignInButton() {
+    return FlatButton(
+      color: Colors.white,
+      splashColor: Colors.grey,
+      onPressed: () {
+        signInWithGoogle().then((user) {
+          if (user != null) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => UserChooseLesson()));
+          }
+        });
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(image: AssetImage("images/google_logo.png"), height: 35.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                'Sign in with Google',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLineDivider() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 25),
+      child: Row(children: <Widget>[
+        Expanded(
+          child: new Container(
+              margin: const EdgeInsets.only(right: 20.0),
+              child: Divider(
+                thickness: 0.8,
+                color: Colors.white,
+                height: 36,
+              )),
+        ),
+        Text("OR", style: TextStyle(color: Colors.white, fontSize: 16)),
+        Expanded(
+          child: new Container(
+              margin: const EdgeInsets.only(left: 20.0),
+              child: Divider(
+                thickness: 0.8,
+                color: Colors.white,
+                height: 36,
+              )),
+        ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -271,7 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(
                       horizontal: 40.0,
-                      vertical: 90.0,
+                      vertical: 70.0,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -280,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: messageReset(),
                           visible: widget.emailReset == "" ? false : true,
                         ),
-                        SizedBox(height: 20.0),
+                        SizedBox(height: 10.0),
                         Text(
                           'Sign In',
                           style: TextStyle(
@@ -290,29 +353,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 30.0),
+                        SizedBox(height: 10.0),
                         _buildEmailTF(),
-                        SizedBox(
-                          height: 30.0,
-                        ),
+                        SizedBox(height: 10.0),
                         _buildPasswordTF(),
                         _buildForgotPasswordBtn(),
                         _buildLoginBtn(),
-                        SizedBox(
-                          height: 3.0,
-                        ),
                         Text(
                           _error,
                           style: TextStyle(
-                            color: Colors.red,
+                            color: Colors.red[700],
                             fontFamily: 'OpenSans',
                             fontSize: 15.0,
                           ),
                         ),
-                        SizedBox(
-                          height: 6.0,
-                        ),
+                        SizedBox(height: 6.0),
                         _buildSignupBtn(),
+                        _buildLineDivider(),
+                        SizedBox(height: 10),
+                        _buildGoogleSignInButton()
                       ],
                     ),
                   ),
